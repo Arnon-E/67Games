@@ -15,11 +15,13 @@ import '../widgets/game_button.dart';
 class _Particle {
   double x, y, vx, vy, alpha, size;
   final Color color;
+  final bool isStar;
   _Particle({
     required this.x, required this.y,
     required this.vx, required this.vy,
     required this.alpha, required this.size,
     required this.color,
+    this.isStar = false,
   });
 }
 
@@ -36,11 +38,12 @@ class _FireworksOverlayState extends State<_FireworksOverlay>
   final List<_Particle> _particles = [];
   final Random _rng = Random();
   int _burstCount = 0;
-  static const int _maxBursts = 6;
+  static const int _maxBursts = 12;
 
   static const List<Color> _colors = [
     Color(0xFFFFD700), Color(0xFFFF6B35), Color(0xFF00DDFF),
     Color(0xFF00FF88), Color(0xFFFF00CC), Color(0xFFFFFFFF),
+    Color(0xFFFF3366), Color(0xFF66FF33), Color(0xFF9933FF),
   ];
 
   @override
@@ -48,7 +51,7 @@ class _FireworksOverlayState extends State<_FireworksOverlay>
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 4),
+      duration: const Duration(seconds: 6),
     )..addListener(_tick);
     _controller.forward();
   }
@@ -66,35 +69,51 @@ class _FireworksOverlayState extends State<_FireworksOverlay>
 
     // Update particles
     setState(() {
+      final newParticles = <_Particle>[];
       for (final p in _particles) {
         p.x += p.vx;
         p.y += p.vy;
-        p.vy += 0.15; // gravity
-        p.vx *= 0.98; // drag
-        p.alpha -= 0.012;
+        p.vy += 0.12; // gravity
+        p.vx *= 0.97; // drag
+        p.alpha -= 0.008;
+
+        // Sparkle trail: randomly spawn small child particles
+        if (_rng.nextDouble() < 0.05 && p.alpha > 0.3) {
+          newParticles.add(_Particle(
+            x: p.x,
+            y: p.y,
+            vx: (_rng.nextDouble() - 0.5) * 0.5,
+            vy: (_rng.nextDouble() - 0.5) * 0.5,
+            alpha: p.alpha * 0.6,
+            size: p.size * 0.4,
+            color: p.color,
+          ));
+        }
       }
+      _particles.addAll(newParticles);
       _particles.removeWhere((p) => p.alpha <= 0);
     });
   }
 
   void _spawnBurst() {
     final size = MediaQuery.of(context).size;
-    final x = 0.2 + _rng.nextDouble() * 0.6; // 20–80% width
-    final y = 0.1 + _rng.nextDouble() * 0.4; // 10–50% height
+    final x = 0.1 + _rng.nextDouble() * 0.8; // 10–90% width
+    final y = 0.05 + _rng.nextDouble() * 0.5; // 5–55% height
     final color = _colors[_rng.nextInt(_colors.length)];
-    const count = 40;
+    const count = 60;
 
     for (int i = 0; i < count; i++) {
       final angle = (i / count) * 2 * pi;
-      final speed = 2.0 + _rng.nextDouble() * 4.0;
+      final speed = 2.0 + _rng.nextDouble() * 5.0;
       _particles.add(_Particle(
         x: x * size.width,
         y: y * size.height,
         vx: cos(angle) * speed,
         vy: sin(angle) * speed,
         alpha: 1.0,
-        size: 2.0 + _rng.nextDouble() * 3.0,
+        size: 2.0 + _rng.nextDouble() * 4.0,
         color: color,
+        isStar: _rng.nextDouble() < 0.3,
       ));
     }
   }
@@ -126,12 +145,251 @@ class _ParticlePainter extends CustomPainter {
       final paint = Paint()
         ..color = p.color.withValues(alpha: p.alpha.clamp(0.0, 1.0))
         ..style = PaintingStyle.fill;
-      canvas.drawCircle(Offset(p.x, p.y), p.size, paint);
+      if (p.isStar) {
+        _drawStar(canvas, Offset(p.x, p.y), p.size * 1.5, paint);
+      } else {
+        canvas.drawCircle(Offset(p.x, p.y), p.size, paint);
+      }
     }
+  }
+
+  void _drawStar(Canvas canvas, Offset center, double radius, Paint paint) {
+    final path = Path();
+    const points = 4;
+    for (int i = 0; i < points * 2; i++) {
+      final r = i.isEven ? radius : radius * 0.4;
+      final angle = (i * pi / points) - pi / 2;
+      final point = Offset(center.dx + r * cos(angle), center.dy + r * sin(angle));
+      if (i == 0) {
+        path.moveTo(point.dx, point.dy);
+      } else {
+        path.lineTo(point.dx, point.dy);
+      }
+    }
+    path.close();
+    canvas.drawPath(path, paint);
   }
 
   @override
   bool shouldRepaint(_ParticlePainter old) => true;
+}
+
+// ── Color-shifting celebration background ────────────────────
+
+class _CelebrationBackground extends StatefulWidget {
+  final Widget child;
+  const _CelebrationBackground({required this.child});
+
+  @override
+  State<_CelebrationBackground> createState() => _CelebrationBackgroundState();
+}
+
+class _CelebrationBackgroundState extends State<_CelebrationBackground>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+
+  static const List<List<Color>> _colorSets = [
+    [Color(0xFF0a0a2f), Color(0xFF1a0a4e), Color(0xFF2a0a3e)],
+    [Color(0xFF0a1a3f), Color(0xFF0a2a5e), Color(0xFF1a0a4e)],
+    [Color(0xFF1a0a2e), Color(0xFF2a0a4e), Color(0xFF0a1a3e)],
+    [Color(0xFF0a0a3f), Color(0xFF1a1a5e), Color(0xFF2a0a2e)],
+    [Color(0xFF0a1a2e), Color(0xFF0a2a3e), Color(0xFF1a0a4e)],
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 8),
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) {
+        final t = _controller.value;
+        final idx = (t * _colorSets.length).floor() % _colorSets.length;
+        final nextIdx = (idx + 1) % _colorSets.length;
+        final blend = (t * _colorSets.length) - idx;
+
+        final colors = List.generate(3, (i) =>
+          Color.lerp(_colorSets[idx][i], _colorSets[nextIdx][i], blend)!,
+        );
+
+        return Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: colors,
+              stops: const [0.0, 0.5, 1.0],
+            ),
+          ),
+          child: child,
+        );
+      },
+      child: widget.child,
+    );
+  }
+}
+
+// ── Floating emoji confetti ──────────────────────────────────
+
+class _EmojiConfetti extends StatefulWidget {
+  const _EmojiConfetti();
+
+  @override
+  State<_EmojiConfetti> createState() => _EmojiConfettiState();
+}
+
+class _EmojiConfettiState extends State<_EmojiConfetti>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  final Random _rng = Random();
+  late final List<_FloatingEmoji> _emojis;
+
+  static const List<String> _emojiPool = [
+    '🎉', '⭐', '🌟', '✨', '💫', '🔥', '🎯', '🏆', '💎', '🎊',
+    '🌈', '⚡', '💥', '🎮', '🥳',
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    _emojis = List.generate(18, (_) => _FloatingEmoji(
+      emoji: _emojiPool[_rng.nextInt(_emojiPool.length)],
+      x: _rng.nextDouble(),
+      startY: 1.0 + _rng.nextDouble() * 0.3,
+      speed: 0.15 + _rng.nextDouble() * 0.25,
+      wobbleSpeed: 1.0 + _rng.nextDouble() * 2.0,
+      wobbleAmount: 0.02 + _rng.nextDouble() * 0.04,
+      size: 18 + _rng.nextDouble() * 16,
+      delay: _rng.nextDouble() * 0.4,
+    ));
+
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 6),
+    )..forward();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, _) {
+        final t = _controller.value;
+        return IgnorePointer(
+          child: ExcludeSemantics(
+            child: Stack(
+              children: _emojis.where((e) => t > e.delay).map((e) {
+              final progress = ((t - e.delay) / (1.0 - e.delay)).clamp(0.0, 1.0);
+              final y = e.startY - progress * (e.startY + 0.3) * e.speed / 0.2;
+              final x = e.x + sin(progress * e.wobbleSpeed * 2 * pi) * e.wobbleAmount;
+              final opacity = progress < 0.1
+                  ? progress / 0.1
+                  : progress > 0.7
+                      ? (1.0 - progress) / 0.3
+                      : 1.0;
+
+              return Positioned(
+                left: x * MediaQuery.of(context).size.width,
+                top: y * MediaQuery.of(context).size.height,
+                child: Opacity(
+                  opacity: opacity.clamp(0.0, 1.0),
+                  child: Text(
+                    e.emoji,
+                    style: TextStyle(fontSize: e.size),
+                  ),
+                ),
+              );
+            }).toList(),
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _FloatingEmoji {
+  final String emoji;
+  final double x, startY, speed, wobbleSpeed, wobbleAmount, size, delay;
+  const _FloatingEmoji({
+    required this.emoji,
+    required this.x,
+    required this.startY,
+    required this.speed,
+    required this.wobbleSpeed,
+    required this.wobbleAmount,
+    required this.size,
+    required this.delay,
+  });
+}
+
+// ── Bouncy score wrapper ─────────────────────────────────────
+
+class _BouncyScore extends StatefulWidget {
+  final Widget child;
+  const _BouncyScore({required this.child});
+
+  @override
+  State<_BouncyScore> createState() => _BouncyScoreState();
+}
+
+class _BouncyScoreState extends State<_BouncyScore>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _scaleAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 800),
+    );
+    _scaleAnimation = TweenSequence<double>([
+      TweenSequenceItem(tween: Tween(begin: 0.0, end: 1.15), weight: 40),
+      TweenSequenceItem(tween: Tween(begin: 1.15, end: 0.92), weight: 20),
+      TweenSequenceItem(tween: Tween(begin: 0.92, end: 1.05), weight: 20),
+      TweenSequenceItem(tween: Tween(begin: 1.05, end: 1.0), weight: 20),
+    ]).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
+    _controller.forward();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _scaleAnimation,
+      builder: (context, child) => Transform.scale(
+        scale: _scaleAnimation.value,
+        child: child,
+      ),
+      child: widget.child,
+    );
+  }
 }
 
 // ── Results screen ───────────────────────────────────────────
@@ -202,88 +460,121 @@ class _ResultsScreenState extends State<ResultsScreen> {
     final isPerfect = deviation == 0;
     final showFireworks = _isExcellent(result.rating.tier);
 
+    // Use celebration background for excellent+, regular background otherwise
+    final Widget background = showFireworks
+        ? _CelebrationBackground(
+            child: SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: _buildResultContent(context, gs, l10n, result, isPerfect,
+                    isPersonalBest, isNearMiss, showFireworks),
+              ),
+            ),
+          )
+        : AppGradientBackground(
+            child: SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: _buildResultContent(context, gs, l10n, result, isPerfect,
+                    isPersonalBest, isNearMiss, showFireworks),
+              ),
+            ),
+          );
+
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: Stack(
         children: [
-          AppGradientBackground(
-            child: SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24),
-                child: Column(
-                  children: [
-                    const SizedBox(height: 24),
-
-                    // Badges
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        if (isPerfect)
-                          _badge(l10n.resultsPerfectStop, const Color(0xFFFFD700)),
-                        if (isPersonalBest && !isPerfect)
-                          _badge(l10n.resultsPersonalBest, const Color(0xFFFF6B35)),
-                        if (isNearMiss && !isPersonalBest && !isPerfect)
-                          _badge(l10n.resultsNearMiss, Colors.white54),
-                      ],
-                    ),
-                    if (isPerfect || isPersonalBest || isNearMiss)
-                      const SizedBox(height: 16),
-
-                    const Spacer(),
-
-                    ScoreDisplay(result: result),
-
-                    const SizedBox(height: 40),
-
-                    // Detail rows
-                    _detailRow(l10n.resultsStoppedAt, formatDeviation(result.stoppedAtMs)),
-                    const SizedBox(height: 8),
-                    _detailRow(l10n.resultsDeviation, formatDeviation(result.deviationMs)),
-                    const SizedBox(height: 8),
-                    _detailRow(l10n.resultsStreak,
-                        '${gs.currentStreakValue > 1 ? "🔥 " : ""}${gs.currentStreakValue}'),
-                    const SizedBox(height: 8),
-                    _detailRow(l10n.resultsXp, '+${result.xpEarned} XP'),
-
-                    const Spacer(),
-
-                    // Action buttons
-                    GameButton(
-                      label: l10n.commonPlayAgain,
-                      onPressed: () => gs.playAgain(),
-                      width: double.infinity,
-                    ),
-                    const SizedBox(height: 12),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: GameButton(
-                            label: l10n.commonMenu,
-                            onPressed: () => gs.returnToMenu(),
-                            primary: false,
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: GameButton(
-                            label: l10n.commonShare,
-                            onPressed: () => _share(context, result, mode.name, l10n),
-                            primary: false,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 24),
-                  ],
-                ),
-              ),
-            ),
-          ),
+          background,
 
           // Fireworks overlay — only for excellent and above
           if (showFireworks) const _FireworksOverlay(),
+
+          // Emoji confetti — only for excellent and above
+          if (showFireworks) const _EmojiConfetti(),
         ],
       ),
+    );
+  }
+
+  Widget _buildResultContent(
+    BuildContext context,
+    GameState gs,
+    AppLocalizations l10n,
+    dynamic result,
+    bool isPerfect,
+    bool isPersonalBest,
+    bool isNearMiss,
+    bool showFireworks,
+  ) {
+    return Column(
+      children: [
+        const SizedBox(height: 24),
+
+        // Badges
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            if (isPerfect)
+              _badge(l10n.resultsPerfectStop, const Color(0xFFFFD700)),
+            if (isPersonalBest && !isPerfect)
+              _badge(l10n.resultsPersonalBest, const Color(0xFFFF6B35)),
+            if (isNearMiss && !isPersonalBest && !isPerfect)
+              _badge(l10n.resultsNearMiss, Colors.white54),
+          ],
+        ),
+        if (isPerfect || isPersonalBest || isNearMiss)
+          const SizedBox(height: 16),
+
+        const Spacer(),
+
+        // Bouncy score for excellent+, regular for others
+        showFireworks
+            ? _BouncyScore(child: ScoreDisplay(result: result))
+            : ScoreDisplay(result: result),
+
+        const SizedBox(height: 40),
+
+        // Detail rows
+        _detailRow(l10n.resultsStoppedAt, formatDeviation(result.stoppedAtMs)),
+        const SizedBox(height: 8),
+        _detailRow(l10n.resultsDeviation, formatDeviation(result.deviationMs)),
+        const SizedBox(height: 8),
+        _detailRow(l10n.resultsStreak,
+            '${gs.currentStreakValue > 1 ? "🔥 " : ""}${gs.currentStreakValue}'),
+        const SizedBox(height: 8),
+        _detailRow(l10n.resultsXp, '+${result.xpEarned} XP'),
+
+        const Spacer(),
+
+        // Action buttons
+        GameButton(
+          label: l10n.commonPlayAgain,
+          onPressed: () => gs.playAgain(),
+          width: double.infinity,
+        ),
+        const SizedBox(height: 12),
+        Row(
+          children: [
+            Expanded(
+              child: GameButton(
+                label: l10n.commonMenu,
+                onPressed: () => gs.returnToMenu(),
+                primary: false,
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: GameButton(
+                label: l10n.commonShare,
+                onPressed: () => _share(context, result, gs.currentMode!.name, l10n),
+                primary: false,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 24),
+      ],
     );
   }
 

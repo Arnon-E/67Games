@@ -14,16 +14,40 @@ class MenuScreen extends StatefulWidget {
   State<MenuScreen> createState() => _MenuScreenState();
 }
 
-class _MenuScreenState extends State<MenuScreen> {
+class _MenuScreenState extends State<MenuScreen>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _pulseController;
+  late Animation<double> _pulseAnimation;
+  late Animation<double> _glowAnimation;
+
   @override
   void initState() {
     super.initState();
+    _pulseController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 2000),
+    )..repeat(reverse: true);
+
+    _pulseAnimation = Tween<double>(begin: 1.0, end: 1.06).animate(
+      CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
+    );
+
+    _glowAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
+    );
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final gs = context.read<GameState>();
       if (gs.dailyRewards.canClaim) {
         _showDailyReward();
       }
     });
+  }
+
+  @override
+  void dispose() {
+    _pulseController.dispose();
+    super.dispose();
   }
 
   void _showDailyReward() {
@@ -39,6 +63,8 @@ class _MenuScreenState extends State<MenuScreen> {
     final gs = context.watch<GameState>();
     final l10n = AppLocalizations.of(context);
     final levelInfo = levelFromXp(gs.stats.totalXp);
+
+    final disableAnimations = MediaQuery.of(context).disableAnimations;
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -86,23 +112,88 @@ class _MenuScreenState extends State<MenuScreen> {
 
               const Spacer(),
 
-              // Logo
-              Text(
-                l10n.menuLogo,
-                style: const TextStyle(
-                  fontSize: 96,
-                  fontWeight: FontWeight.w100,
-                  color: Colors.white,
-                  letterSpacing: -4,
-                ),
-              ),
-              Text(
-                l10n.menuSubtitle,
-                style: const TextStyle(
-                  fontSize: 16,
-                  color: Colors.white38,
-                  letterSpacing: 1,
-                ),
+              // Logo with shimmer glow
+              disableAnimations
+                  ? Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          l10n.menuLogo,
+                          style: const TextStyle(
+                            fontSize: 96,
+                            fontWeight: FontWeight.w100,
+                            color: Colors.white,
+                            letterSpacing: -4,
+                          ),
+                        ),
+                        Text(
+                          l10n.menuSubtitle,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            color: Colors.white38,
+                            letterSpacing: 1,
+                          ),
+                        ),
+                      ],
+                    )
+                  : AnimatedBuilder(
+                animation: _glowAnimation,
+                builder: (context, child) {
+                  final glowOpacity = 0.15 + _glowAnimation.value * 0.25;
+                  return Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      ShaderMask(
+                        shaderCallback: (bounds) {
+                          final offset = _glowAnimation.value * 2 - 0.5;
+                          return LinearGradient(
+                            begin: Alignment(-1.0 + offset, 0),
+                            end: Alignment(0.0 + offset, 0),
+                            colors: [
+                              Colors.white,
+                              const Color(0xFFFFD700),
+                              Colors.white,
+                            ],
+                            stops: const [0.0, 0.5, 1.0],
+                          ).createShader(bounds);
+                        },
+                        child: Text(
+                          l10n.menuLogo,
+                          style: TextStyle(
+                            fontSize: 96,
+                            fontWeight: FontWeight.w100,
+                            color: Colors.white,
+                            letterSpacing: -4,
+                            shadows: [
+                              Shadow(
+                                color: const Color(0xFFFF6B35).withValues(alpha: glowOpacity),
+                                blurRadius: 40,
+                              ),
+                              Shadow(
+                                color: const Color(0xFFFFD700).withValues(alpha: glowOpacity * 0.6),
+                                blurRadius: 80,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      Text(
+                        l10n.menuSubtitle,
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.white38,
+                          letterSpacing: 1,
+                          shadows: [
+                            Shadow(
+                              color: const Color(0xFFFF6B35).withValues(alpha: glowOpacity * 0.3),
+                              blurRadius: 20,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  );
+                },
               ),
 
               const SizedBox(height: 48),
@@ -127,29 +218,76 @@ class _MenuScreenState extends State<MenuScreen> {
 
               const SizedBox(height: 48),
 
-              // PLAY button
+              // PLAY button with pulse
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 48),
-                child: SizedBox(
-                  width: double.infinity,
-                  height: 64,
-                  child: ElevatedButton(
-                    onPressed: () => gs.setScreen(AppScreen.modeSelect),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFFF6B35),
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(32),
+                child: disableAnimations
+                    ? SizedBox(
+                        width: double.infinity,
+                        height: 64,
+                        child: ElevatedButton(
+                          onPressed: () => gs.setScreen(AppScreen.modeSelect),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFFFF6B35),
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(32),
+                            ),
+                            elevation: 12,
+                            shadowColor: const Color(0xFFFF6B35).withValues(alpha: 0.5),
+                          ),
+                          child: Text(
+                            l10n.commonPlay,
+                            style: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 3,
+                            ),
+                          ),
+                        ),
+                      )
+                    : AnimatedBuilder(
+                  animation: _pulseAnimation,
+                  builder: (context, child) {
+                    final glowIntensity = _glowAnimation.value;
+                    return Transform.scale(
+                      scale: _pulseAnimation.value,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(32),
+                          boxShadow: [
+                            BoxShadow(
+                              color: const Color(0xFFFF6B35).withValues(alpha: 0.3 + glowIntensity * 0.3),
+                              blurRadius: 20 + glowIntensity * 20,
+                              spreadRadius: glowIntensity * 8,
+                            ),
+                          ],
+                        ),
+                        child: child,
                       ),
-                      elevation: 12,
-                      shadowColor: const Color(0xFFFF6B35).withValues(alpha: 0.5),
-                    ),
-                    child: Text(
-                      l10n.commonPlay,
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: 3,
+                    );
+                  },
+                  child: SizedBox(
+                    width: double.infinity,
+                    height: 64,
+                    child: ElevatedButton(
+                      onPressed: () => gs.setScreen(AppScreen.modeSelect),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFFF6B35),
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(32),
+                        ),
+                        elevation: 12,
+                        shadowColor: const Color(0xFFFF6B35).withValues(alpha: 0.5),
+                      ),
+                      child: Text(
+                        l10n.commonPlay,
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 3,
+                        ),
                       ),
                     ),
                   ),
