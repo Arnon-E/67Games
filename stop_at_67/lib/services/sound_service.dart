@@ -32,8 +32,8 @@ class SoundService {
     try {
       await _tts.stop();
       await _tts.setPitch(1.1);
-      await _tts.setSpeechRate(0.9);
-      await _tts.speak('Six Seven!');
+      await _tts.setSpeechRate(0.35);
+      await _tts.speak('Siiiixxxx Seeeveeeennn!');
     } catch (_) {}
   }
 
@@ -43,8 +43,8 @@ class SoundService {
 
   // (pitch, rate, text)
   static const _speechMap = <String, (double, double, String)>{
-    'perfect':     (1.2, 0.95, 'Six Seven! Perfect!'),
-    'excellent':   (1.1, 0.9,  'Six Seven!'),
+    'perfect':     (1.2, 0.3, 'Siiiixxxx Seeeveeeennn! Perrrrfect!'),
+    'excellent':   (1.1, 0.35, 'Siiiixxxx Seeeveeeennn!'),
     'good':        (1.0, 1.0,  'Good'),
     'miss':        (0.8, 1.0,  'Miss'),
     'levelUp':     (1.2, 0.9,  'Level Up!'),
