@@ -295,8 +295,9 @@ class _EmojiConfettiState extends State<_EmojiConfetti>
       builder: (context, _) {
         final t = _controller.value;
         return IgnorePointer(
-          child: Stack(
-            children: _emojis.where((e) => t > e.delay).map((e) {
+          child: ExcludeSemantics(
+            child: Stack(
+              children: _emojis.where((e) => t > e.delay).map((e) {
               final progress = ((t - e.delay) / (1.0 - e.delay)).clamp(0.0, 1.0);
               final y = e.startY - progress * (e.startY + 0.3) * e.speed / 0.2;
               final x = e.x + sin(progress * e.wobbleSpeed * 2 * pi) * e.wobbleAmount;
@@ -318,6 +319,7 @@ class _EmojiConfettiState extends State<_EmojiConfetti>
                 ),
               );
             }).toList(),
+            ),
           ),
         );
       },

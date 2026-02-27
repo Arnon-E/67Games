@@ -64,6 +64,8 @@ class _MenuScreenState extends State<MenuScreen>
     final l10n = AppLocalizations.of(context);
     final levelInfo = levelFromXp(gs.stats.totalXp);
 
+    final disableAnimations = MediaQuery.of(context).disableAnimations;
+
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: AppGradientBackground(
@@ -111,7 +113,30 @@ class _MenuScreenState extends State<MenuScreen>
               const Spacer(),
 
               // Logo with shimmer glow
-              AnimatedBuilder(
+              disableAnimations
+                  ? Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          l10n.menuLogo,
+                          style: const TextStyle(
+                            fontSize: 96,
+                            fontWeight: FontWeight.w100,
+                            color: Colors.white,
+                            letterSpacing: -4,
+                          ),
+                        ),
+                        Text(
+                          l10n.menuSubtitle,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            color: Colors.white38,
+                            letterSpacing: 1,
+                          ),
+                        ),
+                      ],
+                    )
+                  : AnimatedBuilder(
                 animation: _glowAnimation,
                 builder: (context, child) {
                   final glowOpacity = 0.15 + _glowAnimation.value * 0.25;
@@ -196,7 +221,32 @@ class _MenuScreenState extends State<MenuScreen>
               // PLAY button with pulse
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 48),
-                child: AnimatedBuilder(
+                child: disableAnimations
+                    ? SizedBox(
+                        width: double.infinity,
+                        height: 64,
+                        child: ElevatedButton(
+                          onPressed: () => gs.setScreen(AppScreen.modeSelect),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFFFF6B35),
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(32),
+                            ),
+                            elevation: 12,
+                            shadowColor: const Color(0xFFFF6B35).withValues(alpha: 0.5),
+                          ),
+                          child: Text(
+                            l10n.commonPlay,
+                            style: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 3,
+                            ),
+                          ),
+                        ),
+                      )
+                    : AnimatedBuilder(
                   animation: _pulseAnimation,
                   builder: (context, child) {
                     final glowIntensity = _glowAnimation.value;
