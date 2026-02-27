@@ -228,4 +228,177 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get languagesRu => 'Русский';
+
+  @override
+  String get leaderboardTitle => 'לוח מובילים';
+
+  @override
+  String get leaderboardYourBest => 'הטוב שלך';
+
+  @override
+  String get leaderboardSignInToCompete => 'התחבר להתחרות';
+
+  @override
+  String get leaderboardSignOut => 'התנתק';
+
+  @override
+  String get leaderboardNoScores => 'אין תוצאות עדיין';
+
+  @override
+  String get leaderboardBeFirst => 'היה הראשון לשחק!';
+
+  @override
+  String get leaderboardSignInToSee => 'התחבר לצפייה בדירוגים';
+
+  @override
+  String get leaderboardScoresGlobal => 'התוצאות שלך יופיעו גלובלית';
+
+  @override
+  String get profileTitle => 'פרופיל';
+
+  @override
+  String profileLevel(int level) {
+    return 'רמה $level';
+  }
+
+  @override
+  String get profileStatistics => 'סטטיסטיקות';
+
+  @override
+  String get profileGames => 'משחקים';
+
+  @override
+  String get profileBestStreak => 'רצף מקסימלי';
+
+  @override
+  String get profilePerfects => 'מושלמים';
+
+  @override
+  String get profileTotalXp => 'סה\"כ נק\' ניסיון';
+
+  @override
+  String get profileBestScores => 'ניקודים מקסימליים';
+
+  @override
+  String get profileAchievements => 'הישגים';
+
+  @override
+  String profileAchievementsUnlocked(int unlocked, int total) {
+    return '$unlocked / $total ננעלו';
+  }
+
+  @override
+  String get shopTitle => 'חנות';
+
+  @override
+  String shopCoins(int count) {
+    return '$count מטבעות';
+  }
+
+  @override
+  String get shopOwned => 'נרכש';
+
+  @override
+  String shopPurchased(String name) {
+    return '$name נרכש!';
+  }
+
+  @override
+  String get shopCategoryTimerSkins => 'עיצובי טיימר';
+
+  @override
+  String get shopCategoryBackgrounds => 'רקעים';
+
+  @override
+  String get shopCategoryCelebrations => 'חגיגות';
+
+  @override
+  String get shopItemNeonTimerName => 'טיימר ניאון';
+
+  @override
+  String get shopItemNeonTimerDesc => 'תצוגת ניאון זוהרת';
+
+  @override
+  String get shopItemGoldTimerName => 'טיימר זהב';
+
+  @override
+  String get shopItemGoldTimerDesc => 'תצוגת זהב יוקרתית';
+
+  @override
+  String get shopItemPurpleHazeName => 'ערפל סגול';
+
+  @override
+  String get shopItemPurpleHazeDesc => 'רקע סגול עמוק';
+
+  @override
+  String get shopItemOceanDeepName => 'עומק האוקיינוס';
+
+  @override
+  String get shopItemOceanDeepDesc => 'ערכת נושא ים כהה';
+
+  @override
+  String get shopItemFireworksName => 'זיקוקים';
+
+  @override
+  String get shopItemFireworksDesc => 'חגוג עם זיקוקים';
+
+  @override
+  String modeCardTarget(String target) {
+    return 'יעד: $target';
+  }
+
+  @override
+  String get modeClassicName => 'קלאסי';
+
+  @override
+  String get modeClassicDesc => 'עצור את הטיימר בדיוק על 6.7 שניות';
+
+  @override
+  String get modeExtendedName => 'מורחב';
+
+  @override
+  String get modeExtendedDesc => 'המבחן האולטימטיבי - עצור על 67 שניות';
+
+  @override
+  String get modeBlindName => 'עיוור';
+
+  @override
+  String get modeBlindDesc =>
+      'הטיימר מוסתר אחרי 3 שניות - סמוך על האינסטינקטים שלך';
+
+  @override
+  String get modeReverseName => 'הפוך';
+
+  @override
+  String get modeReverseDesc => 'ספירה לאחור מ-10 - עצור על 3.3';
+
+  @override
+  String get modeReverse100Name => 'הפוך 100';
+
+  @override
+  String get modeReverse100Desc => 'ספירה לאחור מ-100 - עצור על 33';
+
+  @override
+  String get modeDailyName => 'אתגר יומי';
+
+  @override
+  String get modeDailyDesc => 'ניסיון אחד ביום - התחרה גלובלית';
+
+  @override
+  String get modeSurgeName => 'גל';
+
+  @override
+  String get modeSurgeDesc => 'הטיימר מאיץ בכל משחק — כמה זמן תחזיק?';
+
+  @override
+  String get surgeResetTitle => 'איפוס גל';
+
+  @override
+  String get surgeResetBody => '3 כישלונות ברצף.\nהמהירות מתאפסת ל-1×.';
+
+  @override
+  String get surgeResetWatchAd => 'צפה בפרסומת — שמור מהירות';
+
+  @override
+  String get surgeResetAccept => 'אישור, אפס ל-1×';
 }

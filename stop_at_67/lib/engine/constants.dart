@@ -59,6 +59,14 @@ const Map<String, GameMode> kGameModes = {
     description: 'One attempt per day - compete globally',
     unlockCondition: UnlockCondition(type: 'games_played', value: 1),
   ),
+  'surge': GameMode(
+    id: 'surge',
+    name: 'Surge',
+    targetMs: 6700,
+    displayTarget: '6.700s',
+    description: 'Timer speeds up every game — how long can you keep up?',
+    unlockCondition: UnlockCondition(type: 'games_played', value: 0),
+  ),
 };
 
 // ============================================================

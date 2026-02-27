@@ -199,15 +199,22 @@ class TimerState {
   final bool isRunning;
   final int elapsedMs;
   final String displayTime;
+  final double speedMultiplier;
 
-  const TimerState({required this.isRunning, required this.elapsedMs, required this.displayTime});
+  const TimerState({
+    required this.isRunning,
+    required this.elapsedMs,
+    required this.displayTime,
+    this.speedMultiplier = 1.0,
+  });
 
   factory TimerState.initial() => const TimerState(isRunning: false, elapsedMs: 0, displayTime: '0.000');
 
-  TimerState copyWith({bool? isRunning, int? elapsedMs, String? displayTime}) => TimerState(
+  TimerState copyWith({bool? isRunning, int? elapsedMs, String? displayTime, double? speedMultiplier}) => TimerState(
     isRunning: isRunning ?? this.isRunning,
     elapsedMs: elapsedMs ?? this.elapsedMs,
     displayTime: displayTime ?? this.displayTime,
+    speedMultiplier: speedMultiplier ?? this.speedMultiplier,
   );
 }
 
@@ -309,20 +316,23 @@ class SessionStats {
   final int bestScore;
   final int coinsEarned;
   final int sessionStart;
+  final int surgeGamesPlayed;
 
   const SessionStats({
     this.gamesPlayed = 0,
     this.bestScore = 0,
     this.coinsEarned = 0,
     required this.sessionStart,
+    this.surgeGamesPlayed = 0,
   });
 
   factory SessionStats.initial() => SessionStats(sessionStart: DateTime.now().millisecondsSinceEpoch);
 
-  SessionStats copyWith({int? gamesPlayed, int? bestScore, int? coinsEarned}) => SessionStats(
+  SessionStats copyWith({int? gamesPlayed, int? bestScore, int? coinsEarned, int? surgeGamesPlayed}) => SessionStats(
     gamesPlayed: gamesPlayed ?? this.gamesPlayed,
     bestScore: bestScore ?? this.bestScore,
     coinsEarned: coinsEarned ?? this.coinsEarned,
     sessionStart: sessionStart,
+    surgeGamesPlayed: surgeGamesPlayed ?? this.surgeGamesPlayed,
   );
 }

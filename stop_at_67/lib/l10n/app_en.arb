@@ -86,5 +86,90 @@
 
   "languagesEn": "English",
   "languagesHe": "עברית",
-  "languagesRu": "Русский"
+  "languagesRu": "Русский",
+
+  "leaderboardTitle": "Leaderboard",
+  "leaderboardYourBest": "Your Best",
+  "leaderboardSignInToCompete": "Sign in to compete",
+  "leaderboardSignOut": "Sign out",
+  "leaderboardNoScores": "No scores yet",
+  "leaderboardBeFirst": "Be the first to play!",
+  "leaderboardSignInToSee": "Sign in to see rankings",
+  "leaderboardScoresGlobal": "Your scores will appear globally",
+
+  "profileTitle": "Profile",
+  "profileLevel": "Level {level}",
+  "@profileLevel": {
+    "placeholders": {
+      "level": { "type": "int" }
+    }
+  },
+  "profileStatistics": "Statistics",
+  "profileGames": "Games",
+  "profileBestStreak": "Best Streak",
+  "profilePerfects": "Perfects",
+  "profileTotalXp": "Total XP",
+  "profileBestScores": "Best Scores",
+  "profileAchievements": "Achievements",
+  "profileAchievementsUnlocked": "{unlocked} / {total} unlocked",
+  "@profileAchievementsUnlocked": {
+    "placeholders": {
+      "unlocked": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
+
+  "shopTitle": "Shop",
+  "shopCoins": "{count} coins",
+  "@shopCoins": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "shopOwned": "Owned",
+  "shopPurchased": "{name} purchased!",
+  "@shopPurchased": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "shopCategoryTimerSkins": "Timer Skins",
+  "shopCategoryBackgrounds": "Backgrounds",
+  "shopCategoryCelebrations": "Celebrations",
+  "shopItemNeonTimerName": "Neon Timer",
+  "shopItemNeonTimerDesc": "Glowing neon display",
+  "shopItemGoldTimerName": "Gold Timer",
+  "shopItemGoldTimerDesc": "Luxurious gold display",
+  "shopItemPurpleHazeName": "Purple Haze",
+  "shopItemPurpleHazeDesc": "Deep purple background",
+  "shopItemOceanDeepName": "Ocean Deep",
+  "shopItemOceanDeepDesc": "Dark ocean theme",
+  "shopItemFireworksName": "Fireworks",
+  "shopItemFireworksDesc": "Celebrate with fireworks",
+
+  "modeCardTarget": "Target: {target}",
+  "@modeCardTarget": {
+    "placeholders": {
+      "target": { "type": "String" }
+    }
+  },
+  "modeClassicName": "Classic",
+  "modeClassicDesc": "Stop the timer at exactly 6.7 seconds",
+  "modeExtendedName": "Extended",
+  "modeExtendedDesc": "The ultimate test - stop at 67 seconds",
+  "modeBlindName": "Blind",
+  "modeBlindDesc": "Timer hides after 3 seconds - trust your instincts",
+  "modeReverseName": "Reverse",
+  "modeReverseDesc": "Countdown from 10 - stop at 3.3",
+  "modeReverse100Name": "Reverse 100",
+  "modeReverse100Desc": "Countdown from 100 - stop at 33",
+  "modeDailyName": "Daily Challenge",
+  "modeDailyDesc": "One attempt per day - compete globally",
+  "modeSurgeName": "Surge",
+  "modeSurgeDesc": "Timer speeds up every game — how long can you keep up?",
+
+  "surgeResetTitle": "SURGE RESET",
+  "surgeResetBody": "3 fails in a row.\nSpeed resets to 1×.",
+  "surgeResetWatchAd": "WATCH AD — KEEP SPEED",
+  "surgeResetAccept": "OK, RESET TO 1×"
 }

@@ -86,5 +86,90 @@
 
   "languagesEn": "English",
   "languagesHe": "עברית",
-  "languagesRu": "Русский"
+  "languagesRu": "Русский",
+
+  "leaderboardTitle": "Таблица лидеров",
+  "leaderboardYourBest": "Ваш рекорд",
+  "leaderboardSignInToCompete": "Войдите, чтобы соревноваться",
+  "leaderboardSignOut": "Выйти",
+  "leaderboardNoScores": "Результатов пока нет",
+  "leaderboardBeFirst": "Будьте первым!",
+  "leaderboardSignInToSee": "Войдите, чтобы увидеть рейтинг",
+  "leaderboardScoresGlobal": "Ваши результаты появятся глобально",
+
+  "profileTitle": "Профиль",
+  "profileLevel": "Уровень {level}",
+  "@profileLevel": {
+    "placeholders": {
+      "level": { "type": "int" }
+    }
+  },
+  "profileStatistics": "Статистика",
+  "profileGames": "Игры",
+  "profileBestStreak": "Лучшая серия",
+  "profilePerfects": "Идеальных",
+  "profileTotalXp": "Всего опыта",
+  "profileBestScores": "Лучшие результаты",
+  "profileAchievements": "Достижения",
+  "profileAchievementsUnlocked": "{unlocked} / {total} получено",
+  "@profileAchievementsUnlocked": {
+    "placeholders": {
+      "unlocked": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
+
+  "shopTitle": "Магазин",
+  "shopCoins": "{count} монет",
+  "@shopCoins": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "shopOwned": "Куплено",
+  "shopPurchased": "{name} куплено!",
+  "@shopPurchased": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "shopCategoryTimerSkins": "Облики таймера",
+  "shopCategoryBackgrounds": "Фоны",
+  "shopCategoryCelebrations": "Празднования",
+  "shopItemNeonTimerName": "Неоновый таймер",
+  "shopItemNeonTimerDesc": "Светящийся неоновый дисплей",
+  "shopItemGoldTimerName": "Золотой таймер",
+  "shopItemGoldTimerDesc": "Роскошный золотой дисплей",
+  "shopItemPurpleHazeName": "Фиолетовый туман",
+  "shopItemPurpleHazeDesc": "Глубокий фиолетовый фон",
+  "shopItemOceanDeepName": "Глубина океана",
+  "shopItemOceanDeepDesc": "Тёмная морская тема",
+  "shopItemFireworksName": "Фейерверк",
+  "shopItemFireworksDesc": "Отпразднуйте с фейерверком",
+
+  "modeCardTarget": "Цель: {target}",
+  "@modeCardTarget": {
+    "placeholders": {
+      "target": { "type": "String" }
+    }
+  },
+  "modeClassicName": "Классика",
+  "modeClassicDesc": "Остановите таймер ровно на 6.7 секундах",
+  "modeExtendedName": "Расширенный",
+  "modeExtendedDesc": "Главное испытание — остановитесь на 67 секундах",
+  "modeBlindName": "Слепой",
+  "modeBlindDesc": "Таймер скрывается через 3 секунды — доверьтесь инстинктам",
+  "modeReverseName": "Обратный",
+  "modeReverseDesc": "Обратный отсчёт с 10 — остановитесь на 3.3",
+  "modeReverse100Name": "Обратный 100",
+  "modeReverse100Desc": "Обратный отсчёт со 100 — остановитесь на 33",
+  "modeDailyName": "Ежедневный вызов",
+  "modeDailyDesc": "Одна попытка в день — соревнуйтесь глобально",
+  "modeSurgeName": "Волна",
+  "modeSurgeDesc": "Таймер ускоряется каждую игру — как долго продержитесь?",
+
+  "surgeResetTitle": "СБРОС ВОЛНЫ",
+  "surgeResetBody": "3 неудачи подряд.\nСкорость сбрасывается до 1×.",
+  "surgeResetWatchAd": "СМОТРЕТЬ РЕКЛАМУ — СОХРАНИТЬ СКОРОСТЬ",
+  "surgeResetAccept": "ОК, СБРОСИТЬ ДО 1×"
 }

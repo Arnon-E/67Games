@@ -5,6 +5,7 @@ class TimerDisplay extends StatelessWidget {
   final bool isBlind;
   final Color? ratingColor;
   final String? targetLabel;
+  final String? blindModeLabel;
 
   const TimerDisplay({
     super.key,
@@ -12,6 +13,7 @@ class TimerDisplay extends StatelessWidget {
     this.isBlind = false,
     this.ratingColor,
     this.targetLabel,
+    this.blindModeLabel,
   });
 
   @override
@@ -22,6 +24,7 @@ class TimerDisplay extends StatelessWidget {
 
     return Column(
       mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         // Glow + timer
         Stack(
@@ -74,9 +77,9 @@ class TimerDisplay extends StatelessWidget {
               color: Colors.white.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(20),
             ),
-            child: const Text(
-              'BLIND MODE',
-              style: TextStyle(
+            child: Text(
+              blindModeLabel ?? 'BLIND MODE',
+              style: const TextStyle(
                 fontSize: 14,
                 color: Color(0x99FFFFFF),
                 fontWeight: FontWeight.w600,

@@ -91,6 +91,15 @@ class GameState extends ChangeNotifier {
   SessionStats _sessionStats = SessionStats.initial();
   SessionStats get sessionStats => _sessionStats;
 
+  // ── Surge mode ──────────────────────────────────────────────
+  int _surgeGamesInSession = 0;
+  int _surgeFailStreak = 0;
+  bool _surgePendingReset = false;
+
+  double get surgeSpeedMultiplier => _computeSurgeMultiplier();
+  int get surgeFailStreak => _surgeFailStreak;
+  bool get surgePendingReset => _surgePendingReset;
+
   // ── Internal ────────────────────────────────────────────────
   final StreakManager _streakManager = StreakManager();
   final AchievementChecker _achievementChecker = AchievementChecker();
@@ -190,8 +199,14 @@ class GameState extends ChangeNotifier {
     if (mode.countdownFrom != null) {
       _precisionTimer!.setCountdown(true, mode.countdownFrom!);
     }
+    if (mode.id == 'surge') {
+      _precisionTimer!.setSpeedMultiplier(_computeSurgeMultiplier());
+    }
     _precisionTimer!.start();
   }
+
+  double _computeSurgeMultiplier() =>
+      (1.0 + _surgeGamesInSession * 0.067).clamp(1.0, 3.0);
 
   void _onTimerTick(TimerState state) {
     _timerState = state;
@@ -245,6 +260,19 @@ class GameState extends ChangeNotifier {
     final coinsEarned = result.finalScore ~/ 10;
     final newCoins = _coins + coinsEarned;
 
+    // Surge: update game counter and fail streak
+    if (mode.id == 'surge') {
+      _surgeGamesInSession++;
+      if (result.finalScore < 700) {
+        _surgeFailStreak++;
+      } else {
+        _surgeFailStreak = 0;
+      }
+      if (_surgeFailStreak >= 3) {
+        _surgePendingReset = true;
+      }
+    }
+
     // Session
     final newSession = SessionStats(
       gamesPlayed: _sessionStats.gamesPlayed + 1,
@@ -253,6 +281,9 @@ class GameState extends ChangeNotifier {
           : _sessionStats.bestScore,
       coinsEarned: _sessionStats.coinsEarned + coinsEarned,
       sessionStart: _sessionStats.sessionStart,
+      surgeGamesPlayed: mode.id == 'surge'
+          ? _surgeGamesInSession
+          : _sessionStats.surgeGamesPlayed,
     );
 
     // Persist
@@ -322,6 +353,7 @@ class GameState extends ChangeNotifier {
     _isBlindMode = false;
     _countdownValue = 3;
     _timerState = TimerState.initial();
+    _surgePendingReset = false;
     _screen = AppScreen.countdown;
     notifyListeners();
   }
@@ -333,8 +365,34 @@ class GameState extends ChangeNotifier {
     _lastResult = null;
     _isBlindMode = false;
     _timerState = TimerState.initial();
+    _surgeGamesInSession = 0;
+    _surgeFailStreak = 0;
+    _surgePendingReset = false;
     _screen = AppScreen.menu;
     WakelockPlus.disable().catchError((_) {});
+    notifyListeners();
+  }
+
+  // ═══════════════════════════════════════════════════════════
+  // SURGE ACTIONS
+  // ═══════════════════════════════════════════════════════════
+
+  void surgeAcceptReset() {
+    _surgeGamesInSession = 0;
+    _surgeFailStreak = 0;
+    _surgePendingReset = false;
+    notifyListeners();
+  }
+
+  Future<void> surgeWatchAdRetry() async {
+    bool rewarded = false;
+    final success = await _ads.showRewarded((_) { rewarded = true; });
+    if (success && rewarded) {
+      _surgeFailStreak = 0;
+      _surgePendingReset = false;
+    } else {
+      surgeAcceptReset();
+    }
     notifyListeners();
   }
 

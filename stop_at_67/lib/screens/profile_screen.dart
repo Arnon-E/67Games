@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../l10n/app_localizations.dart';
 import '../state/game_state.dart';
 import '../engine/constants.dart';
 import '../engine/scoring.dart';
@@ -13,6 +14,7 @@ class ProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final gs = context.watch<GameState>();
+    final l10n = AppLocalizations.of(context);
     final stats = gs.stats;
     final levelInfo = levelFromXp(stats.totalXp);
 
@@ -23,7 +25,7 @@ class ProfileScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              ScreenHeader(title: 'Profile', onBack: () => gs.setScreen(AppScreen.menu)),
+              ScreenHeader(title: l10n.profileTitle, onBack: () => gs.setScreen(AppScreen.menu)),
               Expanded(
                 child: ListView(
                   padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -49,7 +51,7 @@ class ProfileScreen extends StatelessWidget {
                             child: const Icon(Icons.person, color: Colors.white, size: 40),
                           ),
                           const SizedBox(height: 12),
-                          Text('Level ${levelInfo.level}',
+                          Text(l10n.profileLevel(levelInfo.level),
                               style: const TextStyle(
                                   fontSize: 24, fontWeight: FontWeight.w200, color: Colors.white)),
                           const SizedBox(height: 8),
@@ -79,7 +81,7 @@ class ProfileScreen extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 32),
-                    _label('Statistics'),
+                    _label(l10n.profileStatistics),
                     const SizedBox(height: 12),
                     GridView.count(
                       crossAxisCount: 2,
@@ -89,23 +91,24 @@ class ProfileScreen extends StatelessWidget {
                       mainAxisSpacing: 12,
                       childAspectRatio: 2.5,
                       children: [
-                        _statTile('Games', '${stats.totalGames}'),
-                        _statTile('Best Streak', '${stats.bestStreak}'),
-                        _statTile('Perfects', '${stats.perfectCount}'),
-                        _statTile('Total XP', '${stats.totalXp}'),
+                        _statTile(l10n.profileGames, '${stats.totalGames}'),
+                        _statTile(l10n.profileBestStreak, '${stats.bestStreak}'),
+                        _statTile(l10n.profilePerfects, '${stats.perfectCount}'),
+                        _statTile(l10n.profileTotalXp, '${stats.totalXp}'),
                       ],
                     ),
                     const SizedBox(height: 24),
-                    _label('Best Scores'),
+                    _label(l10n.profileBestScores),
                     const SizedBox(height: 12),
                     ...kGameModes.values
                         .where((mode) => !const {'extended', 'reverse', 'reverse100'}.contains(mode.id))
                         .map((mode) {
                       final best = stats.bestScores[mode.id];
-                      return _scoreRow(mode.name, best != null ? formatScore(best) : '—');
+                      final modeName = _modeLocalName(mode.id, l10n);
+                      return _scoreRow(modeName, best != null ? formatScore(best) : '—');
                     }),
                     const SizedBox(height: 24),
-                    _label('Achievements'),
+                    _label(l10n.profileAchievements),
                     const SizedBox(height: 12),
                     Container(
                       padding: const EdgeInsets.all(16),
@@ -115,8 +118,11 @@ class ProfileScreen extends StatelessWidget {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text('${gs.achievements.length} / ${kAchievements.length} unlocked',
-                              style: const TextStyle(color: Colors.white70, fontSize: 15)),
+                          Text(
+                            l10n.profileAchievementsUnlocked(
+                                gs.achievements.length, kAchievements.length),
+                            style: const TextStyle(color: Colors.white70, fontSize: 15),
+                          ),
                           Text(
                             '${(gs.achievements.length / kAchievements.length * 100).round()}%',
                             style: const TextStyle(
@@ -134,6 +140,19 @@ class ProfileScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  static String _modeLocalName(String modeId, AppLocalizations l10n) {
+    return switch (modeId) {
+      'classic' => l10n.modeClassicName,
+      'extended' => l10n.modeExtendedName,
+      'blind' => l10n.modeBlindName,
+      'reverse' => l10n.modeReverseName,
+      'reverse100' => l10n.modeReverse100Name,
+      'daily' => l10n.modeDailyName,
+      'surge' => l10n.modeSurgeName,
+      _ => modeId,
+    };
   }
 
   static Widget _label(String text) => Text(

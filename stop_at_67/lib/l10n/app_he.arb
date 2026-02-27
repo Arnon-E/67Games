@@ -87,5 +87,90 @@
 
   "languagesEn": "English",
   "languagesHe": "עברית",
-  "languagesRu": "Русский"
+  "languagesRu": "Русский",
+
+  "leaderboardTitle": "לוח מובילים",
+  "leaderboardYourBest": "הטוב שלך",
+  "leaderboardSignInToCompete": "התחבר להתחרות",
+  "leaderboardSignOut": "התנתק",
+  "leaderboardNoScores": "אין תוצאות עדיין",
+  "leaderboardBeFirst": "היה הראשון לשחק!",
+  "leaderboardSignInToSee": "התחבר לצפייה בדירוגים",
+  "leaderboardScoresGlobal": "התוצאות שלך יופיעו גלובלית",
+
+  "profileTitle": "פרופיל",
+  "profileLevel": "רמה {level}",
+  "@profileLevel": {
+    "placeholders": {
+      "level": { "type": "int" }
+    }
+  },
+  "profileStatistics": "סטטיסטיקות",
+  "profileGames": "משחקים",
+  "profileBestStreak": "רצף מקסימלי",
+  "profilePerfects": "מושלמים",
+  "profileTotalXp": "סה\"כ נק' ניסיון",
+  "profileBestScores": "ניקודים מקסימליים",
+  "profileAchievements": "הישגים",
+  "profileAchievementsUnlocked": "{unlocked} / {total} ננעלו",
+  "@profileAchievementsUnlocked": {
+    "placeholders": {
+      "unlocked": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
+
+  "shopTitle": "חנות",
+  "shopCoins": "{count} מטבעות",
+  "@shopCoins": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "shopOwned": "נרכש",
+  "shopPurchased": "{name} נרכש!",
+  "@shopPurchased": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "shopCategoryTimerSkins": "עיצובי טיימר",
+  "shopCategoryBackgrounds": "רקעים",
+  "shopCategoryCelebrations": "חגיגות",
+  "shopItemNeonTimerName": "טיימר ניאון",
+  "shopItemNeonTimerDesc": "תצוגת ניאון זוהרת",
+  "shopItemGoldTimerName": "טיימר זהב",
+  "shopItemGoldTimerDesc": "תצוגת זהב יוקרתית",
+  "shopItemPurpleHazeName": "ערפל סגול",
+  "shopItemPurpleHazeDesc": "רקע סגול עמוק",
+  "shopItemOceanDeepName": "עומק האוקיינוס",
+  "shopItemOceanDeepDesc": "ערכת נושא ים כהה",
+  "shopItemFireworksName": "זיקוקים",
+  "shopItemFireworksDesc": "חגוג עם זיקוקים",
+
+  "modeCardTarget": "יעד: {target}",
+  "@modeCardTarget": {
+    "placeholders": {
+      "target": { "type": "String" }
+    }
+  },
+  "modeClassicName": "קלאסי",
+  "modeClassicDesc": "עצור את הטיימר בדיוק על 6.7 שניות",
+  "modeExtendedName": "מורחב",
+  "modeExtendedDesc": "המבחן האולטימטיבי - עצור על 67 שניות",
+  "modeBlindName": "עיוור",
+  "modeBlindDesc": "הטיימר מוסתר אחרי 3 שניות - סמוך על האינסטינקטים שלך",
+  "modeReverseName": "הפוך",
+  "modeReverseDesc": "ספירה לאחור מ-10 - עצור על 3.3",
+  "modeReverse100Name": "הפוך 100",
+  "modeReverse100Desc": "ספירה לאחור מ-100 - עצור על 33",
+  "modeDailyName": "אתגר יומי",
+  "modeDailyDesc": "ניסיון אחד ביום - התחרה גלובלית",
+  "modeSurgeName": "גל",
+  "modeSurgeDesc": "הטיימר מאיץ בכל משחק — כמה זמן תחזיק?",
+
+  "surgeResetTitle": "איפוס גל",
+  "surgeResetBody": "3 כישלונות ברצף.\nהמהירות מתאפסת ל-1×.",
+  "surgeResetWatchAd": "צפה בפרסומת — שמור מהירות",
+  "surgeResetAccept": "אישור, אפס ל-1×"
 }

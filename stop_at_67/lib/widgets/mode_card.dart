@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../l10n/app_localizations.dart';
 import '../engine/types.dart';
 
 class ModeCard extends StatelessWidget {
@@ -13,8 +14,36 @@ class ModeCard extends StatelessWidget {
     this.onTap,
   });
 
+  String _localName(AppLocalizations l10n) {
+    return switch (mode.id) {
+      'classic' => l10n.modeClassicName,
+      'extended' => l10n.modeExtendedName,
+      'blind' => l10n.modeBlindName,
+      'reverse' => l10n.modeReverseName,
+      'reverse100' => l10n.modeReverse100Name,
+      'daily' => l10n.modeDailyName,
+      'surge' => l10n.modeSurgeName,
+      _ => mode.name,
+    };
+  }
+
+  String _localDesc(AppLocalizations l10n) {
+    return switch (mode.id) {
+      'classic' => l10n.modeClassicDesc,
+      'extended' => l10n.modeExtendedDesc,
+      'blind' => l10n.modeBlindDesc,
+      'reverse' => l10n.modeReverseDesc,
+      'reverse100' => l10n.modeReverse100Desc,
+      'daily' => l10n.modeDailyDesc,
+      'surge' => l10n.modeSurgeDesc,
+      _ => mode.description,
+    };
+  }
+
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     return GestureDetector(
       onTap: isLocked ? null : onTap,
       child: AnimatedContainer(
@@ -39,7 +68,7 @@ class ModeCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    mode.name,
+                    _localName(l10n),
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w600,
@@ -48,7 +77,7 @@ class ModeCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    mode.description,
+                    _localDesc(l10n),
                     style: TextStyle(
                       fontSize: 13,
                       color: isLocked ? Colors.white24 : Colors.white54,
@@ -56,7 +85,7 @@ class ModeCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Target: ${mode.displayTarget}',
+                    l10n.modeCardTarget(mode.displayTarget),
                     style: TextStyle(
                       fontSize: 12,
                       color: isLocked

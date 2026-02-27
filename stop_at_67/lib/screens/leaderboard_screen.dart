@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../l10n/app_localizations.dart';
 import '../state/game_state.dart';
 import '../state/auth_state.dart';
 import '../engine/constants.dart';
@@ -40,10 +41,24 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
     _loadScores();
   }
 
+  String _modeName(String modeId, AppLocalizations l10n) {
+    return switch (modeId) {
+      'classic' => l10n.modeClassicName,
+      'extended' => l10n.modeExtendedName,
+      'blind' => l10n.modeBlindName,
+      'reverse' => l10n.modeReverseName,
+      'reverse100' => l10n.modeReverse100Name,
+      'daily' => l10n.modeDailyName,
+      'surge' => l10n.modeSurgeName,
+      _ => modeId,
+    };
+  }
+
   @override
   Widget build(BuildContext context) {
     final gs = context.watch<GameState>();
     final auth = context.watch<AuthState>();
+    final l10n = AppLocalizations.of(context);
     final bestScores = gs.stats.bestScores;
     final currentUid = auth.user?.uid;
 
@@ -55,7 +70,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               ScreenHeader(
-                title: 'Leaderboard',
+                title: l10n.leaderboardTitle,
                 onBack: () => gs.setScreen(AppScreen.menu),
               ),
 
@@ -83,7 +98,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                             borderRadius: BorderRadius.circular(20),
                           ),
                           child: Text(
-                            mode.name,
+                            _modeName(mode.id, l10n),
                             style: TextStyle(
                               color: isSelected ? Colors.white : Colors.white54,
                               fontSize: 13,
@@ -124,7 +139,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              auth.isSignedIn ? auth.userName : 'Your Best',
+                              auth.isSignedIn ? auth.userName : l10n.leaderboardYourBest,
                               style: const TextStyle(
                                   color: Colors.white54, fontSize: 12),
                             ),
@@ -142,15 +157,15 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                       ),
                       if (!auth.isSignedIn)
                         GameButton(
-                          label: 'Sign in to compete',
+                          label: l10n.leaderboardSignInToCompete,
                           onPressed: () => gs.setScreen(AppScreen.auth),
                           primary: true,
                         )
                       else
                         GestureDetector(
                           onTap: () => auth.signOut(),
-                          child: const Text('Sign out',
-                              style: TextStyle(
+                          child: Text(l10n.leaderboardSignOut,
+                              style: const TextStyle(
                                   color: Colors.white38, fontSize: 12)),
                         ),
                     ],
@@ -172,20 +187,20 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                           }
                           final entries = snap.data ?? [];
                           if (entries.isEmpty) {
-                            return const Center(
+                            return Center(
                               child: Column(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  Icon(Icons.leaderboard_outlined,
+                                  const Icon(Icons.leaderboard_outlined,
                                       color: Colors.white24, size: 48),
-                                  SizedBox(height: 16),
-                                  Text('No scores yet',
-                                      style: TextStyle(
+                                  const SizedBox(height: 16),
+                                  Text(l10n.leaderboardNoScores,
+                                      style: const TextStyle(
                                           color: Colors.white54,
                                           fontSize: 16)),
-                                  SizedBox(height: 8),
-                                  Text('Be the first to play!',
-                                      style: TextStyle(
+                                  const SizedBox(height: 8),
+                                  Text(l10n.leaderboardBeFirst,
+                                      style: const TextStyle(
                                           color: Colors.white24,
                                           fontSize: 13)),
                                 ],
@@ -208,19 +223,19 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                           );
                         },
                       )
-                    : const Center(
+                    : Center(
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(Icons.lock_outline,
+                            const Icon(Icons.lock_outline,
                                 color: Colors.white24, size: 48),
-                            SizedBox(height: 16),
-                            Text('Sign in to see rankings',
-                                style: TextStyle(
+                            const SizedBox(height: 16),
+                            Text(l10n.leaderboardSignInToSee,
+                                style: const TextStyle(
                                     color: Colors.white54, fontSize: 16)),
-                            SizedBox(height: 8),
-                            Text('Your scores will appear globally',
-                                style: TextStyle(
+                            const SizedBox(height: 8),
+                            Text(l10n.leaderboardScoresGlobal,
+                                style: const TextStyle(
                                     color: Colors.white24, fontSize: 13)),
                           ],
                         ),

@@ -44,32 +44,95 @@ class _PlayingScreenState extends State<PlayingScreen> {
           child: TapArea(
             onTap: _onTap,
             child: SizedBox.expand(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
+              child: Stack(
                 children: [
-                  TimerDisplay(
-                    displayTime: timerState.displayTime,
-                    isBlind: gs.isBlindMode,
-                    targetLabel: mode != null
-                        ? '${l10n.playingTarget}: ${mode.displayTarget}'
-                        : null,
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      TimerDisplay(
+                        displayTime: timerState.displayTime,
+                        isBlind: gs.isBlindMode,
+                        targetLabel: mode != null
+                            ? '${l10n.playingTarget}: ${mode.displayTarget}'
+                            : null,
+                      ),
+                      const SizedBox(height: 64),
+                      Text(
+                        l10n.playingTapHint,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          letterSpacing: 2,
+                          color: Colors.white24,
+                          fontWeight: FontWeight.w300,
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 64),
-                  Text(
-                    l10n.playingTapHint,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      letterSpacing: 2,
-                      color: Colors.white24,
-                      fontWeight: FontWeight.w300,
+                  if (mode?.id == 'surge')
+                    Positioned(
+                      top: 16,
+                      right: 20,
+                      child: _SurgeSpeedBadge(
+                        multiplier: timerState.speedMultiplier,
+                        failStreak: gs.surgeFailStreak,
+                      ),
                     ),
-                  ),
                 ],
               ),
             ),
           ),
         ),
       ),
+    );
+  }
+}
+
+class _SurgeSpeedBadge extends StatelessWidget {
+  final double multiplier;
+  final int failStreak;
+
+  const _SurgeSpeedBadge({required this.multiplier, required this.failStreak});
+
+  @override
+  Widget build(BuildContext context) {
+    final livesLeft = (3 - failStreak).clamp(0, 3);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: Colors.white24, width: 1),
+          ),
+          child: Text(
+            '${multiplier.toStringAsFixed(2)}×',
+            style: const TextStyle(
+              fontSize: 13,
+              color: Colors.white70,
+              fontWeight: FontWeight.w500,
+              letterSpacing: 1,
+            ),
+          ),
+        ),
+        const SizedBox(height: 6),
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: List.generate(3, (i) {
+            final filled = i < livesLeft;
+            return Padding(
+              padding: const EdgeInsets.only(left: 4),
+              child: Icon(
+                filled ? Icons.favorite : Icons.favorite_border,
+                size: 14,
+                color: filled ? Colors.redAccent : Colors.white24,
+              ),
+            );
+          }),
+        ),
+      ],
     );
   }
 }

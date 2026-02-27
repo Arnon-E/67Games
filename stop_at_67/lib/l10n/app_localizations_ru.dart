@@ -229,4 +229,181 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get languagesRu => 'Русский';
+
+  @override
+  String get leaderboardTitle => 'Таблица лидеров';
+
+  @override
+  String get leaderboardYourBest => 'Ваш рекорд';
+
+  @override
+  String get leaderboardSignInToCompete => 'Войдите, чтобы соревноваться';
+
+  @override
+  String get leaderboardSignOut => 'Выйти';
+
+  @override
+  String get leaderboardNoScores => 'Результатов пока нет';
+
+  @override
+  String get leaderboardBeFirst => 'Будьте первым!';
+
+  @override
+  String get leaderboardSignInToSee => 'Войдите, чтобы увидеть рейтинг';
+
+  @override
+  String get leaderboardScoresGlobal => 'Ваши результаты появятся глобально';
+
+  @override
+  String get profileTitle => 'Профиль';
+
+  @override
+  String profileLevel(int level) {
+    return 'Уровень $level';
+  }
+
+  @override
+  String get profileStatistics => 'Статистика';
+
+  @override
+  String get profileGames => 'Игры';
+
+  @override
+  String get profileBestStreak => 'Лучшая серия';
+
+  @override
+  String get profilePerfects => 'Идеальных';
+
+  @override
+  String get profileTotalXp => 'Всего опыта';
+
+  @override
+  String get profileBestScores => 'Лучшие результаты';
+
+  @override
+  String get profileAchievements => 'Достижения';
+
+  @override
+  String profileAchievementsUnlocked(int unlocked, int total) {
+    return '$unlocked / $total получено';
+  }
+
+  @override
+  String get shopTitle => 'Магазин';
+
+  @override
+  String shopCoins(int count) {
+    return '$count монет';
+  }
+
+  @override
+  String get shopOwned => 'Куплено';
+
+  @override
+  String shopPurchased(String name) {
+    return '$name куплено!';
+  }
+
+  @override
+  String get shopCategoryTimerSkins => 'Облики таймера';
+
+  @override
+  String get shopCategoryBackgrounds => 'Фоны';
+
+  @override
+  String get shopCategoryCelebrations => 'Празднования';
+
+  @override
+  String get shopItemNeonTimerName => 'Неоновый таймер';
+
+  @override
+  String get shopItemNeonTimerDesc => 'Светящийся неоновый дисплей';
+
+  @override
+  String get shopItemGoldTimerName => 'Золотой таймер';
+
+  @override
+  String get shopItemGoldTimerDesc => 'Роскошный золотой дисплей';
+
+  @override
+  String get shopItemPurpleHazeName => 'Фиолетовый туман';
+
+  @override
+  String get shopItemPurpleHazeDesc => 'Глубокий фиолетовый фон';
+
+  @override
+  String get shopItemOceanDeepName => 'Глубина океана';
+
+  @override
+  String get shopItemOceanDeepDesc => 'Тёмная морская тема';
+
+  @override
+  String get shopItemFireworksName => 'Фейерверк';
+
+  @override
+  String get shopItemFireworksDesc => 'Отпразднуйте с фейерверком';
+
+  @override
+  String modeCardTarget(String target) {
+    return 'Цель: $target';
+  }
+
+  @override
+  String get modeClassicName => 'Классика';
+
+  @override
+  String get modeClassicDesc => 'Остановите таймер ровно на 6.7 секундах';
+
+  @override
+  String get modeExtendedName => 'Расширенный';
+
+  @override
+  String get modeExtendedDesc =>
+      'Главное испытание — остановитесь на 67 секундах';
+
+  @override
+  String get modeBlindName => 'Слепой';
+
+  @override
+  String get modeBlindDesc =>
+      'Таймер скрывается через 3 секунды — доверьтесь инстинктам';
+
+  @override
+  String get modeReverseName => 'Обратный';
+
+  @override
+  String get modeReverseDesc => 'Обратный отсчёт с 10 — остановитесь на 3.3';
+
+  @override
+  String get modeReverse100Name => 'Обратный 100';
+
+  @override
+  String get modeReverse100Desc =>
+      'Обратный отсчёт со 100 — остановитесь на 33';
+
+  @override
+  String get modeDailyName => 'Ежедневный вызов';
+
+  @override
+  String get modeDailyDesc => 'Одна попытка в день — соревнуйтесь глобально';
+
+  @override
+  String get modeSurgeName => 'Волна';
+
+  @override
+  String get modeSurgeDesc =>
+      'Таймер ускоряется каждую игру — как долго продержитесь?';
+
+  @override
+  String get surgeResetTitle => 'СБРОС ВОЛНЫ';
+
+  @override
+  String get surgeResetBody =>
+      '3 неудачи подряд.\nСкорость сбрасывается до 1×.';
+
+  @override
+  String get surgeResetWatchAd => 'СМОТРЕТЬ РЕКЛАМУ — СОХРАНИТЬ СКОРОСТЬ';
+
+  @override
+  String get surgeResetAccept => 'ОК, СБРОСИТЬ ДО 1×';
 }

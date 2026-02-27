@@ -136,11 +136,53 @@ class _ParticlePainter extends CustomPainter {
 
 // ── Results screen ───────────────────────────────────────────
 
-class ResultsScreen extends StatelessWidget {
+class ResultsScreen extends StatefulWidget {
   const ResultsScreen({super.key});
+
+  @override
+  State<ResultsScreen> createState() => _ResultsScreenState();
+}
+
+class _ResultsScreenState extends State<ResultsScreen> {
+  bool _surgeDialogShown = false;
 
   static bool _isExcellent(String? tier) =>
       tier == 'perfect' || tier == 'incredible' || tier == 'excellent';
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final gs = context.read<GameState>();
+    if (gs.surgePendingReset && !_surgeDialogShown) {
+      _surgeDialogShown = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _showSurgeResetDialog();
+      });
+    }
+  }
+
+  Future<void> _showSurgeResetDialog() async {
+    final gs = context.read<GameState>();
+    final l10n = AppLocalizations.of(context);
+    await showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => _SurgeResetDialog(
+        title: l10n.surgeResetTitle,
+        body: l10n.surgeResetBody,
+        watchAdLabel: l10n.surgeResetWatchAd,
+        acceptLabel: l10n.surgeResetAccept,
+        onAccept: () {
+          Navigator.of(ctx).pop();
+          gs.surgeAcceptReset();
+        },
+        onWatchAd: () async {
+          Navigator.of(ctx).pop();
+          await gs.surgeWatchAdRetry();
+        },
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -279,5 +321,93 @@ class ResultsScreen extends StatelessWidget {
           'Can you beat me?';
       await Share.share(text);
     } catch (_) {}
+  }
+}
+
+// ── Surge reset dialog ───────────────────────────────────────
+
+class _SurgeResetDialog extends StatelessWidget {
+  final String title;
+  final String body;
+  final String watchAdLabel;
+  final String acceptLabel;
+  final VoidCallback onAccept;
+  final Future<void> Function() onWatchAd;
+
+  const _SurgeResetDialog({
+    required this.title,
+    required this.body,
+    required this.watchAdLabel,
+    required this.acceptLabel,
+    required this.onAccept,
+    required this.onWatchAd,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      backgroundColor: const Color(0xFF1a1a2e),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      child: Padding(
+        padding: const EdgeInsets.all(28),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text('⚡', style: TextStyle(fontSize: 40)),
+            const SizedBox(height: 12),
+            Text(
+              title,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 20,
+                fontWeight: FontWeight.w700,
+                letterSpacing: 2,
+              ),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              body,
+              textAlign: TextAlign.center,
+              style: const TextStyle(color: Colors.white54, fontSize: 15, height: 1.5),
+            ),
+            const SizedBox(height: 28),
+            SizedBox(
+              width: double.infinity,
+              child: TextButton(
+                onPressed: onWatchAd,
+                style: TextButton.styleFrom(
+                  backgroundColor: const Color(0xFF00DDFF).withValues(alpha: 0.15),
+                  foregroundColor: const Color(0xFF00DDFF),
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    side: const BorderSide(color: Color(0xFF00DDFF), width: 1),
+                  ),
+                ),
+                child: Text(
+                  watchAdLabel,
+                  style: const TextStyle(fontWeight: FontWeight.w600, letterSpacing: 1),
+                ),
+              ),
+            ),
+            const SizedBox(height: 10),
+            SizedBox(
+              width: double.infinity,
+              child: TextButton(
+                onPressed: onAccept,
+                style: TextButton.styleFrom(
+                  foregroundColor: Colors.white38,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                ),
+                child: Text(
+                  acceptLabel,
+                  style: const TextStyle(fontWeight: FontWeight.w500, letterSpacing: 1),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
