@@ -56,6 +56,7 @@ class _PlayingScreenState extends State<PlayingScreen> {
                         targetLabel: mode != null
                             ? '${l10n.playingTarget}: ${mode.displayTarget}'
                             : null,
+                        blindModeLabel: l10n.playingBlindMode,
                       ),
                       const SizedBox(height: 64),
                       Text(
