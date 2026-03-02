@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../theme/app_colors.dart';
+import '../theme/app_text_styles.dart';
 
 class ScreenHeader extends StatelessWidget {
   final String title;
@@ -15,18 +17,10 @@ class ScreenHeader extends StatelessWidget {
           if (onBack != null)
             GestureDetector(
               onTap: onBack,
-              child: const Icon(Icons.arrow_back_ios, color: Colors.white70, size: 20),
+              child: const Icon(Icons.arrow_back_ios, color: AppColors.textSecondary, size: 20),
             ),
           if (onBack != null) const SizedBox(width: 12),
-          Text(
-            title,
-            style: const TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.w300,
-              color: Colors.white,
-              letterSpacing: 2,
-            ),
-          ),
+          Text(title, style: AppTextStyles.screenTitle),
         ],
       ),
     );

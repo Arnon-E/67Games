@@ -47,13 +47,14 @@ class AuthState extends ChangeNotifier {
     try {
       final user = await _authService.signInWithGoogle();
       if (user != null) {
+        _user = user;
         _displayName = await _authService.getDisplayName(user);
       }
       _isLoading = false;
       notifyListeners();
       return user != null;
     } catch (e) {
-      _error = 'Google sign-in failed';
+      _error = e.toString();
       _isLoading = false;
       notifyListeners();
       return false;
@@ -72,6 +73,7 @@ class AuthState extends ChangeNotifier {
     try {
       final user = await _authService.signInAnonymous(name.trim());
       if (user != null) {
+        _user = user;
         _displayName = name.trim();
       }
       _isLoading = false;

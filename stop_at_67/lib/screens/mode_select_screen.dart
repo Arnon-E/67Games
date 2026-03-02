@@ -32,7 +32,7 @@ class ModeSelectScreen extends StatelessWidget {
                 child: ListView(
                   padding: const EdgeInsets.only(top: 8, bottom: 24),
                   children: kGameModes.values
-                      .where((mode) => !const {'extended', 'reverse', 'reverse100'}.contains(mode.id))
+                      .where((mode) => !const {'extended', 'reverse', 'reverse100', 'daily'}.contains(mode.id))
                       .map((mode) {
                     final locked = !isModeUnlocked(mode.id, gs.stats);
                     return ModeCard(

@@ -3,6 +3,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 
 import 'l10n/app_localizations.dart';
+import 'theme/app_theme.dart';
 
 import 'state/game_state.dart';
 import 'state/language_state.dart';
@@ -35,20 +36,7 @@ class StopAt67App extends StatelessWidget {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      theme: ThemeData(
-        brightness: Brightness.dark,
-        scaffoldBackgroundColor: const Color(0xFF0a0a0f),
-        colorScheme: const ColorScheme.dark(
-          primary: Color(0xFFFF6B35),
-          secondary: Color(0xFFFF6B35),
-          surface: Color(0xFF1a1a2e),
-        ),
-        textTheme: const TextTheme(
-          bodyMedium: TextStyle(color: Colors.white),
-          bodyLarge: TextStyle(color: Colors.white),
-        ),
-        useMaterial3: true,
-      ),
+      theme: AppTheme.darkTheme,
       home: const _ScreenSwitcher(),
     );
   }

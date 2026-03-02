@@ -38,6 +38,8 @@
 
   "countdownGetReady": "היה מוכן",
 
+  "playingStopAt": "עצור על ",
+  "playingStop": "עצור",
   "playingBlindMode": "מצב עיוור",
   "playingTapHint": "הקש בכל מקום כדי לעצור",
   "playingTarget": "יעד",
@@ -168,6 +170,14 @@
   "modeDailyDesc": "ניסיון אחד ביום - התחרה גלובלית",
   "modeSurgeName": "גל",
   "modeSurgeDesc": "הטיימר מאיץ בכל משחק — כמה זמן תחזיק?",
+
+  "authSignIn": "התחבר",
+  "authCompeteGlobally": "התחרה גלובלית",
+  "authSubtitle": "התחבר כדי להופיע בלוח המובילים\nולעקוב אחר הדירוג שלך ברחבי העולם.",
+  "authContinueWithGoogle": "המשך עם Google",
+  "authSigningIn": "מתחבר…",
+  "authPlayAsGuest": "שחק כאורח",
+  "authEnterDisplayName": "הזן שם תצוגה",
 
   "surgeResetTitle": "איפוס גל",
   "surgeResetBody": "3 כישלונות ברצף.\nהמהירות מתאפסת ל-1×.",

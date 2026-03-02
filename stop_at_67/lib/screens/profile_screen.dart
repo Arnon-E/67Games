@@ -5,6 +5,7 @@ import '../l10n/app_localizations.dart';
 import '../state/game_state.dart';
 import '../engine/constants.dart';
 import '../engine/scoring.dart';
+import '../theme/app_colors.dart';
 import '../widgets/app_gradient_background.dart';
 import '../widgets/screen_header.dart';
 
@@ -40,20 +41,20 @@ class ProfileScreen extends StatelessWidget {
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
                               gradient: const LinearGradient(
-                                  colors: [Color(0xFFFF6B35), Color(0xFFFF9B65)]),
+                                  colors: [AppColors.orange, AppColors.orangeLight]),
                               boxShadow: [
                                 BoxShadow(
-                                    color: const Color(0xFFFF6B35).withValues(alpha: 0.4),
+                                    color: AppColors.orange.withValues(alpha: 0.4),
                                     blurRadius: 20,
                                     spreadRadius: 4)
                               ],
                             ),
-                            child: const Icon(Icons.person, color: Colors.white, size: 40),
+                            child: const Icon(Icons.person, color: AppColors.textPrimary, size: 40),
                           ),
                           const SizedBox(height: 12),
                           Text(l10n.profileLevel(levelInfo.level),
                               style: const TextStyle(
-                                  fontSize: 24, fontWeight: FontWeight.w200, color: Colors.white)),
+                                  fontSize: 24, fontWeight: FontWeight.w200, color: AppColors.textPrimary)),
                           const SizedBox(height: 8),
                           SizedBox(
                             width: 200,
@@ -65,15 +66,15 @@ class ProfileScreen extends StatelessWidget {
                                     value: levelInfo.nextLevelXp > 0
                                         ? levelInfo.currentXp / levelInfo.nextLevelXp
                                         : 1.0,
-                                    backgroundColor: Colors.white12,
+                                    backgroundColor: AppColors.textHint,
                                     valueColor:
-                                        const AlwaysStoppedAnimation(Color(0xFFFF6B35)),
+                                        const AlwaysStoppedAnimation(AppColors.orange),
                                     minHeight: 6,
                                   ),
                                 ),
                                 const SizedBox(height: 4),
                                 Text('${levelInfo.currentXp} / ${levelInfo.nextLevelXp} XP',
-                                    style: const TextStyle(color: Colors.white38, fontSize: 11)),
+                                    style: const TextStyle(color: AppColors.textDisabled, fontSize: 11)),
                               ],
                             ),
                           ),
@@ -113,7 +114,7 @@ class ProfileScreen extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                          color: const Color(0xFF1a1a2e),
+                          color: AppColors.darkCard,
                           borderRadius: BorderRadius.circular(12)),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -121,12 +122,12 @@ class ProfileScreen extends StatelessWidget {
                           Text(
                             l10n.profileAchievementsUnlocked(
                                 gs.achievements.length, kAchievements.length),
-                            style: const TextStyle(color: Colors.white70, fontSize: 15),
+                            style: const TextStyle(color: AppColors.textSecondary, fontSize: 15),
                           ),
                           Text(
                             '${(gs.achievements.length / kAchievements.length * 100).round()}%',
                             style: const TextStyle(
-                                color: Color(0xFFFF6B35), fontSize: 15, fontWeight: FontWeight.w600),
+                                color: AppColors.orange, fontSize: 15, fontWeight: FontWeight.w600),
                           ),
                         ],
                       ),
@@ -158,22 +159,22 @@ class ProfileScreen extends StatelessWidget {
   static Widget _label(String text) => Text(
         text.toUpperCase(),
         style: const TextStyle(
-            fontSize: 11, letterSpacing: 2, color: Colors.white38, fontWeight: FontWeight.w600),
+            fontSize: 11, letterSpacing: 2, color: AppColors.textDisabled, fontWeight: FontWeight.w600),
       );
 
   static Widget _statTile(String label, String value) => Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
-            color: const Color(0xFF1a1a2e), borderRadius: BorderRadius.circular(12)),
+            color: AppColors.darkCard, borderRadius: BorderRadius.circular(12)),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.center,
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(label, style: const TextStyle(color: Colors.white38, fontSize: 11)),
+            Text(label, style: const TextStyle(color: AppColors.textDisabled, fontSize: 11)),
             Text(value,
                 style: const TextStyle(
-                    color: Colors.white, fontSize: 18, fontWeight: FontWeight.w300)),
+                    color: AppColors.textPrimary, fontSize: 18, fontWeight: FontWeight.w300)),
           ],
         ),
       );
@@ -182,14 +183,14 @@ class ProfileScreen extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         margin: const EdgeInsets.only(bottom: 8),
         decoration: BoxDecoration(
-            color: const Color(0xFF1a1a2e), borderRadius: BorderRadius.circular(12)),
+            color: AppColors.darkCard, borderRadius: BorderRadius.circular(12)),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(label, style: const TextStyle(color: Colors.white70, fontSize: 15)),
+            Text(label, style: const TextStyle(color: AppColors.textSecondary, fontSize: 15)),
             Text(value,
                 style: const TextStyle(
-                    color: Color(0xFFFF6B35), fontSize: 15, fontWeight: FontWeight.w600)),
+                    color: AppColors.orange, fontSize: 15, fontWeight: FontWeight.w600)),
           ],
         ),
       );

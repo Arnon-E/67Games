@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../l10n/app_localizations.dart';
 import '../state/game_state.dart';
+import '../theme/app_colors.dart';
 import '../widgets/app_gradient_background.dart';
 import '../widgets/screen_header.dart';
 
@@ -92,18 +93,18 @@ class ShopScreen extends StatelessWidget {
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFFFD700).withValues(alpha: 0.12),
+                    color: AppColors.gold.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: const Color(0xFFFFD700).withValues(alpha: 0.3)),
+                    border: Border.all(color: AppColors.gold.withValues(alpha: 0.3)),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.circle, color: Color(0xFFFFD700), size: 16),
+                      const Icon(Icons.circle, color: AppColors.gold, size: 16),
                       const SizedBox(width: 8),
                       Text(l10n.shopCoins(gs.coins),
                           style: const TextStyle(
-                              color: Color(0xFFFFD700), fontSize: 15, fontWeight: FontWeight.w600)),
+                              color: AppColors.gold, fontSize: 15, fontWeight: FontWeight.w600)),
                     ],
                   ),
                 ),
@@ -119,7 +120,7 @@ class ShopScreen extends StatelessWidget {
                         Text(_categoryName(entry.key, l10n).toUpperCase(),
                             style: const TextStyle(
                                 fontSize: 11, letterSpacing: 2,
-                                color: Colors.white38, fontWeight: FontWeight.w600)),
+                                color: AppColors.textDisabled, fontWeight: FontWeight.w600)),
                         const SizedBox(height: 10),
                         ...entry.value.map((item) => _ItemCard(
                               item: item,
@@ -167,7 +168,7 @@ class _ItemCard extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFF1a1a2e),
+        color: AppColors.darkCard,
         borderRadius: BorderRadius.circular(14),
         border: owned ? Border.all(color: item.color.withValues(alpha: 0.5)) : null,
       ),
@@ -187,8 +188,8 @@ class _ItemCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(name, style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w600)),
-                Text(description, style: const TextStyle(color: Colors.white38, fontSize: 12)),
+                Text(name, style: const TextStyle(color: AppColors.textPrimary, fontSize: 15, fontWeight: FontWeight.w600)),
+                Text(description, style: const TextStyle(color: AppColors.textDisabled, fontSize: 12)),
               ],
             ),
           ),
@@ -213,16 +214,16 @@ class _ItemCard extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
-                    color: canAfford ? const Color(0xFFFF6B35) : Colors.white12,
+                    color: canAfford ? AppColors.orange : AppColors.textHint,
                     borderRadius: BorderRadius.circular(20)),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.circle, color: canAfford ? Colors.white : Colors.white38, size: 10),
+                    Icon(Icons.circle, color: canAfford ? AppColors.textPrimary : AppColors.textDisabled, size: 10),
                     const SizedBox(width: 4),
                     Text('${item.price}',
                         style: TextStyle(
-                            color: canAfford ? Colors.white : Colors.white38,
+                            color: canAfford ? AppColors.textPrimary : AppColors.textDisabled,
                             fontSize: 13, fontWeight: FontWeight.w600)),
                   ],
                 ),

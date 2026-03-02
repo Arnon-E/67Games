@@ -37,6 +37,8 @@
 
   "countdownGetReady": "GET READY",
 
+  "playingStopAt": "Stop at ",
+  "playingStop": "STOP",
   "playingBlindMode": "BLIND MODE",
   "playingTapHint": "TAP ANYWHERE TO STOP",
   "playingTarget": "Target",
@@ -167,6 +169,14 @@
   "modeDailyDesc": "One attempt per day - compete globally",
   "modeSurgeName": "Surge",
   "modeSurgeDesc": "Timer speeds up every game — how long can you keep up?",
+
+  "authSignIn": "Sign In",
+  "authCompeteGlobally": "Compete Globally",
+  "authSubtitle": "Sign in to appear on the leaderboard\nand track your rank worldwide.",
+  "authContinueWithGoogle": "Continue with Google",
+  "authSigningIn": "Signing in…",
+  "authPlayAsGuest": "Play as Guest",
+  "authEnterDisplayName": "Enter your display name",
 
   "surgeResetTitle": "SURGE RESET",
   "surgeResetBody": "3 fails in a row.\nSpeed resets to 1×.",

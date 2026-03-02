@@ -92,6 +92,12 @@ class AppLocalizationsHe extends AppLocalizations {
   String get countdownGetReady => 'היה מוכן';
 
   @override
+  String get playingStopAt => 'עצור על ';
+
+  @override
+  String get playingStop => 'עצור';
+
+  @override
   String get playingBlindMode => 'מצב עיוור';
 
   @override
@@ -389,6 +395,28 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get modeSurgeDesc => 'הטיימר מאיץ בכל משחק — כמה זמן תחזיק?';
+
+  @override
+  String get authSignIn => 'התחבר';
+
+  @override
+  String get authCompeteGlobally => 'התחרה גלובלית';
+
+  @override
+  String get authSubtitle =>
+      'התחבר כדי להופיע בלוח המובילים\nולעקוב אחר הדירוג שלך ברחבי העולם.';
+
+  @override
+  String get authContinueWithGoogle => 'המשך עם Google';
+
+  @override
+  String get authSigningIn => 'מתחבר…';
+
+  @override
+  String get authPlayAsGuest => 'שחק כאורח';
+
+  @override
+  String get authEnterDisplayName => 'הזן שם תצוגה';
 
   @override
   String get surgeResetTitle => 'איפוס גל';

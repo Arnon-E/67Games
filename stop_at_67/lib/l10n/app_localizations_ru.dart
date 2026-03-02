@@ -92,6 +92,12 @@ class AppLocalizationsRu extends AppLocalizations {
   String get countdownGetReady => 'ПРИГОТОВЬТЕСЬ';
 
   @override
+  String get playingStopAt => 'Стоп на ';
+
+  @override
+  String get playingStop => 'СТОП';
+
+  @override
   String get playingBlindMode => 'СЛЕПОЙ РЕЖИМ';
 
   @override
@@ -393,6 +399,28 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get modeSurgeDesc =>
       'Таймер ускоряется каждую игру — как долго продержитесь?';
+
+  @override
+  String get authSignIn => 'Войти';
+
+  @override
+  String get authCompeteGlobally => 'Соревнуйтесь глобально';
+
+  @override
+  String get authSubtitle =>
+      'Войдите, чтобы появиться в таблице лидеров\nи отслеживать свой рейтинг по всему миру.';
+
+  @override
+  String get authContinueWithGoogle => 'Продолжить с Google';
+
+  @override
+  String get authSigningIn => 'Вход…';
+
+  @override
+  String get authPlayAsGuest => 'Играть как гость';
+
+  @override
+  String get authEnterDisplayName => 'Введите отображаемое имя';
 
   @override
   String get surgeResetTitle => 'СБРОС ВОЛНЫ';

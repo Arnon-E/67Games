@@ -3,8 +3,8 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 class AdsService {
   // Test ad unit IDs (replace with real ones for production)
-  static const _interstitialAdUnitId = 'ca-app-pub-3940256099942544/1033173712';
-  static const _rewardedAdUnitId = 'ca-app-pub-3940256099942544/5224354917';
+  static const _interstitialAdUnitId = 'ca-app-pub-6676728509237934/8213370504';
+  static const _rewardedAdUnitId = 'ca-app-pub-6676728509237934/8993875800';
 
   InterstitialAd? _interstitial;
   RewardedAd? _rewarded;
@@ -20,7 +20,6 @@ class AdsService {
         maxAdContentRating: MaxAdContentRating.pg,
         tagForChildDirectedTreatment: TagForChildDirectedTreatment.unspecified,
         tagForUnderAgeOfConsent: TagForUnderAgeOfConsent.unspecified,
-        testDeviceIds: const ['EMULATOR'],
       ),
     );
     _initialized = true;

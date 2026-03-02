@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 
 import '../state/game_state.dart';
 import '../state/auth_state.dart';
+import '../l10n/app_localizations.dart';
+import '../theme/app_colors.dart';
 import '../widgets/app_gradient_background.dart';
 import '../widgets/screen_header.dart';
 import '../widgets/game_button.dart';
@@ -25,23 +27,20 @@ class _AuthScreenState extends State<AuthScreen> {
   }
 
   Future<void> _signInGoogle() async {
-    final auth = context.read<AuthState>();
-    final gs = context.read<GameState>();
-    final ok = await auth.signInWithGoogle();
-    if (ok && mounted) gs.setScreen(AppScreen.leaderboard);
+    final ok = await context.read<AuthState>().signInWithGoogle();
+    if (ok && mounted) context.read<GameState>().setScreen(AppScreen.leaderboard);
   }
 
   Future<void> _signInGuest() async {
-    final auth = context.read<AuthState>();
-    final gs = context.read<GameState>();
-    final ok = await auth.signInAnonymous(_nameController.text);
-    if (ok && mounted) gs.setScreen(AppScreen.leaderboard);
+    final ok = await context.read<AuthState>().signInAnonymous(_nameController.text);
+    if (ok && mounted) context.read<GameState>().setScreen(AppScreen.leaderboard);
   }
 
   @override
   Widget build(BuildContext context) {
     final auth = context.watch<AuthState>();
     final gs = context.watch<GameState>();
+    final l10n = AppLocalizations.of(context);
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -51,7 +50,7 @@ class _AuthScreenState extends State<AuthScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               ScreenHeader(
-                title: 'Sign In',
+                title: l10n.authSignIn,
                 onBack: () => gs.setScreen(AppScreen.leaderboard),
               ),
               Expanded(
@@ -61,20 +60,20 @@ class _AuthScreenState extends State<AuthScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       const Icon(Icons.emoji_events_outlined,
-                          color: Color(0xFFFF6B35), size: 64),
+                          color: AppColors.orange, size: 64),
                       const SizedBox(height: 24),
-                      const Text(
-                        'Compete Globally',
-                        style: TextStyle(
-                            color: Colors.white,
+                      Text(
+                        l10n.authCompeteGlobally,
+                        style: const TextStyle(
+                            color: AppColors.textPrimary,
                             fontSize: 24,
                             fontWeight: FontWeight.w200),
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 8),
-                      const Text(
-                        'Sign in to appear on the leaderboard\nand track your rank worldwide.',
-                        style: TextStyle(color: Colors.white38, fontSize: 14),
+                      Text(
+                        l10n.authSubtitle,
+                        style: const TextStyle(color: AppColors.textDisabled, fontSize: 14),
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 48),
@@ -82,14 +81,14 @@ class _AuthScreenState extends State<AuthScreen> {
                       if (auth.error != null) ...[
                         Text(auth.error!,
                             style: const TextStyle(
-                                color: Color(0xFFFF6B35), fontSize: 13)),
+                                color: AppColors.orange, fontSize: 13)),
                         const SizedBox(height: 16),
                       ],
 
                       if (!_showGuestForm) ...[
                         // Google sign-in
                         GameButton(
-                          label: auth.isLoading ? 'Signing in…' : 'Continue with Google',
+                          label: auth.isLoading ? l10n.authSigningIn : l10n.authContinueWithGoogle,
                           onPressed: auth.isLoading ? null : _signInGoogle,
                           width: double.infinity,
                         ),
@@ -97,33 +96,33 @@ class _AuthScreenState extends State<AuthScreen> {
                         // Or play as guest
                         GestureDetector(
                           onTap: () => setState(() => _showGuestForm = true),
-                          child: const Text(
-                            'Play as Guest',
-                            style: TextStyle(
-                                color: Colors.white54,
+                          child: Text(
+                            l10n.authPlayAsGuest,
+                            style: const TextStyle(
+                                color: AppColors.textDisabled,
                                 fontSize: 15,
                                 decoration: TextDecoration.underline,
-                                decorationColor: Colors.white54),
+                                decorationColor: AppColors.textDisabled),
                           ),
                         ),
                       ] else ...[
                         // Guest name form
                         Container(
                           decoration: BoxDecoration(
-                            color: const Color(0xFF1a1a2e),
+                            color: AppColors.darkCard,
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(
-                                color: const Color(0xFFFF6B35).withValues(alpha: 0.3)),
+                                color: AppColors.orange.withValues(alpha: 0.3)),
                           ),
                           child: TextField(
                             controller: _nameController,
                             autofocus: true,
                             maxLength: 20,
-                            style: const TextStyle(color: Colors.white),
-                            decoration: const InputDecoration(
-                              hintText: 'Enter your display name',
-                              hintStyle: TextStyle(color: Colors.white38),
-                              contentPadding: EdgeInsets.symmetric(
+                            style: const TextStyle(color: AppColors.textPrimary),
+                            decoration: InputDecoration(
+                              hintText: l10n.authEnterDisplayName,
+                              hintStyle: const TextStyle(color: AppColors.textDisabled),
+                              contentPadding: const EdgeInsets.symmetric(
                                   horizontal: 16, vertical: 14),
                               border: InputBorder.none,
                               counterText: '',
@@ -132,16 +131,16 @@ class _AuthScreenState extends State<AuthScreen> {
                         ),
                         const SizedBox(height: 16),
                         GameButton(
-                          label: auth.isLoading ? 'Signing in…' : 'Play as Guest',
+                          label: auth.isLoading ? l10n.authSigningIn : l10n.authPlayAsGuest,
                           onPressed: auth.isLoading ? null : _signInGuest,
                           width: double.infinity,
                         ),
                         const SizedBox(height: 16),
                         GestureDetector(
                           onTap: () => setState(() => _showGuestForm = false),
-                          child: const Text(
-                            'Back',
-                            style: TextStyle(color: Colors.white38, fontSize: 14),
+                          child: Text(
+                            l10n.commonBack,
+                            style: const TextStyle(color: AppColors.textDisabled, fontSize: 14),
                           ),
                         ),
                       ],
