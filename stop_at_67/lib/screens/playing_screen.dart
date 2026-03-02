@@ -46,28 +46,30 @@ class _PlayingScreenState extends State<PlayingScreen> {
             child: SizedBox.expand(
               child: Stack(
                 children: [
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      TimerDisplay(
-                        displayTime: timerState.displayTime,
-                        isBlind: gs.isBlindMode,
-                        targetLabel: mode != null
-                            ? '${l10n.playingTarget}: ${mode.displayTarget}'
-                            : null,
-                      ),
-                      const SizedBox(height: 64),
-                      Text(
-                        l10n.playingTapHint,
-                        style: const TextStyle(
-                          fontSize: 14,
-                          letterSpacing: 2,
-                          color: Colors.white24,
-                          fontWeight: FontWeight.w300,
+                  Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        TimerDisplay(
+                          displayTime: timerState.displayTime,
+                          isBlind: gs.isBlindMode,
+                          targetLabel: mode != null
+                              ? '${l10n.playingTarget}: ${mode.displayTarget}'
+                              : null,
                         ),
-                      ),
-                    ],
+                        const SizedBox(height: 64),
+                        Text(
+                          l10n.playingTapHint,
+                          style: const TextStyle(
+                            fontSize: 14,
+                            letterSpacing: 2,
+                            color: Colors.white24,
+                            fontWeight: FontWeight.w300,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                   if (mode?.id == 'surge')
                     Positioned(

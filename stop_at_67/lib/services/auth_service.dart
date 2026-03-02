@@ -11,29 +11,26 @@ class AuthService {
   User? get currentUser => _auth.currentUser;
   bool get isSignedIn => _auth.currentUser != null;
 
-  /// Sign in with Google. Returns the signed-in User or null on failure.
+  /// Sign in with Google. Returns the signed-in User or null on cancellation.
+  /// Throws on actual errors so callers can surface them.
   Future<User?> signInWithGoogle() async {
-    try {
-      final googleUser = await _googleSignIn.signIn();
-      if (googleUser == null) return null;
-      final googleAuth = await googleUser.authentication;
-      final credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
-        idToken: googleAuth.idToken,
+    final googleUser = await _googleSignIn.signIn();
+    if (googleUser == null) return null; // user cancelled
+    final googleAuth = await googleUser.authentication;
+    final credential = GoogleAuthProvider.credential(
+      accessToken: googleAuth.accessToken,
+      idToken: googleAuth.idToken,
+    );
+    final result = await _auth.signInWithCredential(credential);
+    final user = result.user;
+    if (user != null) {
+      await _upsertUserDoc(
+        uid: user.uid,
+        displayName: user.displayName ?? googleUser.displayName ?? 'Player',
+        isAnonymous: false,
       );
-      final result = await _auth.signInWithCredential(credential);
-      final user = result.user;
-      if (user != null) {
-        await _upsertUserDoc(
-          uid: user.uid,
-          displayName: user.displayName ?? googleUser.displayName ?? 'Player',
-          isAnonymous: false,
-        );
-      }
-      return user;
-    } catch (_) {
-      return null;
     }
+    return user;
   }
 
   /// Sign in anonymously with a chosen display name.

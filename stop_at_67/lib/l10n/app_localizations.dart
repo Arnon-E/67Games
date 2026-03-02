@@ -838,6 +838,48 @@ abstract class AppLocalizations {
   /// **'Timer speeds up every game — how long can you keep up?'**
   String get modeSurgeDesc;
 
+  /// No description provided for @authSignIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign In'**
+  String get authSignIn;
+
+  /// No description provided for @authCompeteGlobally.
+  ///
+  /// In en, this message translates to:
+  /// **'Compete Globally'**
+  String get authCompeteGlobally;
+
+  /// No description provided for @authSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in to appear on the leaderboard\nand track your rank worldwide.'**
+  String get authSubtitle;
+
+  /// No description provided for @authContinueWithGoogle.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue with Google'**
+  String get authContinueWithGoogle;
+
+  /// No description provided for @authSigningIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Signing in…'**
+  String get authSigningIn;
+
+  /// No description provided for @authPlayAsGuest.
+  ///
+  /// In en, this message translates to:
+  /// **'Play as Guest'**
+  String get authPlayAsGuest;
+
+  /// No description provided for @authEnterDisplayName.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your display name'**
+  String get authEnterDisplayName;
+
   /// No description provided for @surgeResetTitle.
   ///
   /// In en, this message translates to:

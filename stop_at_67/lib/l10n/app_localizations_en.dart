@@ -392,6 +392,28 @@ class AppLocalizationsEn extends AppLocalizations {
       'Timer speeds up every game — how long can you keep up?';
 
   @override
+  String get authSignIn => 'Sign In';
+
+  @override
+  String get authCompeteGlobally => 'Compete Globally';
+
+  @override
+  String get authSubtitle =>
+      'Sign in to appear on the leaderboard\nand track your rank worldwide.';
+
+  @override
+  String get authContinueWithGoogle => 'Continue with Google';
+
+  @override
+  String get authSigningIn => 'Signing in…';
+
+  @override
+  String get authPlayAsGuest => 'Play as Guest';
+
+  @override
+  String get authEnterDisplayName => 'Enter your display name';
+
+  @override
   String get surgeResetTitle => 'SURGE RESET';
 
   @override

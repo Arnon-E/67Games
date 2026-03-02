@@ -81,7 +81,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                   scrollDirection: Axis.horizontal,
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   children: kGameModes.values
-                      .where((mode) => !const {'extended', 'reverse', 'reverse100'}.contains(mode.id))
+                      .where((mode) => !const {'extended', 'reverse', 'reverse100', 'daily'}.contains(mode.id))
                       .map((mode) {
                     final isSelected = _selectedModeId == mode.id;
                     return Padding(

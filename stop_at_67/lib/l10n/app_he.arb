@@ -169,6 +169,14 @@
   "modeSurgeName": "גל",
   "modeSurgeDesc": "הטיימר מאיץ בכל משחק — כמה זמן תחזיק?",
 
+  "authSignIn": "התחבר",
+  "authCompeteGlobally": "התחרה גלובלית",
+  "authSubtitle": "התחבר כדי להופיע בלוח המובילים\nולעקוב אחר הדירוג שלך ברחבי העולם.",
+  "authContinueWithGoogle": "המשך עם Google",
+  "authSigningIn": "מתחבר…",
+  "authPlayAsGuest": "שחק כאורח",
+  "authEnterDisplayName": "הזן שם תצוגה",
+
   "surgeResetTitle": "איפוס גל",
   "surgeResetBody": "3 כישלונות ברצף.\nהמהירות מתאפסת ל-1×.",
   "surgeResetWatchAd": "צפה בפרסומת — שמור מהירות",

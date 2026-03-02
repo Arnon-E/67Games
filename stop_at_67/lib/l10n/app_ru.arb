@@ -168,6 +168,14 @@
   "modeSurgeName": "Волна",
   "modeSurgeDesc": "Таймер ускоряется каждую игру — как долго продержитесь?",
 
+  "authSignIn": "Войти",
+  "authCompeteGlobally": "Соревнуйтесь глобально",
+  "authSubtitle": "Войдите, чтобы появиться в таблице лидеров\nи отслеживать свой рейтинг по всему миру.",
+  "authContinueWithGoogle": "Продолжить с Google",
+  "authSigningIn": "Вход…",
+  "authPlayAsGuest": "Играть как гость",
+  "authEnterDisplayName": "Введите отображаемое имя",
+
   "surgeResetTitle": "СБРОС ВОЛНЫ",
   "surgeResetBody": "3 неудачи подряд.\nСкорость сбрасывается до 1×.",
   "surgeResetWatchAd": "СМОТРЕТЬ РЕКЛАМУ — СОХРАНИТЬ СКОРОСТЬ",
