@@ -8,6 +8,7 @@ import '../engine/constants.dart';
 import '../engine/scoring.dart';
 import '../engine/types.dart';
 import '../services/leaderboard_service.dart';
+import '../theme/app_colors.dart';
 import '../widgets/app_gradient_background.dart';
 import '../widgets/screen_header.dart';
 import '../widgets/game_button.dart';
@@ -93,14 +94,14 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                               horizontal: 16, vertical: 8),
                           decoration: BoxDecoration(
                             color: isSelected
-                                ? const Color(0xFFFF6B35)
-                                : const Color(0xFF2a2a3e),
+                                ? AppColors.orange
+                                : AppColors.darkElevated,
                             borderRadius: BorderRadius.circular(20),
                           ),
                           child: Text(
                             _modeName(mode.id, l10n),
                             style: TextStyle(
-                              color: isSelected ? Colors.white : Colors.white54,
+                              color: isSelected ? AppColors.textPrimary : AppColors.textDisabled,
                               fontSize: 13,
                               fontWeight: isSelected
                                   ? FontWeight.w600
@@ -121,17 +122,17 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                 child: Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF1a1a2e),
+                    color: AppColors.darkCard,
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
-                        color: const Color(0xFFFF6B35).withValues(alpha: 0.3)),
+                        color: AppColors.orange.withValues(alpha: 0.3)),
                   ),
                   child: Row(
                     children: [
                       const CircleAvatar(
                         radius: 20,
-                        backgroundColor: Color(0xFFFF6B35),
-                        child: Icon(Icons.person, color: Colors.white, size: 20),
+                        backgroundColor: AppColors.orange,
+                        child: Icon(Icons.person, color: AppColors.textPrimary, size: 20),
                       ),
                       const SizedBox(width: 12),
                       Expanded(
@@ -141,14 +142,14 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                             Text(
                               auth.isSignedIn ? auth.userName : l10n.leaderboardYourBest,
                               style: const TextStyle(
-                                  color: Colors.white54, fontSize: 12),
+                                  color: AppColors.textDisabled, fontSize: 12),
                             ),
                             Text(
                               bestScores[_selectedModeId] != null
                                   ? formatScore(bestScores[_selectedModeId]!)
                                   : '—',
                               style: const TextStyle(
-                                  color: Colors.white,
+                                  color: AppColors.textPrimary,
                                   fontSize: 24,
                                   fontWeight: FontWeight.w200),
                             ),
@@ -166,7 +167,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                           onTap: () => auth.signOut(),
                           child: Text(l10n.leaderboardSignOut,
                               style: const TextStyle(
-                                  color: Colors.white38, fontSize: 12)),
+                                  color: AppColors.textDisabled, fontSize: 12)),
                         ),
                     ],
                   ),
@@ -183,7 +184,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                           if (snap.connectionState == ConnectionState.waiting) {
                             return const Center(
                                 child: CircularProgressIndicator(
-                                    color: Color(0xFFFF6B35)));
+                                    color: AppColors.orange));
                           }
                           final entries = snap.data ?? [];
                           if (entries.isEmpty) {
@@ -192,23 +193,23 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   const Icon(Icons.leaderboard_outlined,
-                                      color: Colors.white24, size: 48),
+                                      color: AppColors.textHint, size: 48),
                                   const SizedBox(height: 16),
                                   Text(l10n.leaderboardNoScores,
                                       style: const TextStyle(
-                                          color: Colors.white54,
+                                          color: AppColors.textDisabled,
                                           fontSize: 16)),
                                   const SizedBox(height: 8),
                                   Text(l10n.leaderboardBeFirst,
                                       style: const TextStyle(
-                                          color: Colors.white24,
+                                          color: AppColors.textHint,
                                           fontSize: 13)),
                                 ],
                               ),
                             );
                           }
                           return RefreshIndicator(
-                            color: const Color(0xFFFF6B35),
+                            color: AppColors.orange,
                             onRefresh: () async => _loadScores(),
                             child: ListView.builder(
                               padding: const EdgeInsets.symmetric(
@@ -228,15 +229,15 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             const Icon(Icons.lock_outline,
-                                color: Colors.white24, size: 48),
+                                color: AppColors.textHint, size: 48),
                             const SizedBox(height: 16),
                             Text(l10n.leaderboardSignInToSee,
                                 style: const TextStyle(
-                                    color: Colors.white54, fontSize: 16)),
+                                    color: AppColors.textDisabled, fontSize: 16)),
                             const SizedBox(height: 8),
                             Text(l10n.leaderboardScoresGlobal,
                                 style: const TextStyle(
-                                    color: Colors.white24, fontSize: 13)),
+                                    color: AppColors.textHint, fontSize: 13)),
                           ],
                         ),
                       ),
@@ -257,10 +258,10 @@ class _RankRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final rankColor = switch (entry.rank) {
-      1 => const Color(0xFFFFD700),
+      1 => AppColors.gold,
       2 => const Color(0xFFCCCCCC),
       3 => const Color(0xFFCD7F32),
-      _ => Colors.white38,
+      _ => AppColors.textDisabled,
     };
 
     return Container(
@@ -268,12 +269,11 @@ class _RankRow extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
         color: isMe
-            ? const Color(0xFFFF6B35).withValues(alpha: 0.12)
-            : const Color(0xFF1a1a2e),
+            ? AppColors.orange.withValues(alpha: 0.12)
+            : AppColors.darkCard,
         borderRadius: BorderRadius.circular(12),
         border: isMe
-            ? Border.all(
-                color: const Color(0xFFFF6B35).withValues(alpha: 0.4))
+            ? Border.all(color: AppColors.orange.withValues(alpha: 0.4))
             : null,
       ),
       child: Row(
@@ -293,17 +293,16 @@ class _RankRow extends StatelessWidget {
             child: Text(
               entry.displayName,
               style: TextStyle(
-                  color: isMe ? const Color(0xFFFF6B35) : Colors.white,
+                  color: isMe ? AppColors.orange : AppColors.textPrimary,
                   fontSize: 15,
-                  fontWeight:
-                      isMe ? FontWeight.w600 : FontWeight.normal),
+                  fontWeight: isMe ? FontWeight.w600 : FontWeight.normal),
               overflow: TextOverflow.ellipsis,
             ),
           ),
           Text(
             formatScore(entry.score),
             style: const TextStyle(
-                color: Colors.white,
+                color: AppColors.textPrimary,
                 fontSize: 15,
                 fontWeight: FontWeight.w600),
           ),

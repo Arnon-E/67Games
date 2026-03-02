@@ -37,6 +37,8 @@
 
   "countdownGetReady": "ПРИГОТОВЬТЕСЬ",
 
+  "playingStopAt": "Стоп на ",
+  "playingStop": "СТОП",
   "playingBlindMode": "СЛЕПОЙ РЕЖИМ",
   "playingTapHint": "НАЖМИТЕ КУДА УГОДНО, ЧТОБЫ ОСТАНОВИТЬ",
   "playingTarget": "Цель",

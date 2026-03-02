@@ -92,6 +92,12 @@ class AppLocalizationsHe extends AppLocalizations {
   String get countdownGetReady => 'היה מוכן';
 
   @override
+  String get playingStopAt => 'עצור על ';
+
+  @override
+  String get playingStop => 'עצור';
+
+  @override
   String get playingBlindMode => 'מצב עיוור';
 
   @override

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../l10n/app_localizations.dart';
 import '../engine/types.dart';
+import '../theme/app_colors.dart';
 
 class ModeCard extends StatelessWidget {
   final GameMode mode;
@@ -52,13 +53,13 @@ class ModeCard extends StatelessWidget {
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
           color: isLocked
-              ? const Color(0xFF1a1a2e).withValues(alpha: 0.5)
-              : const Color(0xFF1a1a2e),
+              ? AppColors.darkCard.withValues(alpha: 0.5)
+              : AppColors.darkCard,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: isLocked
-                ? Colors.white12
-                : const Color(0xFFFF6B35).withValues(alpha: 0.3),
+                ? AppColors.textHint
+                : AppColors.orange.withValues(alpha: 0.3),
           ),
         ),
         child: Row(
@@ -72,7 +73,7 @@ class ModeCard extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w600,
-                      color: isLocked ? Colors.white38 : Colors.white,
+                      color: isLocked ? AppColors.textDisabled : AppColors.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -80,7 +81,7 @@ class ModeCard extends StatelessWidget {
                     _localDesc(l10n),
                     style: TextStyle(
                       fontSize: 13,
-                      color: isLocked ? Colors.white24 : Colors.white54,
+                      color: isLocked ? AppColors.textHint : AppColors.textDisabled,
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -88,9 +89,7 @@ class ModeCard extends StatelessWidget {
                     l10n.modeCardTarget(mode.displayTarget),
                     style: TextStyle(
                       fontSize: 12,
-                      color: isLocked
-                          ? Colors.white24
-                          : const Color(0xFFFF6B35),
+                      color: isLocked ? AppColors.textHint : AppColors.orange,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -98,9 +97,9 @@ class ModeCard extends StatelessWidget {
               ),
             ),
             if (isLocked)
-              const Icon(Icons.lock_outline, color: Colors.white38, size: 24)
+              const Icon(Icons.lock_outline, color: AppColors.textDisabled, size: 24)
             else
-              const Icon(Icons.chevron_right, color: Colors.white54, size: 24),
+              const Icon(Icons.chevron_right, color: AppColors.textDisabled, size: 24),
           ],
         ),
       ),

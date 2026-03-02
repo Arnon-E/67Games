@@ -38,6 +38,8 @@
 
   "countdownGetReady": "היה מוכן",
 
+  "playingStopAt": "עצור על ",
+  "playingStop": "עצור",
   "playingBlindMode": "מצב עיוור",
   "playingTapHint": "הקש בכל מקום כדי לעצור",
   "playingTarget": "יעד",

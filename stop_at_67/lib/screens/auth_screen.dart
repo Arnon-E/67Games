@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../state/game_state.dart';
 import '../state/auth_state.dart';
 import '../l10n/app_localizations.dart';
+import '../theme/app_colors.dart';
 import '../widgets/app_gradient_background.dart';
 import '../widgets/screen_header.dart';
 import '../widgets/game_button.dart';
@@ -59,12 +60,12 @@ class _AuthScreenState extends State<AuthScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       const Icon(Icons.emoji_events_outlined,
-                          color: Color(0xFFFF6B35), size: 64),
+                          color: AppColors.orange, size: 64),
                       const SizedBox(height: 24),
                       Text(
                         l10n.authCompeteGlobally,
                         style: const TextStyle(
-                            color: Colors.white,
+                            color: AppColors.textPrimary,
                             fontSize: 24,
                             fontWeight: FontWeight.w200),
                         textAlign: TextAlign.center,
@@ -72,7 +73,7 @@ class _AuthScreenState extends State<AuthScreen> {
                       const SizedBox(height: 8),
                       Text(
                         l10n.authSubtitle,
-                        style: const TextStyle(color: Colors.white38, fontSize: 14),
+                        style: const TextStyle(color: AppColors.textDisabled, fontSize: 14),
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 48),
@@ -80,7 +81,7 @@ class _AuthScreenState extends State<AuthScreen> {
                       if (auth.error != null) ...[
                         Text(auth.error!,
                             style: const TextStyle(
-                                color: Color(0xFFFF6B35), fontSize: 13)),
+                                color: AppColors.orange, fontSize: 13)),
                         const SizedBox(height: 16),
                       ],
 
@@ -98,29 +99,29 @@ class _AuthScreenState extends State<AuthScreen> {
                           child: Text(
                             l10n.authPlayAsGuest,
                             style: const TextStyle(
-                                color: Colors.white54,
+                                color: AppColors.textDisabled,
                                 fontSize: 15,
                                 decoration: TextDecoration.underline,
-                                decorationColor: Colors.white54),
+                                decorationColor: AppColors.textDisabled),
                           ),
                         ),
                       ] else ...[
                         // Guest name form
                         Container(
                           decoration: BoxDecoration(
-                            color: const Color(0xFF1a1a2e),
+                            color: AppColors.darkCard,
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(
-                                color: const Color(0xFFFF6B35).withValues(alpha: 0.3)),
+                                color: AppColors.orange.withValues(alpha: 0.3)),
                           ),
                           child: TextField(
                             controller: _nameController,
                             autofocus: true,
                             maxLength: 20,
-                            style: const TextStyle(color: Colors.white),
+                            style: const TextStyle(color: AppColors.textPrimary),
                             decoration: InputDecoration(
                               hintText: l10n.authEnterDisplayName,
-                              hintStyle: const TextStyle(color: Colors.white38),
+                              hintStyle: const TextStyle(color: AppColors.textDisabled),
                               contentPadding: const EdgeInsets.symmetric(
                                   horizontal: 16, vertical: 14),
                               border: InputBorder.none,
@@ -139,7 +140,7 @@ class _AuthScreenState extends State<AuthScreen> {
                           onTap: () => setState(() => _showGuestForm = false),
                           child: Text(
                             l10n.commonBack,
-                            style: const TextStyle(color: Colors.white38, fontSize: 14),
+                            style: const TextStyle(color: AppColors.textDisabled, fontSize: 14),
                           ),
                         ),
                       ],

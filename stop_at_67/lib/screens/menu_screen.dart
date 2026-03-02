@@ -4,6 +4,7 @@ import '../l10n/app_localizations.dart';
 
 import '../state/game_state.dart';
 import '../engine/constants.dart';
+import '../theme/app_colors.dart';
 import '../widgets/app_gradient_background.dart';
 import '../widgets/daily_reward_modal.dart';
 
@@ -82,29 +83,29 @@ class _MenuScreenState extends State<MenuScreen>
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF2a2a3e),
+                        color: AppColors.darkElevated,
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Text(
                         l10n.menuLevel(levelInfo.level),
-                        style: const TextStyle(color: Colors.white70, fontSize: 13),
+                        style: const TextStyle(color: AppColors.textSecondary, fontSize: 13),
                       ),
                     ),
                     // Coins
                     Row(
                       children: [
-                        const Icon(Icons.circle, color: Color(0xFFFFD700), size: 14),
+                        const Icon(Icons.circle, color: AppColors.gold, size: 14),
                         const SizedBox(width: 4),
                         Text(
                           '${gs.coins}',
-                          style: const TextStyle(color: Colors.white70, fontSize: 14),
+                          style: const TextStyle(color: AppColors.textSecondary, fontSize: 14),
                         ),
                       ],
                     ),
                     // Settings
                     GestureDetector(
                       onTap: () => gs.setScreen(AppScreen.settings),
-                      child: const Icon(Icons.settings_outlined, color: Colors.white54, size: 24),
+                      child: const Icon(Icons.settings_outlined, color: AppColors.textDisabled, size: 24),
                     ),
                   ],
                 ),
@@ -122,7 +123,7 @@ class _MenuScreenState extends State<MenuScreen>
                           style: const TextStyle(
                             fontSize: 96,
                             fontWeight: FontWeight.w100,
-                            color: Colors.white,
+                            color: AppColors.textPrimary,
                             letterSpacing: -4,
                           ),
                         ),
@@ -130,7 +131,7 @@ class _MenuScreenState extends State<MenuScreen>
                           l10n.menuSubtitle,
                           style: const TextStyle(
                             fontSize: 16,
-                            color: Colors.white38,
+                            color: AppColors.textDisabled,
                             letterSpacing: 1,
                           ),
                         ),
@@ -149,10 +150,10 @@ class _MenuScreenState extends State<MenuScreen>
                           return LinearGradient(
                             begin: Alignment(-1.0 + offset, 0),
                             end: Alignment(0.0 + offset, 0),
-                            colors: [
-                              Colors.white,
-                              const Color(0xFFFFD700),
-                              Colors.white,
+                            colors: const [
+                              AppColors.textPrimary,
+                              AppColors.gold,
+                              AppColors.textPrimary,
                             ],
                             stops: const [0.0, 0.5, 1.0],
                           ).createShader(bounds);
@@ -162,15 +163,15 @@ class _MenuScreenState extends State<MenuScreen>
                           style: TextStyle(
                             fontSize: 96,
                             fontWeight: FontWeight.w100,
-                            color: Colors.white,
+                            color: AppColors.textPrimary,
                             letterSpacing: -4,
                             shadows: [
                               Shadow(
-                                color: const Color(0xFFFF6B35).withValues(alpha: glowOpacity),
+                                color: AppColors.orange.withValues(alpha: glowOpacity),
                                 blurRadius: 40,
                               ),
                               Shadow(
-                                color: const Color(0xFFFFD700).withValues(alpha: glowOpacity * 0.6),
+                                color: AppColors.gold.withValues(alpha: glowOpacity * 0.6),
                                 blurRadius: 80,
                               ),
                             ],
@@ -181,11 +182,11 @@ class _MenuScreenState extends State<MenuScreen>
                         l10n.menuSubtitle,
                         style: TextStyle(
                           fontSize: 16,
-                          color: Colors.white38,
+                          color: AppColors.textDisabled,
                           letterSpacing: 1,
                           shadows: [
                             Shadow(
-                              color: const Color(0xFFFF6B35).withValues(alpha: glowOpacity * 0.3),
+                              color: AppColors.orange.withValues(alpha: glowOpacity * 0.3),
                               blurRadius: 20,
                             ),
                           ],
@@ -228,17 +229,17 @@ class _MenuScreenState extends State<MenuScreen>
                         child: ElevatedButton(
                           onPressed: () => gs.setScreen(AppScreen.modeSelect),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFFFF6B35),
-                            foregroundColor: Colors.white,
+                            backgroundColor: AppColors.orange,
+                            foregroundColor: AppColors.textPrimary,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(32),
                             ),
                             elevation: 12,
-                            shadowColor: const Color(0xFFFF6B35).withValues(alpha: 0.5),
+                            shadowColor: AppColors.orange.withValues(alpha: 0.5),
                           ),
-                          child: Text(
-                            l10n.commonPlay,
-                            style: const TextStyle(
+                          child: const Text(
+                            'PLAY',
+                            style: TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.w700,
                               letterSpacing: 3,
@@ -257,7 +258,7 @@ class _MenuScreenState extends State<MenuScreen>
                           borderRadius: BorderRadius.circular(32),
                           boxShadow: [
                             BoxShadow(
-                              color: const Color(0xFFFF6B35).withValues(alpha: 0.3 + glowIntensity * 0.3),
+                              color: AppColors.orange.withValues(alpha: 0.3 + glowIntensity * 0.3),
                               blurRadius: 20 + glowIntensity * 20,
                               spreadRadius: glowIntensity * 8,
                             ),
@@ -273,13 +274,13 @@ class _MenuScreenState extends State<MenuScreen>
                     child: ElevatedButton(
                       onPressed: () => gs.setScreen(AppScreen.modeSelect),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFFF6B35),
-                        foregroundColor: Colors.white,
+                        backgroundColor: AppColors.orange,
+                        foregroundColor: AppColors.textPrimary,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(32),
                         ),
                         elevation: 12,
-                        shadowColor: const Color(0xFFFF6B35).withValues(alpha: 0.5),
+                        shadowColor: AppColors.orange.withValues(alpha: 0.5),
                       ),
                       child: Text(
                         l10n.commonPlay,
@@ -322,21 +323,21 @@ class _MenuScreenState extends State<MenuScreen>
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFFFD700).withValues(alpha: 0.15),
+                        color: AppColors.gold.withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(20),
                         border: Border.all(
-                          color: const Color(0xFFFFD700).withValues(alpha: 0.4),
+                          color: AppColors.gold.withValues(alpha: 0.4),
                         ),
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Icon(Icons.card_giftcard, color: Color(0xFFFFD700), size: 18),
+                          const Icon(Icons.card_giftcard, color: AppColors.gold, size: 18),
                           const SizedBox(width: 8),
                           Text(
                             l10n.menuDailyReward,
                             style: const TextStyle(
-                              color: Color(0xFFFFD700),
+                              color: AppColors.gold,
                               fontSize: 14,
                               fontWeight: FontWeight.w600,
                             ),
@@ -361,12 +362,12 @@ class _MenuScreenState extends State<MenuScreen>
           style: const TextStyle(
             fontSize: 28,
             fontWeight: FontWeight.w200,
-            color: Colors.white,
+            color: AppColors.textPrimary,
           ),
         ),
         Text(
           label,
-          style: const TextStyle(fontSize: 12, color: Colors.white38),
+          style: const TextStyle(fontSize: 12, color: AppColors.textDisabled),
         ),
       ],
     );
@@ -378,15 +379,15 @@ class _MenuScreenState extends State<MenuScreen>
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         decoration: BoxDecoration(
-          color: const Color(0xFF2a2a3e),
+          color: AppColors.darkElevated,
           borderRadius: BorderRadius.circular(20),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, color: Colors.white54, size: 16),
+            Icon(icon, color: AppColors.textDisabled, size: 16),
             const SizedBox(width: 6),
-            Text(label, style: const TextStyle(color: Colors.white54, fontSize: 12)),
+            Text(label, style: const TextStyle(color: AppColors.textDisabled, fontSize: 12)),
           ],
         ),
       ),

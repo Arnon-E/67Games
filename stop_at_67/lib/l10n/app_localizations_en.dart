@@ -92,6 +92,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get countdownGetReady => 'GET READY';
 
   @override
+  String get playingStopAt => 'Stop at ';
+
+  @override
+  String get playingStop => 'STOP';
+
+  @override
   String get playingBlindMode => 'BLIND MODE';
 
   @override

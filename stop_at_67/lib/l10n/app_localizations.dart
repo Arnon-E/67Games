@@ -262,6 +262,18 @@ abstract class AppLocalizations {
   /// **'GET READY'**
   String get countdownGetReady;
 
+  /// No description provided for @playingStopAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop at '**
+  String get playingStopAt;
+
+  /// No description provided for @playingStop.
+  ///
+  /// In en, this message translates to:
+  /// **'STOP'**
+  String get playingStop;
+
   /// No description provided for @playingBlindMode.
   ///
   /// In en, this message translates to:

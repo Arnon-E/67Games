@@ -6,6 +6,7 @@ import '../l10n/app_localizations.dart';
 
 import '../state/game_state.dart';
 import '../engine/scoring.dart';
+import '../theme/app_colors.dart';
 import '../widgets/app_gradient_background.dart';
 import '../widgets/score_display.dart';
 import '../widgets/game_button.dart';
@@ -450,7 +451,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
     final mode = gs.currentMode;
 
     if (result == null || mode == null) {
-      return const Scaffold(backgroundColor: Color(0xFF0a0a0f));
+      return const Scaffold(backgroundColor: AppColors.darkPrimary);
     }
 
     final deviation = result.deviationMs;
@@ -516,11 +517,11 @@ class _ResultsScreenState extends State<ResultsScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             if (isPerfect)
-              _badge(l10n.resultsPerfectStop, const Color(0xFFFFD700)),
+              _badge(l10n.resultsPerfectStop, AppColors.gold),
             if (isPersonalBest && !isPerfect)
-              _badge(l10n.resultsPersonalBest, const Color(0xFFFF6B35)),
+              _badge(l10n.resultsPersonalBest, AppColors.orange),
             if (isNearMiss && !isPersonalBest && !isPerfect)
-              _badge(l10n.resultsNearMiss, Colors.white54),
+              _badge(l10n.resultsNearMiss, AppColors.textDisabled),
           ],
         ),
         if (isPerfect || isPersonalBest || isNearMiss)
@@ -597,9 +598,9 @@ class _ResultsScreenState extends State<ResultsScreen> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(label, style: const TextStyle(color: Colors.white38, fontSize: 15)),
+        Text(label, style: const TextStyle(color: AppColors.textDisabled, fontSize: 15)),
         Text(value,
-            style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w500)),
+            style: const TextStyle(color: AppColors.textPrimary, fontSize: 15, fontWeight: FontWeight.w500)),
       ],
     );
   }
@@ -637,7 +638,7 @@ class _SurgeResetDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      backgroundColor: const Color(0xFF1a1a2e),
+      backgroundColor: AppColors.darkCard,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       child: Padding(
         padding: const EdgeInsets.all(28),
@@ -649,7 +650,7 @@ class _SurgeResetDialog extends StatelessWidget {
             Text(
               title,
               style: const TextStyle(
-                color: Colors.white,
+                color: AppColors.textPrimary,
                 fontSize: 20,
                 fontWeight: FontWeight.w700,
                 letterSpacing: 2,
@@ -659,7 +660,7 @@ class _SurgeResetDialog extends StatelessWidget {
             Text(
               body,
               textAlign: TextAlign.center,
-              style: const TextStyle(color: Colors.white54, fontSize: 15, height: 1.5),
+              style: const TextStyle(color: AppColors.textDisabled, fontSize: 15, height: 1.5),
             ),
             const SizedBox(height: 28),
             SizedBox(
@@ -667,12 +668,12 @@ class _SurgeResetDialog extends StatelessWidget {
               child: TextButton(
                 onPressed: onWatchAd,
                 style: TextButton.styleFrom(
-                  backgroundColor: const Color(0xFF00DDFF).withValues(alpha: 0.15),
-                  foregroundColor: const Color(0xFF00DDFF),
+                  backgroundColor: AppColors.cyan.withValues(alpha: 0.15),
+                  foregroundColor: AppColors.cyan,
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
-                    side: const BorderSide(color: Color(0xFF00DDFF), width: 1),
+                    side: const BorderSide(color: AppColors.cyan, width: 1),
                   ),
                 ),
                 child: Text(
@@ -687,7 +688,7 @@ class _SurgeResetDialog extends StatelessWidget {
               child: TextButton(
                 onPressed: onAccept,
                 style: TextButton.styleFrom(
-                  foregroundColor: Colors.white38,
+                  foregroundColor: AppColors.textDisabled,
                   padding: const EdgeInsets.symmetric(vertical: 14),
                 ),
                 child: Text(

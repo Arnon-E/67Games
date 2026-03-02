@@ -37,6 +37,8 @@
 
   "countdownGetReady": "GET READY",
 
+  "playingStopAt": "Stop at ",
+  "playingStop": "STOP",
   "playingBlindMode": "BLIND MODE",
   "playingTapHint": "TAP ANYWHERE TO STOP",
   "playingTarget": "Target",

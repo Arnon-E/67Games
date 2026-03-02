@@ -92,6 +92,12 @@ class AppLocalizationsRu extends AppLocalizations {
   String get countdownGetReady => 'ПРИГОТОВЬТЕСЬ';
 
   @override
+  String get playingStopAt => 'Стоп на ';
+
+  @override
+  String get playingStop => 'СТОП';
+
+  @override
   String get playingBlindMode => 'СЛЕПОЙ РЕЖИМ';
 
   @override

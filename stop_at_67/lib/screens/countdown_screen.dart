@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import '../l10n/app_localizations.dart';
 
 import '../state/game_state.dart';
+import '../theme/app_colors.dart';
 import '../widgets/app_gradient_background.dart';
 import '../widgets/countdown_display.dart';
 
@@ -53,7 +54,7 @@ class _CountdownScreenState extends State<CountdownScreen> {
                 style: const TextStyle(
                   fontSize: 18,
                   letterSpacing: 4,
-                  color: Colors.white38,
+                  color: AppColors.textDisabled,
                   fontWeight: FontWeight.w300,
                 ),
               ),
