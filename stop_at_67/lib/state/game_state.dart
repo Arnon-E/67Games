@@ -390,6 +390,9 @@ class GameState extends ChangeNotifier {
     if (success && rewarded) {
       _surgeFailStreak = 0;
       _surgePendingReset = false;
+      // Undo the last failed game's speed increment so the player
+      // resumes at the speed they had before that failed round.
+      if (_surgeGamesInSession > 0) _surgeGamesInSession--;
     } else {
       surgeAcceptReset();
     }
