@@ -95,6 +95,7 @@ class PlayerStats {
   final int averageDeviation;
   final int totalXp;
   final int level;
+  final Map<String, int> modeGamesPlayed;
 
   const PlayerStats({
     required this.totalGames,
@@ -106,6 +107,7 @@ class PlayerStats {
     required this.averageDeviation,
     required this.totalXp,
     required this.level,
+    this.modeGamesPlayed = const {},
   });
 
   PlayerStats copyWith({
@@ -118,6 +120,7 @@ class PlayerStats {
     int? averageDeviation,
     int? totalXp,
     int? level,
+    Map<String, int>? modeGamesPlayed,
   }) {
     return PlayerStats(
       totalGames: totalGames ?? this.totalGames,
@@ -129,6 +132,7 @@ class PlayerStats {
       averageDeviation: averageDeviation ?? this.averageDeviation,
       totalXp: totalXp ?? this.totalXp,
       level: level ?? this.level,
+      modeGamesPlayed: modeGamesPlayed ?? this.modeGamesPlayed,
     );
   }
 
@@ -142,6 +146,7 @@ class PlayerStats {
     'averageDeviation': averageDeviation,
     'totalXp': totalXp,
     'level': level,
+    'modeGamesPlayed': modeGamesPlayed,
   };
 
   factory PlayerStats.fromJson(Map<String, dynamic> json) => PlayerStats(
@@ -157,6 +162,10 @@ class PlayerStats {
     averageDeviation: (json['averageDeviation'] as num?)?.toInt() ?? 0,
     totalXp: (json['totalXp'] as num?)?.toInt() ?? 0,
     level: (json['level'] as num?)?.toInt() ?? 1,
+    modeGamesPlayed: (json['modeGamesPlayed'] as Map<String, dynamic>?)?.map(
+          (k, v) => MapEntry(k, (v as num).toInt()),
+        ) ??
+        {},
   );
 }
 

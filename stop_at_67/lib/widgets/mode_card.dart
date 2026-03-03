@@ -1,18 +1,21 @@
 import 'package:flutter/material.dart';
 import '../l10n/app_localizations.dart';
 import '../engine/types.dart';
+import '../engine/constants.dart';
 import '../theme/app_colors.dart';
 
 class ModeCard extends StatelessWidget {
   final GameMode mode;
   final bool isLocked;
   final VoidCallback? onTap;
+  final PlayerStats? stats;
 
   const ModeCard({
     super.key,
     required this.mode,
     this.isLocked = false,
     this.onTap,
+    this.stats,
   });
 
   String _localName(AppLocalizations l10n) {
@@ -41,9 +44,46 @@ class ModeCard extends StatelessWidget {
     };
   }
 
+  String? _unlockLabel() {
+    final condition = mode.unlockCondition;
+    if (condition == null) return null;
+    switch (condition.type) {
+      case 'games_played':
+        return 'Play ${condition.value} games';
+      case 'mode_games_played':
+        final modeName = kGameModes[condition.modeId]?.name ?? condition.modeId ?? '';
+        return 'Play ${condition.value} $modeName games';
+      case 'score':
+        final modeName = kGameModes[condition.modeId]?.name ?? condition.modeId ?? '';
+        return 'Score ${condition.value}+ in $modeName';
+      default:
+        return null;
+    }
+  }
+
+  String? _unlockProgress() {
+    final s = stats;
+    final condition = mode.unlockCondition;
+    if (s == null || condition == null || !isLocked) return null;
+    switch (condition.type) {
+      case 'games_played':
+        return '${s.totalGames}/${condition.value}';
+      case 'mode_games_played':
+        final current = s.modeGamesPlayed[condition.modeId ?? ''] ?? 0;
+        return '$current/${condition.value}';
+      case 'score':
+        final current = s.bestScores[condition.modeId ?? ''] ?? 0;
+        return '$current/${condition.value}';
+      default:
+        return null;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final unlockLabel = _unlockLabel();
+    final progress = _unlockProgress();
 
     return GestureDetector(
       onTap: isLocked ? null : onTap,
@@ -93,9 +133,36 @@ class ModeCard extends StatelessWidget {
                       fontWeight: FontWeight.w500,
                     ),
                   ),
+                  if (unlockLabel != null) ...[
+                    const SizedBox(height: 6),
+                    Row(
+                      children: [
+                        Icon(
+                          isLocked ? Icons.lock_clock : Icons.info_outline,
+                          size: 12,
+                          color: isLocked
+                              ? AppColors.textHint
+                              : AppColors.textDisabled.withValues(alpha: 0.6),
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          isLocked && progress != null
+                              ? '$unlockLabel ($progress)'
+                              : unlockLabel,
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: isLocked
+                                ? AppColors.textHint
+                                : AppColors.textDisabled.withValues(alpha: 0.6),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ],
               ),
             ),
+            const SizedBox(width: 8),
             if (isLocked)
               const Icon(Icons.lock_outline, color: AppColors.textDisabled, size: 24)
             else

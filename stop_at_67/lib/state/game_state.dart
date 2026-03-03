@@ -105,6 +105,7 @@ class GameState extends ChangeNotifier {
   final AchievementChecker _achievementChecker = AchievementChecker();
   PrecisionTimer? _precisionTimer;
   bool _initialized = false;
+  int _gamesAtLastAd = 0; // tracks totalGames when last interstitial was shown
 
   final AuthState _authState;
   final LeaderboardService _leaderboard;
@@ -324,10 +325,6 @@ class GameState extends ChangeNotifier {
       );
     }
 
-    // Ad after every 5 lifetime games (persisted across sessions)
-    if (AdsService.shouldShowAd(newStats.totalGames)) {
-      await _ads.showInterstitial();
-    }
   }
 
   void _playResultFeedback(ScoreResult result) {
@@ -347,7 +344,7 @@ class GameState extends ChangeNotifier {
     }
   }
 
-  void playAgain() {
+  Future<void> playAgain() async {
     if (_currentMode == null) return;
     _lastResult = null;
     _isBlindMode = false;
@@ -356,6 +353,13 @@ class GameState extends ChangeNotifier {
     _surgePendingReset = false;
     _screen = AppScreen.countdown;
     notifyListeners();
+
+    // Show interstitial every 5 games the user actively chooses to play again
+    final gamesSinceLastAd = _stats.totalGames - _gamesAtLastAd;
+    if (gamesSinceLastAd > 0 && gamesSinceLastAd % 5 == 0) {
+      _gamesAtLastAd = _stats.totalGames;
+      await _ads.showInterstitial();
+    }
   }
 
   void returnToMenu() {
@@ -390,6 +394,8 @@ class GameState extends ChangeNotifier {
     if (success && rewarded) {
       _surgeFailStreak = 0;
       _surgePendingReset = false;
+      // Reset the interstitial counter so the next ad is 5 games away
+      _gamesAtLastAd = _stats.totalGames;
     } else {
       surgeAcceptReset();
     }
