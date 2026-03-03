@@ -78,8 +78,9 @@ class _PlayingScreenState extends State<PlayingScreen> {
                             TextSpan(
                               text: l10n.playingStopAt,
                               style: const TextStyle(
-                                fontSize: 22,
-                                fontWeight: FontWeight.w700,
+                                fontSize: 30,
+                                fontWeight: FontWeight.w800,
+                                fontStyle: FontStyle.italic,
                                 color: AppColors.textPrimary,
                                 letterSpacing: 0.5,
                               ),
@@ -89,14 +90,18 @@ class _PlayingScreenState extends State<PlayingScreen> {
                                   ? mode.displayTarget
                                   : '67',
                               style: const TextStyle(
-                                fontSize: 22,
+                                fontSize: 30,
                                 fontWeight: FontWeight.w900,
                                 color: AppColors.gold,
                                 letterSpacing: 0.5,
                                 shadows: [
                                   Shadow(
                                     color: AppColors.gold,
-                                    blurRadius: 12,
+                                    blurRadius: 16,
+                                  ),
+                                  Shadow(
+                                    color: AppColors.goldWarm,
+                                    blurRadius: 32,
                                   ),
                                 ],
                               ),
