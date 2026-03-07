@@ -103,6 +103,7 @@ class GameState extends ChangeNotifier {
   // ── Double Tap mode ─────────────────────────────────────────
   // Phase: 0=not active, 1=running (waiting for mid-tap), 2=mid-done (waiting for stop)
   static const int _doubleTapMidpointMs = 3350;
+  static const int _doubleTapDeviationDivisor = 2; // average mid-tap + stop deviation
   int _doubleTapPhase = 0;
   int _doubleTapMidMs = 0; // virtual elapsed ms recorded at mid-tap
   int get doubleTapPhase => _doubleTapPhase;
@@ -122,6 +123,7 @@ class GameState extends ChangeNotifier {
   // ── Pressure mode ────────────────────────────────────────────
   static const int _pressureInitialToleranceMs = 50;
   static const int _pressureToleranceStepMs = 10;
+  static const int _pressureMinToleranceMs = 10;
   static const int _pressurePointsPerRound = 200;
   int _pressureTolerance = _pressureInitialToleranceMs;
   int _pressureRoundsSucceeded = 0;
@@ -297,7 +299,7 @@ class GameState extends ChangeNotifier {
       // Combined deviation: average of mid-tap error and stop error
       final midDev = (_doubleTapMidMs - _doubleTapMidpointMs).abs();
       final stopDev = (stoppedAtMs - mode.targetMs).abs();
-      effectiveDeviation = (midDev + stopDev) ~/ 2;
+      effectiveDeviation = (midDev + stopDev) ~/ _doubleTapDeviationDivisor;
       effectiveTargetMs = mode.targetMs;
       _doubleTapPhase = 0;
     } else if (mode.movingTarget) {
@@ -340,8 +342,8 @@ class GameState extends ChangeNotifier {
       _pressureLastRoundSuccess = hitTolerance;
       if (hitTolerance) {
         _pressureRoundsSucceeded++;
-        _pressureTolerance =
-            (_pressureTolerance - _pressureToleranceStepMs).clamp(10, _pressureInitialToleranceMs);
+        _pressureTolerance = (_pressureTolerance - _pressureToleranceStepMs)
+                .clamp(_pressureMinToleranceMs, _pressureInitialToleranceMs);
       } else {
         // Game over: override final score with rounds-survived score
         final pressureScore =
