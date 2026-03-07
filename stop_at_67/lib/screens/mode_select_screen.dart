@@ -38,6 +38,7 @@ class ModeSelectScreen extends StatelessWidget {
                     return ModeCard(
                       mode: mode,
                       isLocked: locked,
+                      stats: gs.stats,
                       onTap: () {
                         gs.selectMode(mode.id);
                         gs.startCountdown();

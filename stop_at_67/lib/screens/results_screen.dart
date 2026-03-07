@@ -53,8 +53,13 @@ class _FireworksOverlayState extends State<_FireworksOverlay>
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 6),
-    )..addListener(_tick);
-    _controller.forward();
+    )..addListener(_tick)
+      ..addStatusListener((status) {
+        if (status == AnimationStatus.completed) {
+          _burstCount = 0;
+        }
+      });
+    _controller.repeat();
   }
 
   void _tick() {
@@ -280,7 +285,7 @@ class _EmojiConfettiState extends State<_EmojiConfetti>
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 6),
-    )..forward();
+    )..repeat();
   }
 
   @override
