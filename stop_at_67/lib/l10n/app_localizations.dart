@@ -850,6 +850,29 @@ abstract class AppLocalizations {
   /// **'Timer speeds up every game — how long can you keep up?'**
   String get modeSurgeDesc;
 
+  String get modeDoubleTapName;
+  String get modeDoubleTapDesc;
+  String get modeMovingTargetName;
+  String get modeMovingTargetDesc;
+  String get modeCalibrationName;
+  String get modeCalibrationDesc;
+  String get modePressureName;
+  String get modePressureDesc;
+
+  String get playingDoubleTapMidHint;
+  String get playingDoubleTapStopHint;
+
+  String get resultsNextAttempt;
+  String resultsCalibrationAttempt(int current, int total);
+  String get resultsCalibrationSummary;
+  String get resultsCalibrationAttemptLabel;
+  String get resultsCalibrationAvgDeviation;
+  String get resultsPressureCleared;
+  String get resultsPressureEliminated;
+  String get resultsPressureRounds;
+  String get resultsPressureNextTolerance;
+  String get resultsPressureNextRound;
+
   /// No description provided for @authSignIn.
   ///
   /// In en, this message translates to:

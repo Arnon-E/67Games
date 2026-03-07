@@ -21,9 +21,18 @@ class _PlayingScreenState extends State<PlayingScreen> {
 
   Future<void> _onStop() async {
     if (_stopped) return;
+    final gs = context.read<GameState>();
+    final mode = gs.currentMode;
+
+    // Double Tap: first user tap records the midpoint, second stops the timer
+    if (mode != null && mode.doubleTap && gs.doubleTapPhase == 1) {
+      gs.doubleTapMid();
+      return; // Do not stop yet; wait for the second tap
+    }
+
     _stopped = true;
     Haptics.vibrate(HapticsType.medium).catchError((_) {});
-    await context.read<GameState>().stopGame();
+    await gs.stopGame();
   }
 
   @override
@@ -32,6 +41,19 @@ class _PlayingScreenState extends State<PlayingScreen> {
     final timerState = gs.timerState;
     final mode = gs.currentMode;
     final l10n = AppLocalizations.of(context);
+
+    // Moving Target: show the dynamic target in the title
+    final String targetDisplay = (mode != null && mode.movingTarget)
+        ? _formatMs(gs.movingTargetCurrentMs)
+        : (mode?.displayTarget ?? '67');
+
+    // Double Tap: tap hint changes based on phase
+    String? doubleTapHint;
+    if (mode != null && mode.doubleTap) {
+      doubleTapHint = gs.doubleTapPhase == 1
+          ? l10n.playingDoubleTapMidHint
+          : l10n.playingDoubleTapStopHint;
+    }
 
     return PopScope(
       canPop: false,
@@ -68,7 +90,7 @@ class _PlayingScreenState extends State<PlayingScreen> {
                   child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    // Title bar: "Stop at 67"
+                    // Title bar: "Stop at X.XXXs"
                     Padding(
                       padding: const EdgeInsets.only(top: 20),
                       child: RichText(
@@ -86,9 +108,7 @@ class _PlayingScreenState extends State<PlayingScreen> {
                               ),
                             ),
                             TextSpan(
-                              text: mode != null
-                                  ? mode.displayTarget
-                                  : '67',
+                              text: targetDisplay,
                               style: const TextStyle(
                                 fontSize: 30,
                                 fontWeight: FontWeight.w900,
@@ -120,6 +140,22 @@ class _PlayingScreenState extends State<PlayingScreen> {
                       targetLabel: null, // shown in title instead
                     ),
 
+                    // Double Tap hint label below timer
+                    if (doubleTapHint != null) ...[
+                      const SizedBox(height: 16),
+                      Text(
+                        doubleTapHint,
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: gs.doubleTapPhase == 2
+                              ? AppColors.orange
+                              : AppColors.textDisabled,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 1.5,
+                        ),
+                      ),
+                    ],
+
                     const Spacer(),
 
                     // STOP orb button
@@ -143,6 +179,28 @@ class _PlayingScreenState extends State<PlayingScreen> {
                       failStreak: gs.surgeFailStreak,
                     ),
                   ),
+
+                // Calibration badge (top-right overlay)
+                if (mode != null && mode.isCalibration)
+                  Positioned(
+                    top: 16,
+                    right: 20,
+                    child: _CalibrationBadge(
+                      attempt: gs.calibrationResults.length + 1,
+                      total: mode.calibrationRounds,
+                    ),
+                  ),
+
+                // Pressure badge (top-right overlay)
+                if (mode != null && mode.isPressure)
+                  Positioned(
+                    top: 16,
+                    right: 20,
+                    child: _PressureBadge(
+                      toleranceMs: gs.pressureTolerance,
+                      roundsSucceeded: gs.pressureRoundsSucceeded,
+                    ),
+                  ),
               ],
             ),
           ),
@@ -150,7 +208,16 @@ class _PlayingScreenState extends State<PlayingScreen> {
       ),
     );
   }
+
+  /// Formats milliseconds as "X.XXXs" for Moving Target title display.
+  static String _formatMs(int ms) {
+    final s = ms ~/ 1000;
+    final millis = ms % 1000;
+    return '$s.${millis.toString().padLeft(3, '0')}s';
+  }
 }
+
+// ── Surge speed badge ────────────────────────────────────────
 
 class _SurgeSpeedBadge extends StatelessWidget {
   final double multiplier;
@@ -196,6 +263,79 @@ class _SurgeSpeedBadge extends StatelessWidget {
             );
           }),
         ),
+      ],
+    );
+  }
+}
+
+// ── Calibration attempt badge ────────────────────────────────
+
+class _CalibrationBadge extends StatelessWidget {
+  final int attempt;
+  final int total;
+  const _CalibrationBadge({required this.attempt, required this.total});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: AppColors.cyan.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: AppColors.cyan.withValues(alpha: 0.5), width: 1),
+      ),
+      child: Text(
+        '$attempt / $total',
+        style: const TextStyle(
+          fontSize: 13,
+          color: AppColors.cyan,
+          fontWeight: FontWeight.w600,
+          letterSpacing: 1,
+        ),
+      ),
+    );
+  }
+}
+
+// ── Pressure tolerance badge ─────────────────────────────────
+
+class _PressureBadge extends StatelessWidget {
+  final int toleranceMs;
+  final int roundsSucceeded;
+  const _PressureBadge({required this.toleranceMs, required this.roundsSucceeded});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+          decoration: BoxDecoration(
+            color: Colors.redAccent.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: Colors.redAccent.withValues(alpha: 0.5), width: 1),
+          ),
+          child: Text(
+            '±${toleranceMs}ms',
+            style: const TextStyle(
+              fontSize: 13,
+              color: Colors.redAccent,
+              fontWeight: FontWeight.w600,
+              letterSpacing: 1,
+            ),
+          ),
+        ),
+        if (roundsSucceeded > 0) ...[
+          const SizedBox(height: 4),
+          Text(
+            '🔥 $roundsSucceeded',
+            style: const TextStyle(
+              fontSize: 12,
+              color: AppColors.textSecondary,
+            ),
+          ),
+        ],
       ],
     );
   }
