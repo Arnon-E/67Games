@@ -105,13 +105,6 @@ class _StopButtonState extends State<StopButton>
                     ],
                     stops: const [0.0, 0.25, 0.6, 1.0],
                   ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.5),
-                      blurRadius: 12,
-                      offset: const Offset(0, 6),
-                    ),
-                  ],
                 ),
               ),
               // Specular highlight (top-left crescent)
@@ -127,7 +120,7 @@ class _StopButtonState extends State<StopButton>
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                       colors: [
-                        Colors.white.withValues(alpha: 0.55),
+                        Colors.white.withValues(alpha: 0.28),
                         Colors.white.withValues(alpha: 0.0),
                       ],
                     ),

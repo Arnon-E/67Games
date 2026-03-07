@@ -19,6 +19,9 @@ bool checkUnlockCondition(UnlockCondition condition, PlayerStats stats) {
       return (stats.bestScores[condition.modeId!] ?? 0) >= condition.value;
     case 'games_played':
       return stats.totalGames >= condition.value;
+    case 'mode_games_played':
+      if (condition.modeId == null) return false;
+      return (stats.modeGamesPlayed[condition.modeId!] ?? 0) >= condition.value;
     default:
       return false;
   }
@@ -42,6 +45,13 @@ List<({GameMode mode, double progress, String requirement})> getLockedModes(Play
           case 'games_played':
             progress = (stats.totalGames / condition.value * 100).clamp(0, 100);
             requirement = 'Play ${condition.value} games';
+            break;
+          case 'mode_games_played':
+            final modeId = condition.modeId ?? '';
+            final current = stats.modeGamesPlayed[modeId] ?? 0;
+            progress = (current / condition.value * 100).clamp(0, 100);
+            final modeName2 = kGameModes[modeId]?.name ?? 'Unknown';
+            requirement = 'Play ${condition.value} $modeName2 games';
             break;
         }
 
@@ -165,6 +175,9 @@ PlayerStats updateStats(
     newBestScores[modeId] = result.finalScore;
   }
 
+  final newModeGamesPlayed = Map<String, int>.from(stats.modeGamesPlayed);
+  newModeGamesPlayed[modeId] = (newModeGamesPlayed[modeId] ?? 0) + 1;
+
   final newPerfectCount = stats.perfectCount + (result.deviationMs == 0 ? 1 : 0);
   final newAverageDeviation =
       ((stats.averageDeviation * stats.totalGames + result.deviationMs) / newTotalGames).round();
@@ -182,5 +195,6 @@ PlayerStats updateStats(
     averageDeviation: newAverageDeviation,
     totalXp: newTotalXp,
     level: newLevel,
+    modeGamesPlayed: newModeGamesPlayed,
   );
 }

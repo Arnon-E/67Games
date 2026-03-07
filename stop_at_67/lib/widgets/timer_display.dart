@@ -61,47 +61,55 @@ class TimerDisplay extends StatelessWidget {
               Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      // Text glow bloom
-                      if (!isBlind)
-                        Text(
-                          displayTime,
-                          style: TextStyle(
-                            fontSize: 80,
-                            fontWeight: FontWeight.w700,
-                            foreground: Paint()
-                              ..maskFilter = const MaskFilter.blur(
-                                  BlurStyle.normal, 18)
-                              ..color = textColor.withValues(alpha: 0.6),
-                            letterSpacing: -2,
-                            fontFeatures: const [FontFeature.tabularFigures()],
+                  FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: SizedBox(
+                      width: 240,
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          // Text glow bloom
+                          if (!isBlind)
+                            Text(
+                              displayTime,
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 80,
+                                fontWeight: FontWeight.w700,
+                                foreground: Paint()
+                                  ..maskFilter = const MaskFilter.blur(
+                                      BlurStyle.normal, 18)
+                                  ..color = textColor.withValues(alpha: 0.6),
+                                letterSpacing: -2,
+                                fontFeatures: const [FontFeature.tabularFigures()],
+                              ),
+                            ),
+                          Text(
+                            isBlind ? '?.??' : displayTime,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 80,
+                              fontWeight: FontWeight.w700,
+                              color: textColor,
+                              letterSpacing: -2,
+                              fontFeatures: const [FontFeature.tabularFigures()],
+                              shadows: isBlind
+                                  ? null
+                                  : [
+                                      Shadow(
+                                        color: textColor.withValues(alpha: 0.8),
+                                        blurRadius: 12,
+                                      ),
+                                      Shadow(
+                                        color: AppColors.orange.withValues(alpha: 0.4),
+                                        blurRadius: 30,
+                                      ),
+                                    ],
+                            ),
                           ),
-                        ),
-                      Text(
-                        isBlind ? '?.??' : displayTime,
-                        style: TextStyle(
-                          fontSize: 80,
-                          fontWeight: FontWeight.w700,
-                          color: textColor,
-                          letterSpacing: -2,
-                          fontFeatures: const [FontFeature.tabularFigures()],
-                          shadows: isBlind
-                              ? null
-                              : [
-                                  Shadow(
-                                    color: textColor.withValues(alpha: 0.8),
-                                    blurRadius: 12,
-                                  ),
-                                  Shadow(
-                                    color: AppColors.orange.withValues(alpha: 0.4),
-                                    blurRadius: 30,
-                                  ),
-                                ],
-                        ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
                   if (targetLabel != null) ...[
                     const SizedBox(height: 4),

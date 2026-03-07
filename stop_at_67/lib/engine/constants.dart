@@ -29,7 +29,7 @@ const Map<String, GameMode> kGameModes = {
     displayTarget: '6.700s',
     description: 'Timer hides after 3 seconds - trust your instincts',
     blindAfterMs: 3000,
-    unlockCondition: UnlockCondition(type: 'games_played', value: 10),
+    unlockCondition: UnlockCondition(type: 'games_played', value: 5),
   ),
   'reverse': GameMode(
     id: 'reverse',
@@ -65,7 +65,7 @@ const Map<String, GameMode> kGameModes = {
     targetMs: 6700,
     displayTarget: '6.700s',
     description: 'Timer speeds up every game — how long can you keep up?',
-    unlockCondition: UnlockCondition(type: 'games_played', value: 0),
+    unlockCondition: UnlockCondition(type: 'mode_games_played', modeId: 'blind', value: 3),
   ),
 };
 
