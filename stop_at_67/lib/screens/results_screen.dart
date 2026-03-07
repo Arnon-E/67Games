@@ -441,7 +441,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
           gs.surgeAcceptReset();
         },
         onWatchAd: () async {
-          Navigator.of(ctx).pop();
+          // The dialog manages its own dismissal after the ad finishes.
           await gs.surgeWatchAdRetry();
         },
       ),
@@ -623,7 +623,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
 
 // ── Surge reset dialog ───────────────────────────────────────
 
-class _SurgeResetDialog extends StatelessWidget {
+class _SurgeResetDialog extends StatefulWidget {
   final String title;
   final String body;
   final String watchAdLabel;
@@ -641,6 +641,13 @@ class _SurgeResetDialog extends StatelessWidget {
   });
 
   @override
+  State<_SurgeResetDialog> createState() => _SurgeResetDialogState();
+}
+
+class _SurgeResetDialogState extends State<_SurgeResetDialog> {
+  bool _isLoading = false;
+
+  @override
   Widget build(BuildContext context) {
     return Dialog(
       backgroundColor: AppColors.darkCard,
@@ -653,7 +660,7 @@ class _SurgeResetDialog extends StatelessWidget {
             const Text('⚡', style: TextStyle(fontSize: 40)),
             const SizedBox(height: 12),
             Text(
-              title,
+              widget.title,
               style: const TextStyle(
                 color: AppColors.textPrimary,
                 fontSize: 20,
@@ -663,7 +670,7 @@ class _SurgeResetDialog extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             Text(
-              body,
+              widget.body,
               textAlign: TextAlign.center,
               style: const TextStyle(color: AppColors.textDisabled, fontSize: 15, height: 1.5),
             ),
@@ -671,33 +678,50 @@ class _SurgeResetDialog extends StatelessWidget {
             SizedBox(
               width: double.infinity,
               child: TextButton(
-                onPressed: onWatchAd,
+                onPressed: _isLoading
+                    ? null
+                    : () async {
+                        setState(() => _isLoading = true);
+                        await widget.onWatchAd();
+                        if (mounted) Navigator.of(context).pop();
+                      },
                 style: TextButton.styleFrom(
                   backgroundColor: AppColors.cyan.withValues(alpha: 0.15),
                   foregroundColor: AppColors.cyan,
+                  disabledForegroundColor: AppColors.cyan.withValues(alpha: 0.4),
+                  disabledBackgroundColor: AppColors.cyan.withValues(alpha: 0.07),
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                     side: const BorderSide(color: AppColors.cyan, width: 1),
                   ),
                 ),
-                child: Text(
-                  watchAdLabel,
-                  style: const TextStyle(fontWeight: FontWeight.w600, letterSpacing: 1),
-                ),
+                child: _isLoading
+                    ? const SizedBox(
+                        height: 18,
+                        width: 18,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor: AlwaysStoppedAnimation<Color>(AppColors.cyan),
+                        ),
+                      )
+                    : Text(
+                        widget.watchAdLabel,
+                        style: const TextStyle(fontWeight: FontWeight.w600, letterSpacing: 1),
+                      ),
               ),
             ),
             const SizedBox(height: 10),
             SizedBox(
               width: double.infinity,
               child: TextButton(
-                onPressed: onAccept,
+                onPressed: _isLoading ? null : widget.onAccept,
                 style: TextButton.styleFrom(
                   foregroundColor: AppColors.textDisabled,
                   padding: const EdgeInsets.symmetric(vertical: 14),
                 ),
                 child: Text(
-                  acceptLabel,
+                  widget.acceptLabel,
                   style: const TextStyle(fontWeight: FontWeight.w500, letterSpacing: 1),
                 ),
               ),
