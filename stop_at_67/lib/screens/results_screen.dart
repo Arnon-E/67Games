@@ -6,6 +6,7 @@ import '../l10n/app_localizations.dart';
 
 import '../state/game_state.dart';
 import '../engine/scoring.dart';
+import '../engine/types.dart';
 import '../theme/app_colors.dart';
 import '../widgets/app_gradient_background.dart';
 import '../widgets/score_display.dart';
@@ -513,6 +514,33 @@ class _ResultsScreenState extends State<ResultsScreen> {
     bool isNearMiss,
     bool showFireworks,
   ) {
+    final mode = gs.currentMode!;
+
+    // ── Calibration: interim round (1–4 of 5) ───────────────
+    if (mode.isCalibration &&
+        gs.calibrationResults.length < mode.calibrationRounds) {
+      return _buildCalibrationInterimContent(context, gs, l10n, result);
+    }
+
+    // ── Calibration: final round summary ────────────────────
+    if (mode.isCalibration &&
+        gs.calibrationResults.length >= mode.calibrationRounds) {
+      return _buildCalibrationSummaryContent(context, gs, l10n, result,
+          isPerfect, isPersonalBest, showFireworks);
+    }
+
+    // ── Pressure: success round ──────────────────────────────
+    if (mode.isPressure && gs.pressureLastRoundSuccess) {
+      return _buildPressureSuccessContent(context, gs, l10n, result);
+    }
+
+    // ── Pressure: failure (game over) ───────────────────────
+    if (mode.isPressure && !gs.pressureLastRoundSuccess) {
+      return _buildPressureFailureContent(context, gs, l10n, result,
+          isPersonalBest, showFireworks);
+    }
+
+    // ── Normal result ────────────────────────────────────────
     return Column(
       children: [
         const SizedBox(height: 24),
@@ -574,6 +602,238 @@ class _ResultsScreenState extends State<ResultsScreen> {
               child: GameButton(
                 label: l10n.commonShare,
                 onPressed: () => _share(context, result, gs.currentMode!.name, l10n),
+                primary: false,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 24),
+      ],
+    );
+  }
+
+  // ── Calibration interim (attempts 1–4) ─────────────────────
+
+  Widget _buildCalibrationInterimContent(
+    BuildContext context,
+    GameState gs,
+    AppLocalizations l10n,
+    ScoreResult result,
+  ) {
+    final mode = gs.currentMode!;
+    final attemptNum = gs.calibrationResults.length; // already added
+    return Column(
+      children: [
+        const SizedBox(height: 24),
+        _badge(
+          l10n.resultsCalibrationAttempt(attemptNum, mode.calibrationRounds),
+          AppColors.cyan,
+        ),
+        const SizedBox(height: 16),
+        const Spacer(),
+        ScoreDisplay(result: result),
+        const SizedBox(height: 40),
+        _detailRow(l10n.resultsDeviation, formatDeviation(result.deviationMs)),
+        const SizedBox(height: 8),
+        _detailRow(l10n.resultsStoppedAt, formatDeviation(result.stoppedAtMs)),
+        const Spacer(),
+        GameButton(
+          label: l10n.resultsNextAttempt,
+          onPressed: () => gs.playAgain(),
+          width: double.infinity,
+        ),
+        const SizedBox(height: 12),
+        GameButton(
+          label: l10n.commonMenu,
+          onPressed: () => gs.returnToMenu(),
+          primary: false,
+          width: double.infinity,
+        ),
+        const SizedBox(height: 24),
+      ],
+    );
+  }
+
+  // ── Calibration final summary (after attempt 5) ───────────
+
+  Widget _buildCalibrationSummaryContent(
+    BuildContext context,
+    GameState gs,
+    AppLocalizations l10n,
+    ScoreResult avgResult,
+    bool isPerfect,
+    bool isPersonalBest,
+    bool showFireworks,
+  ) {
+    final attempts = gs.calibrationResults;
+    return Column(
+      children: [
+        const SizedBox(height: 24),
+        _badge(l10n.resultsCalibrationSummary, AppColors.cyan),
+        const SizedBox(height: 16),
+        if (isPersonalBest) ...[
+          _badge(l10n.resultsPersonalBest, AppColors.orange),
+          const SizedBox(height: 8),
+        ],
+        const Spacer(),
+        showFireworks
+            ? _BouncyScore(child: ScoreDisplay(result: avgResult))
+            : ScoreDisplay(result: avgResult),
+        const SizedBox(height: 24),
+        // Individual attempt deviations
+        ...List.generate(attempts.length, (i) {
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 6),
+            child: _detailRow(
+              '${l10n.resultsCalibrationAttemptLabel} ${i + 1}',
+              formatDeviation(attempts[i].deviationMs),
+            ),
+          );
+        }),
+        const SizedBox(height: 8),
+        _detailRow(
+          l10n.resultsCalibrationAvgDeviation,
+          formatDeviation(avgResult.deviationMs),
+        ),
+        const SizedBox(height: 8),
+        _detailRow(l10n.resultsXp, '+${avgResult.xpEarned} XP'),
+        const Spacer(),
+        GameButton(
+          label: l10n.commonPlayAgain,
+          onPressed: () => gs.playAgain(),
+          width: double.infinity,
+        ),
+        const SizedBox(height: 12),
+        Row(
+          children: [
+            Expanded(
+              child: GameButton(
+                label: l10n.commonMenu,
+                onPressed: () => gs.returnToMenu(),
+                primary: false,
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: GameButton(
+                label: l10n.commonShare,
+                onPressed: () =>
+                    _share(context, avgResult, gs.currentMode!.name, l10n),
+                primary: false,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 24),
+      ],
+    );
+  }
+
+  // ── Pressure success round ────────────────────────────────
+
+  Widget _buildPressureSuccessContent(
+    BuildContext context,
+    GameState gs,
+    AppLocalizations l10n,
+    ScoreResult result,
+  ) {
+    final nextTolerance = gs.pressureTolerance; // already tightened
+    return Column(
+      children: [
+        const SizedBox(height: 24),
+        _badge(l10n.resultsPressureCleared, const Color(0xFF00FF88)),
+        const SizedBox(height: 16),
+        const Spacer(),
+        ScoreDisplay(result: result),
+        const SizedBox(height: 40),
+        _detailRow(l10n.resultsDeviation, formatDeviation(result.deviationMs)),
+        const SizedBox(height: 8),
+        _detailRow(
+          l10n.resultsPressureRounds,
+          '${gs.pressureRoundsSucceeded}',
+        ),
+        const SizedBox(height: 8),
+        _detailRow(
+          l10n.resultsPressureNextTolerance,
+          '±${nextTolerance}ms',
+        ),
+        const Spacer(),
+        GameButton(
+          label: l10n.resultsPressureNextRound,
+          onPressed: () => gs.playAgain(),
+          width: double.infinity,
+        ),
+        const SizedBox(height: 12),
+        GameButton(
+          label: l10n.commonMenu,
+          onPressed: () => gs.returnToMenu(),
+          primary: false,
+          width: double.infinity,
+        ),
+        const SizedBox(height: 24),
+      ],
+    );
+  }
+
+  // ── Pressure failure (game over) ─────────────────────────
+
+  Widget _buildPressureFailureContent(
+    BuildContext context,
+    GameState gs,
+    AppLocalizations l10n,
+    ScoreResult result,
+    bool isPersonalBest,
+    bool showFireworks,
+  ) {
+    return Column(
+      children: [
+        const SizedBox(height: 24),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            _badge(l10n.resultsPressureEliminated, Colors.redAccent),
+            if (isPersonalBest) ...[
+              const SizedBox(width: 8),
+              _badge(l10n.resultsPersonalBest, AppColors.orange),
+            ],
+          ],
+        ),
+        const SizedBox(height: 16),
+        const Spacer(),
+        showFireworks
+            ? _BouncyScore(child: ScoreDisplay(result: result))
+            : ScoreDisplay(result: result),
+        const SizedBox(height: 40),
+        _detailRow(
+          l10n.resultsPressureRounds,
+          '${gs.pressureRoundsSucceeded}',
+        ),
+        const SizedBox(height: 8),
+        _detailRow(l10n.resultsDeviation, formatDeviation(result.deviationMs)),
+        const SizedBox(height: 8),
+        _detailRow(l10n.resultsXp, '+${result.xpEarned} XP'),
+        const Spacer(),
+        GameButton(
+          label: l10n.commonPlayAgain,
+          onPressed: () => gs.playAgain(),
+          width: double.infinity,
+        ),
+        const SizedBox(height: 12),
+        Row(
+          children: [
+            Expanded(
+              child: GameButton(
+                label: l10n.commonMenu,
+                onPressed: () => gs.returnToMenu(),
+                primary: false,
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: GameButton(
+                label: l10n.commonShare,
+                onPressed: () =>
+                    _share(context, result, gs.currentMode!.name, l10n),
                 primary: false,
               ),
             ),

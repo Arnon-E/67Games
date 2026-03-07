@@ -100,6 +100,34 @@ class GameState extends ChangeNotifier {
   int get surgeFailStreak => _surgeFailStreak;
   bool get surgePendingReset => _surgePendingReset;
 
+  // ── Double Tap mode ─────────────────────────────────────────
+  // Phase: 0=not active, 1=running (waiting for mid-tap), 2=mid-done (waiting for stop)
+  int _doubleTapPhase = 0;
+  int _doubleTapMidMs = 0; // virtual elapsed ms recorded at mid-tap
+  int get doubleTapPhase => _doubleTapPhase;
+
+  // ── Moving Target mode ──────────────────────────────────────
+  int _movingTargetRound = 0; // 0-indexed round counter
+  int get movingTargetCurrentMs {
+    final mode = _currentMode;
+    if (mode == null || !mode.movingTarget) return 6700;
+    return mode.targetMs + _movingTargetRound * mode.movingTargetStep;
+  }
+
+  // ── Calibration mode ────────────────────────────────────────
+  List<ScoreResult> _calibrationResults = [];
+  List<ScoreResult> get calibrationResults => List.unmodifiable(_calibrationResults);
+
+  // ── Pressure mode ────────────────────────────────────────────
+  static const int _pressureInitialToleranceMs = 50;
+  static const int _pressureToleranceStepMs = 10;
+  int _pressureTolerance = _pressureInitialToleranceMs;
+  int _pressureRoundsSucceeded = 0;
+  bool _pressureLastRoundSuccess = false;
+  int get pressureTolerance => _pressureTolerance;
+  int get pressureRoundsSucceeded => _pressureRoundsSucceeded;
+  bool get pressureLastRoundSuccess => _pressureLastRoundSuccess;
+
   // ── Internal ────────────────────────────────────────────────
   final StreakManager _streakManager = StreakManager();
   final AchievementChecker _achievementChecker = AchievementChecker();
@@ -166,6 +194,14 @@ class GameState extends ChangeNotifier {
     final mode = kGameModes[modeId];
     if (mode == null) return;
     _currentMode = mode;
+    // Reset any per-run state for the newly selected mode
+    _movingTargetRound = 0;
+    _calibrationResults = [];
+    _pressureTolerance = _pressureInitialToleranceMs;
+    _pressureRoundsSucceeded = 0;
+    _pressureLastRoundSuccess = false;
+    _doubleTapPhase = 0;
+    _doubleTapMidMs = 0;
     _screen = AppScreen.modeSelect;
     notifyListeners();
   }
@@ -196,6 +232,12 @@ class GameState extends ChangeNotifier {
 
     WakelockPlus.enable().catchError((_) {});
 
+    // Double Tap: start waiting for the mid-tap
+    if (mode.doubleTap) {
+      _doubleTapPhase = 1;
+      _doubleTapMidMs = 0;
+    }
+
     _precisionTimer = PrecisionTimer(onTick: _onTimerTick);
     if (mode.countdownFrom != null) {
       _precisionTimer!.setCountdown(true, mode.countdownFrom!);
@@ -220,6 +262,18 @@ class GameState extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Called from the playing screen when the user taps at the midpoint
+  /// during Double Tap mode. Records the mid-tap time and advances phase.
+  void doubleTapMid() {
+    final timer = _precisionTimer;
+    if (timer == null || _doubleTapPhase != 1) return;
+    // getStoppedValue(0) returns _virtualElapsed without stopping the timer
+    _doubleTapMidMs = timer.getStoppedValue(0);
+    _doubleTapPhase = 2;
+    Haptics.vibrate(HapticsType.medium).catchError((_) {});
+    notifyListeners();
+  }
+
   // Called from playing screen when user taps
   Future<void> stopGame() async {
     final timer = _precisionTimer;
@@ -232,21 +286,91 @@ class GameState extends ChangeNotifier {
     WakelockPlus.disable().catchError((_) {});
 
     final stoppedAtMs = timer.getStoppedValue(elapsedMs);
-    final deviation = (stoppedAtMs - mode.targetMs).abs();
+
+    // ── Determine effective target & deviation ───────────────
+    final int effectiveTargetMs;
+    final int effectiveDeviation;
+
+    if (mode.doubleTap) {
+      // Combined deviation: average of mid-tap error and stop error
+      final midDev = (_doubleTapMidMs - 3350).abs();
+      final stopDev = (stoppedAtMs - mode.targetMs).abs();
+      effectiveDeviation = (midDev + stopDev) ~/ 2;
+      effectiveTargetMs = mode.targetMs;
+      _doubleTapPhase = 0;
+    } else if (mode.movingTarget) {
+      effectiveTargetMs = movingTargetCurrentMs;
+      effectiveDeviation = (stoppedAtMs - effectiveTargetMs).abs();
+    } else {
+      effectiveTargetMs = mode.targetMs;
+      effectiveDeviation = (stoppedAtMs - effectiveTargetMs).abs();
+    }
 
     // Process streak
-    final streakResult = _streakManager.processAttempt(deviation);
+    final streakResult = _streakManager.processAttempt(effectiveDeviation);
     final bestScore = _stats.bestScores[mode.id] ?? 0;
 
-    // Calculate score
-    final result = calculateScore(
-      stoppedAtMs,
-      mode,
-      streakResult.streakForScoring,
-      bestScore,
-    );
+    // ── Calculate score ──────────────────────────────────────
+    ScoreResult result;
 
-    // Check achievements
+    if (mode.doubleTap) {
+      // Build score directly from combined deviation
+      final rawScore = (kScoringConfig.maxScore - effectiveDeviation)
+          .clamp(0, kScoringConfig.maxScore);
+      final streakMult = calculateStreakMultiplier(streakResult.streakForScoring);
+      final finalScore = (rawScore * streakMult).round();
+      result = ScoreResult(
+        stoppedAtMs: stoppedAtMs,
+        targetMs: effectiveTargetMs,
+        deviationMs: effectiveDeviation,
+        rawScore: rawScore,
+        streakMultiplier: streakMult,
+        finalScore: finalScore,
+        rating: getRating(effectiveDeviation),
+        xpEarned: (finalScore / kScoringConfig.xpDivisor).round(),
+        isNewBest: finalScore > bestScore,
+      );
+    } else if (mode.isPressure) {
+      // Normal scoring for the individual round
+      result = calculateScore(stoppedAtMs, mode, streakResult.streakForScoring, bestScore);
+      // Update pressure state
+      final hitTolerance = effectiveDeviation <= _pressureTolerance;
+      _pressureLastRoundSuccess = hitTolerance;
+      if (hitTolerance) {
+        _pressureRoundsSucceeded++;
+        _pressureTolerance =
+            (_pressureTolerance - _pressureToleranceStepMs).clamp(10, _pressureInitialToleranceMs);
+      } else {
+        // Game over: override final score with rounds-survived score
+        final pressureScore = (_pressureRoundsSucceeded * 200).clamp(0, 1000);
+        result = ScoreResult(
+          stoppedAtMs: stoppedAtMs,
+          targetMs: effectiveTargetMs,
+          deviationMs: effectiveDeviation,
+          rawScore: pressureScore,
+          streakMultiplier: 1.0,
+          finalScore: pressureScore,
+          rating: getRating(effectiveDeviation),
+          xpEarned: (pressureScore / kScoringConfig.xpDivisor).round(),
+          isNewBest: pressureScore > bestScore,
+        );
+      }
+    } else {
+      result = calculateScore(
+        stoppedAtMs,
+        mode,
+        streakResult.streakForScoring,
+        bestScore,
+        overrideTargetMs: mode.movingTarget ? effectiveTargetMs : null,
+      );
+    }
+
+    // ── Calibration: accumulate attempts ─────────────────────
+    if (mode.isCalibration) {
+      _calibrationResults = [..._calibrationResults, result];
+    }
+
+    // ── Check achievements ───────────────────────────────────
     final newAchievements = _achievementChecker.checkAfterGame(
       result,
       _stats,
@@ -254,11 +378,42 @@ class GameState extends ChangeNotifier {
       streakResult.newStreak,
     );
 
-    // Update stats
-    final newStats = updateStats(_stats, result, mode.id, streakResult.newStreak);
+    // ── Update stats ─────────────────────────────────────────
+    // For calibration, only persist stats after the final attempt.
+    // For pressure success rounds, persist each round normally.
+    final bool persistStats = !mode.isCalibration ||
+        _calibrationResults.length >= mode.calibrationRounds;
 
-    // Coins (1 per 10 points)
-    final coinsEarned = result.finalScore ~/ 10;
+    // Use averaged result for calibration final persistence
+    ScoreResult resultToSave = result;
+    if (mode.isCalibration && _calibrationResults.length >= mode.calibrationRounds) {
+      final avgDev = _calibrationResults
+              .map((r) => r.deviationMs)
+              .reduce((a, b) => a + b) ~/
+          _calibrationResults.length;
+      final avgScore = _calibrationResults
+              .map((r) => r.finalScore)
+              .reduce((a, b) => a + b) ~/
+          _calibrationResults.length;
+      resultToSave = ScoreResult(
+        stoppedAtMs: result.stoppedAtMs,
+        targetMs: result.targetMs,
+        deviationMs: avgDev,
+        rawScore: avgScore,
+        streakMultiplier: 1.0,
+        finalScore: avgScore,
+        rating: getRating(avgDev),
+        xpEarned: (avgScore / kScoringConfig.xpDivisor).round(),
+        isNewBest: avgScore > bestScore,
+      );
+    }
+
+    final newStats = persistStats
+        ? updateStats(_stats, resultToSave, mode.id, streakResult.newStreak)
+        : _stats;
+
+    // Coins (1 per 10 points); skip for calibration interim rounds
+    final coinsEarned = persistStats ? resultToSave.finalScore ~/ 10 : 0;
     final newCoins = _coins + coinsEarned;
 
     // Surge: update game counter and fail streak
@@ -274,11 +429,16 @@ class GameState extends ChangeNotifier {
       }
     }
 
+    // Moving Target: advance round
+    if (mode.movingTarget) {
+      _movingTargetRound++;
+    }
+
     // Session
     final newSession = SessionStats(
       gamesPlayed: _sessionStats.gamesPlayed + 1,
-      bestScore: result.finalScore > _sessionStats.bestScore
-          ? result.finalScore
+      bestScore: resultToSave.finalScore > _sessionStats.bestScore
+          ? resultToSave.finalScore
           : _sessionStats.bestScore,
       coinsEarned: _sessionStats.coinsEarned + coinsEarned,
       sessionStart: _sessionStats.sessionStart,
@@ -288,43 +448,52 @@ class GameState extends ChangeNotifier {
     );
 
     // Persist
-    await Future.wait([
-      _storage.saveStats(newStats),
-      _storage.saveCoins(newCoins),
-      _storage.saveAchievements([
-        ..._achievements,
-        ...newAchievements.map((a) => a.id),
-      ]),
-      _storage.saveStreak(
-        streakResult.newStreak,
-        _streakManager.getBestStreak(),
-      ),
-    ]);
+    if (persistStats) {
+      await Future.wait([
+        _storage.saveStats(newStats),
+        _storage.saveCoins(newCoins),
+        _storage.saveAchievements([
+          ..._achievements,
+          ...newAchievements.map((a) => a.id),
+        ]),
+        _storage.saveStreak(
+          streakResult.newStreak,
+          _streakManager.getBestStreak(),
+        ),
+      ]);
+    }
 
     // Apply state
-    _lastResult = result;
-    _stats = newStats;
-    _coins = newCoins;
-    _achievements = [..._achievements, ...newAchievements.map((a) => a.id)];
+    _lastResult = mode.isCalibration &&
+            _calibrationResults.length >= mode.calibrationRounds
+        ? resultToSave
+        : result;
+    if (persistStats) {
+      _stats = newStats;
+      _coins = newCoins;
+      _achievements = [
+        ..._achievements,
+        ...newAchievements.map((a) => a.id),
+      ];
+    }
     _sessionStats = newSession;
     _timerState = _timerState.copyWith(isRunning: false);
     _screen = AppScreen.results;
     notifyListeners();
 
     // Sound feedback
-    _playResultFeedback(result);
+    _playResultFeedback(resultToSave);
 
     // Submit to online leaderboard if signed in and new personal best
-    if (result.isNewBest && _authState.isSignedIn) {
+    if (resultToSave.isNewBest && _authState.isSignedIn) {
       final uid = _authState.user!.uid;
       _leaderboard.submitScore(
         uid: uid,
         modeId: mode.id,
-        score: result.finalScore,
+        score: resultToSave.finalScore,
         displayName: _authState.userName,
       );
     }
-
   }
 
   void _playResultFeedback(ScoreResult result) {
@@ -345,7 +514,29 @@ class GameState extends ChangeNotifier {
   }
 
   Future<void> playAgain() async {
-    if (_currentMode == null) return;
+    final mode = _currentMode;
+    if (mode == null) return;
+
+    // Determine if we are continuing a calibration run (not yet complete)
+    final bool calibrationContinue = mode.isCalibration &&
+        _calibrationResults.isNotEmpty &&
+        _calibrationResults.length < mode.calibrationRounds;
+
+    // Determine if we are continuing a pressure run (last round was a success)
+    final bool pressureContinue = mode.isPressure && _pressureLastRoundSuccess;
+
+    // Reset completed calibration run so next "Play Again" starts fresh
+    if (mode.isCalibration && !calibrationContinue) {
+      _calibrationResults = [];
+    }
+
+    // Reset pressure state when starting a new run (failure = game over)
+    if (mode.isPressure && !pressureContinue) {
+      _pressureTolerance = _pressureInitialToleranceMs;
+      _pressureRoundsSucceeded = 0;
+      _pressureLastRoundSuccess = false;
+    }
+
     _lastResult = null;
     _isBlindMode = false;
     _countdownValue = 3;
@@ -354,11 +545,13 @@ class GameState extends ChangeNotifier {
     _screen = AppScreen.countdown;
     notifyListeners();
 
-    // Show interstitial every 5 games the user actively chooses to play again
-    final gamesSinceLastAd = _stats.totalGames - _gamesAtLastAd;
-    if (gamesSinceLastAd > 0 && gamesSinceLastAd % 5 == 0) {
-      _gamesAtLastAd = _stats.totalGames;
-      await _ads.showInterstitial();
+    // Show interstitial every 5 games (skip for mid-run continuations)
+    if (!calibrationContinue && !pressureContinue) {
+      final gamesSinceLastAd = _stats.totalGames - _gamesAtLastAd;
+      if (gamesSinceLastAd > 0 && gamesSinceLastAd % 5 == 0) {
+        _gamesAtLastAd = _stats.totalGames;
+        await _ads.showInterstitial();
+      }
     }
   }
 
@@ -372,6 +565,14 @@ class GameState extends ChangeNotifier {
     _surgeGamesInSession = 0;
     _surgeFailStreak = 0;
     _surgePendingReset = false;
+    // Reset new-mode state
+    _doubleTapPhase = 0;
+    _doubleTapMidMs = 0;
+    _movingTargetRound = 0;
+    _calibrationResults = [];
+    _pressureTolerance = _pressureInitialToleranceMs;
+    _pressureRoundsSucceeded = 0;
+    _pressureLastRoundSuccess = false;
     _screen = AppScreen.menu;
     WakelockPlus.disable().catchError((_) {});
     notifyListeners();

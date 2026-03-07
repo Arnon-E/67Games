@@ -170,6 +170,34 @@
   "modeDailyDesc": "ניסיון אחד ביום - התחרה גלובלית",
   "modeSurgeName": "גל",
   "modeSurgeDesc": "הטיימר מאיץ בכל משחק — כמה זמן תחזיק?",
+  "modeDoubleTapName": "Double Tap",
+  "modeDoubleTapDesc": "הקש ב-3.35 שנ׳ ואז עצור ב-6.7 — בדוק את הקצב שלך",
+  "modeMovingTargetName": "מטרה נעה",
+  "modeMovingTargetDesc": "כל סיבוב המטרה משתנה — הישאר מסתגל",
+  "modeCalibrationName": "כיול",
+  "modeCalibrationDesc": "5 ניסיונות ממוצעים — עקוב אחר עקביותך",
+  "modePressureName": "לחץ",
+  "modePressureDesc": "פגע בתוך הסבילות — היא מצטמצמת בכל הצלחה",
+
+  "playingDoubleTapMidHint": "הקש ב-3.35 שנ׳",
+  "playingDoubleTapStopHint": "עצור ב-6.7 שנ׳",
+
+  "resultsNextAttempt": "ניסיון הבא",
+  "resultsCalibrationAttempt": "ניסיון {current} / {total}",
+  "@resultsCalibrationAttempt": {
+    "placeholders": {
+      "current": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
+  "resultsCalibrationSummary": "סיכום כיול",
+  "resultsCalibrationAttemptLabel": "ניסיון",
+  "resultsCalibrationAvgDeviation": "סטייה ממוצעת",
+  "resultsPressureCleared": "סיבוב הושלם ✓",
+  "resultsPressureEliminated": "הודחת ✗",
+  "resultsPressureRounds": "סיבובים שרדת",
+  "resultsPressureNextTolerance": "סבילות הבאה",
+  "resultsPressureNextRound": "סיבוב הבא",
 
   "authSignIn": "התחבר",
   "authCompeteGlobally": "התחרה גלובלית",

@@ -22,6 +22,21 @@ class GameMode {
   final int? countdownFrom;
   final int? blindAfterMs;
   final UnlockCondition? unlockCondition;
+
+  // Double Tap mode: user taps at midpoint then again to stop
+  final bool doubleTap;
+
+  // Moving Target mode: target shifts each round
+  final bool movingTarget;
+  final int movingTargetStep; // ms increase per round (default 200)
+
+  // Calibration mode: N attempts, score averaged
+  final bool isCalibration;
+  final int calibrationRounds; // default 5
+
+  // Pressure mode: tolerance tightens with each success
+  final bool isPressure;
+
   const GameMode({
     required this.id,
     required this.name,
@@ -32,6 +47,12 @@ class GameMode {
     this.countdownFrom,
     this.blindAfterMs,
     this.unlockCondition,
+    this.doubleTap = false,
+    this.movingTarget = false,
+    this.movingTargetStep = 200,
+    this.isCalibration = false,
+    this.calibrationRounds = 5,
+    this.isPressure = false,
   });
 }
 

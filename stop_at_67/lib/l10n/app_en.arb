@@ -169,6 +169,34 @@
   "modeDailyDesc": "One attempt per day - compete globally",
   "modeSurgeName": "Surge",
   "modeSurgeDesc": "Timer speeds up every game — how long can you keep up?",
+  "modeDoubleTapName": "Double Tap",
+  "modeDoubleTapDesc": "Tap at 3.35s then stop at 6.7s — test your rhythm",
+  "modeMovingTargetName": "Moving Target",
+  "modeMovingTargetDesc": "Each round the target shifts — stay adaptable",
+  "modeCalibrationName": "Calibration",
+  "modeCalibrationDesc": "5 attempts averaged — track your consistency",
+  "modePressureName": "Pressure",
+  "modePressureDesc": "Hit within tolerance — it tightens each success",
+
+  "playingDoubleTapMidHint": "TAP AT 3.35s",
+  "playingDoubleTapStopHint": "STOP AT 6.7s",
+
+  "resultsNextAttempt": "Next Attempt",
+  "resultsCalibrationAttempt": "Attempt {current} / {total}",
+  "@resultsCalibrationAttempt": {
+    "placeholders": {
+      "current": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
+  "resultsCalibrationSummary": "CALIBRATION SUMMARY",
+  "resultsCalibrationAttemptLabel": "Attempt",
+  "resultsCalibrationAvgDeviation": "Avg Deviation",
+  "resultsPressureCleared": "ROUND CLEARED ✓",
+  "resultsPressureEliminated": "ELIMINATED ✗",
+  "resultsPressureRounds": "Rounds Survived",
+  "resultsPressureNextTolerance": "Next Tolerance",
+  "resultsPressureNextRound": "Next Round",
 
   "authSignIn": "Sign In",
   "authCompeteGlobally": "Compete Globally",

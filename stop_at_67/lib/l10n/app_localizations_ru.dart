@@ -401,6 +401,71 @@ class AppLocalizationsRu extends AppLocalizations {
       'Таймер ускоряется каждую игру — как долго продержитесь?';
 
   @override
+  String get modeDoubleTapName => 'Двойное касание';
+
+  @override
+  String get modeDoubleTapDesc =>
+      'Нажмите на 3.35с, затем остановитесь на 6.7с — проверьте ритм';
+
+  @override
+  String get modeMovingTargetName => 'Движущаяся цель';
+
+  @override
+  String get modeMovingTargetDesc =>
+      'Каждый раунд цель меняется — оставайтесь гибкими';
+
+  @override
+  String get modeCalibrationName => 'Калибровка';
+
+  @override
+  String get modeCalibrationDesc =>
+      '5 попыток в среднем — отслеживайте свою стабильность';
+
+  @override
+  String get modePressureName => 'Давление';
+
+  @override
+  String get modePressureDesc =>
+      'Попадите в допуск — он сужается с каждым успехом';
+
+  @override
+  String get playingDoubleTapMidHint => 'НАЖМИТЕ НА 3.35с';
+
+  @override
+  String get playingDoubleTapStopHint => 'СТОП НА 6.7с';
+
+  @override
+  String get resultsNextAttempt => 'Следующая попытка';
+
+  @override
+  String resultsCalibrationAttempt(int current, int total) =>
+      'Попытка $current / $total';
+
+  @override
+  String get resultsCalibrationSummary => 'ИТОГИ КАЛИБРОВКИ';
+
+  @override
+  String get resultsCalibrationAttemptLabel => 'Попытка';
+
+  @override
+  String get resultsCalibrationAvgDeviation => 'Среднее отклонение';
+
+  @override
+  String get resultsPressureCleared => 'РАУНД ПРОЙДЕН ✓';
+
+  @override
+  String get resultsPressureEliminated => 'ВЫБЫЛИ ✗';
+
+  @override
+  String get resultsPressureRounds => 'Выживших раундов';
+
+  @override
+  String get resultsPressureNextTolerance => 'Следующий допуск';
+
+  @override
+  String get resultsPressureNextRound => 'Следующий раунд';
+
+  @override
   String get authSignIn => 'Войти';
 
   @override

@@ -397,6 +397,69 @@ class AppLocalizationsHe extends AppLocalizations {
   String get modeSurgeDesc => 'הטיימר מאיץ בכל משחק — כמה זמן תחזיק?';
 
   @override
+  String get modeDoubleTapName => 'Double Tap';
+
+  @override
+  String get modeDoubleTapDesc =>
+      'הקש ב-3.35 שנ׳ ואז עצור ב-6.7 — בדוק את הקצב שלך';
+
+  @override
+  String get modeMovingTargetName => 'מטרה נעה';
+
+  @override
+  String get modeMovingTargetDesc => 'כל סיבוב המטרה משתנה — הישאר מסתגל';
+
+  @override
+  String get modeCalibrationName => 'כיול';
+
+  @override
+  String get modeCalibrationDesc => '5 ניסיונות ממוצעים — עקוב אחר עקביותך';
+
+  @override
+  String get modePressureName => 'לחץ';
+
+  @override
+  String get modePressureDesc =>
+      'פגע בתוך הסבילות — היא מצטמצמת בכל הצלחה';
+
+  @override
+  String get playingDoubleTapMidHint => 'הקש ב-3.35 שנ׳';
+
+  @override
+  String get playingDoubleTapStopHint => 'עצור ב-6.7 שנ׳';
+
+  @override
+  String get resultsNextAttempt => 'ניסיון הבא';
+
+  @override
+  String resultsCalibrationAttempt(int current, int total) =>
+      'ניסיון $current / $total';
+
+  @override
+  String get resultsCalibrationSummary => 'סיכום כיול';
+
+  @override
+  String get resultsCalibrationAttemptLabel => 'ניסיון';
+
+  @override
+  String get resultsCalibrationAvgDeviation => 'סטייה ממוצעת';
+
+  @override
+  String get resultsPressureCleared => 'סיבוב הושלם ✓';
+
+  @override
+  String get resultsPressureEliminated => 'הודחת ✗';
+
+  @override
+  String get resultsPressureRounds => 'סיבובים שרדת';
+
+  @override
+  String get resultsPressureNextTolerance => 'סבילות הבאה';
+
+  @override
+  String get resultsPressureNextRound => 'סיבוב הבא';
+
+  @override
   String get authSignIn => 'התחבר';
 
   @override
