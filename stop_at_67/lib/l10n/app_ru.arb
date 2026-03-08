@@ -171,6 +171,34 @@
   "modeDailyDesc": "Одна попытка в день — соревнуйтесь глобально",
   "modeSurgeName": "Волна",
   "modeSurgeDesc": "Таймер ускоряется каждую игру — как долго продержитесь?",
+  "modeDoubleTapName": "Двойное касание",
+  "modeDoubleTapDesc": "Нажмите на 3.35с, затем остановитесь на 6.7с — проверьте ритм",
+  "modeMovingTargetName": "Движущаяся цель",
+  "modeMovingTargetDesc": "Каждый раунд цель меняется — оставайтесь гибкими",
+  "modeCalibrationName": "Калибровка",
+  "modeCalibrationDesc": "5 попыток в среднем — отслеживайте свою стабильность",
+  "modePressureName": "Давление",
+  "modePressureDesc": "Попадите в допуск — он сужается с каждым успехом",
+
+  "playingDoubleTapMidHint": "НАЖМИТЕ НА 3.35с",
+  "playingDoubleTapStopHint": "СТОП НА 6.7с",
+
+  "resultsNextAttempt": "Следующая попытка",
+  "resultsCalibrationAttempt": "Попытка {current} / {total}",
+  "@resultsCalibrationAttempt": {
+    "placeholders": {
+      "current": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
+  "resultsCalibrationSummary": "ИТОГИ КАЛИБРОВКИ",
+  "resultsCalibrationAttemptLabel": "Попытка",
+  "resultsCalibrationAvgDeviation": "Среднее отклонение",
+  "resultsPressureCleared": "РАУНД ПРОЙДЕН ✓",
+  "resultsPressureEliminated": "ВЫБЫЛИ ✗",
+  "resultsPressureRounds": "Выживших раундов",
+  "resultsPressureNextTolerance": "Следующий допуск",
+  "resultsPressureNextRound": "Следующий раунд",
 
   "authSignIn": "Войти",
   "authCompeteGlobally": "Соревнуйтесь глобально",

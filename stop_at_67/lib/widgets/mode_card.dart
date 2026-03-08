@@ -27,6 +27,10 @@ class ModeCard extends StatelessWidget {
       'reverse100' => l10n.modeReverse100Name,
       'daily' => l10n.modeDailyName,
       'surge' => l10n.modeSurgeName,
+      'doubletap' => l10n.modeDoubleTapName,
+      'movingtarget' => l10n.modeMovingTargetName,
+      'calibration' => l10n.modeCalibrationName,
+      'pressure' => l10n.modePressureName,
       _ => mode.name,
     };
   }
@@ -40,6 +44,10 @@ class ModeCard extends StatelessWidget {
       'reverse100' => l10n.modeReverse100Desc,
       'daily' => l10n.modeDailyDesc,
       'surge' => l10n.modeSurgeDesc,
+      'doubletap' => l10n.modeDoubleTapDesc,
+      'movingtarget' => l10n.modeMovingTargetDesc,
+      'calibration' => l10n.modeCalibrationDesc,
+      'pressure' => l10n.modePressureDesc,
       _ => mode.description,
     };
   }

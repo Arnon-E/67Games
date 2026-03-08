@@ -9,9 +9,10 @@ ScoreResult calculateScore(
   int stoppedAtMs,
   GameMode mode,
   int currentStreak,
-  int bestScore,
-) {
-  final targetMs = mode.targetMs;
+  int bestScore, {
+  int? overrideTargetMs,
+}) {
+  final targetMs = overrideTargetMs ?? mode.targetMs;
   final deviationMs = (stoppedAtMs - targetMs).abs();
   final rawScore = (kScoringConfig.maxScore - deviationMs).clamp(0, kScoringConfig.maxScore);
   final streakMultiplier = calculateStreakMultiplier(currentStreak);

@@ -86,7 +86,7 @@ class AppLocalizationsHe extends AppLocalizations {
   String get modeSelectTitle => 'בחר מצב';
 
   @override
-  String get modeSelectBack => '→ חזור';
+  String get modeSelectBack => '← חזור';
 
   @override
   String get countdownGetReady => 'היה מוכן';
@@ -401,6 +401,69 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get modeSurgeDesc => 'הטיימר מאיץ בכל משחק — כמה זמן תחזיק?';
+
+  @override
+  String get modeDoubleTapName => 'Double Tap';
+
+  @override
+  String get modeDoubleTapDesc =>
+      'הקש ב-3.35 שנ׳ ואז עצור ב-6.7 — בדוק את הקצב שלך';
+
+  @override
+  String get modeMovingTargetName => 'מטרה נעה';
+
+  @override
+  String get modeMovingTargetDesc => 'כל סיבוב המטרה משתנה — שמור על גמישות';
+
+  @override
+  String get modeCalibrationName => 'כיול';
+
+  @override
+  String get modeCalibrationDesc => '5 ניסיונות ממוצעים — בדוק את היציבות שלך';
+
+  @override
+  String get modePressureName => 'לחץ';
+
+  @override
+  String get modePressureDesc => 'פגע בתוך הטווח - זה  מתהדק בכל הצלחה';
+
+  @override
+  String get playingDoubleTapMidHint => 'הקש ב-3.35 שנ׳';
+
+  @override
+  String get playingDoubleTapStopHint => 'עצור ב-6.7 שנ׳';
+
+  @override
+  String get resultsNextAttempt => 'ניסיון הבא';
+
+  @override
+  String resultsCalibrationAttempt(int current, int total) {
+    return 'ניסיון $current / $total';
+  }
+
+  @override
+  String get resultsCalibrationSummary => 'סיכום כיול';
+
+  @override
+  String get resultsCalibrationAttemptLabel => 'ניסיון';
+
+  @override
+  String get resultsCalibrationAvgDeviation => 'סטייה ממוצעת';
+
+  @override
+  String get resultsPressureCleared => 'סיבוב הושלם ✓';
+
+  @override
+  String get resultsPressureEliminated => 'הודחת ✗';
+
+  @override
+  String get resultsPressureRounds => 'סיבובים שרדת';
+
+  @override
+  String get resultsPressureNextTolerance => 'טווח הבא';
+
+  @override
+  String get resultsPressureNextRound => 'סיבוב הבא';
 
   @override
   String get authSignIn => 'התחבר';

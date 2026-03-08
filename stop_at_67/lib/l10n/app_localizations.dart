@@ -862,6 +862,126 @@ abstract class AppLocalizations {
   /// **'Timer speeds up every game — how long can you keep up?'**
   String get modeSurgeDesc;
 
+  /// No description provided for @modeDoubleTapName.
+  ///
+  /// In en, this message translates to:
+  /// **'Double Tap'**
+  String get modeDoubleTapName;
+
+  /// No description provided for @modeDoubleTapDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap at 3.35s then stop at 6.7s — test your rhythm'**
+  String get modeDoubleTapDesc;
+
+  /// No description provided for @modeMovingTargetName.
+  ///
+  /// In en, this message translates to:
+  /// **'Moving Target'**
+  String get modeMovingTargetName;
+
+  /// No description provided for @modeMovingTargetDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Each round the target shifts — stay adaptable'**
+  String get modeMovingTargetDesc;
+
+  /// No description provided for @modeCalibrationName.
+  ///
+  /// In en, this message translates to:
+  /// **'Calibration'**
+  String get modeCalibrationName;
+
+  /// No description provided for @modeCalibrationDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'5 attempts averaged — track your consistency'**
+  String get modeCalibrationDesc;
+
+  /// No description provided for @modePressureName.
+  ///
+  /// In en, this message translates to:
+  /// **'Pressure'**
+  String get modePressureName;
+
+  /// No description provided for @modePressureDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Hit within tolerance — it tightens each success'**
+  String get modePressureDesc;
+
+  /// No description provided for @playingDoubleTapMidHint.
+  ///
+  /// In en, this message translates to:
+  /// **'TAP AT 3.35s'**
+  String get playingDoubleTapMidHint;
+
+  /// No description provided for @playingDoubleTapStopHint.
+  ///
+  /// In en, this message translates to:
+  /// **'STOP AT 6.7s'**
+  String get playingDoubleTapStopHint;
+
+  /// No description provided for @resultsNextAttempt.
+  ///
+  /// In en, this message translates to:
+  /// **'Next Attempt'**
+  String get resultsNextAttempt;
+
+  /// No description provided for @resultsCalibrationAttempt.
+  ///
+  /// In en, this message translates to:
+  /// **'Attempt {current} / {total}'**
+  String resultsCalibrationAttempt(int current, int total);
+
+  /// No description provided for @resultsCalibrationSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'CALIBRATION SUMMARY'**
+  String get resultsCalibrationSummary;
+
+  /// No description provided for @resultsCalibrationAttemptLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Attempt'**
+  String get resultsCalibrationAttemptLabel;
+
+  /// No description provided for @resultsCalibrationAvgDeviation.
+  ///
+  /// In en, this message translates to:
+  /// **'Avg Deviation'**
+  String get resultsCalibrationAvgDeviation;
+
+  /// No description provided for @resultsPressureCleared.
+  ///
+  /// In en, this message translates to:
+  /// **'ROUND CLEARED ✓'**
+  String get resultsPressureCleared;
+
+  /// No description provided for @resultsPressureEliminated.
+  ///
+  /// In en, this message translates to:
+  /// **'ELIMINATED ✗'**
+  String get resultsPressureEliminated;
+
+  /// No description provided for @resultsPressureRounds.
+  ///
+  /// In en, this message translates to:
+  /// **'Rounds Survived'**
+  String get resultsPressureRounds;
+
+  /// No description provided for @resultsPressureNextTolerance.
+  ///
+  /// In en, this message translates to:
+  /// **'Next Tolerance'**
+  String get resultsPressureNextTolerance;
+
+  /// No description provided for @resultsPressureNextRound.
+  ///
+  /// In en, this message translates to:
+  /// **'Next Round'**
+  String get resultsPressureNextRound;
+
   /// No description provided for @authSignIn.
   ///
   /// In en, this message translates to:

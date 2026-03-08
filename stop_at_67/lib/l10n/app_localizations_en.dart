@@ -404,6 +404,72 @@ class AppLocalizationsEn extends AppLocalizations {
       'Timer speeds up every game — how long can you keep up?';
 
   @override
+  String get modeDoubleTapName => 'Double Tap';
+
+  @override
+  String get modeDoubleTapDesc =>
+      'Tap at 3.35s then stop at 6.7s — test your rhythm';
+
+  @override
+  String get modeMovingTargetName => 'Moving Target';
+
+  @override
+  String get modeMovingTargetDesc =>
+      'Each round the target shifts — stay adaptable';
+
+  @override
+  String get modeCalibrationName => 'Calibration';
+
+  @override
+  String get modeCalibrationDesc =>
+      '5 attempts averaged — track your consistency';
+
+  @override
+  String get modePressureName => 'Pressure';
+
+  @override
+  String get modePressureDesc =>
+      'Hit within tolerance — it tightens each success';
+
+  @override
+  String get playingDoubleTapMidHint => 'TAP AT 3.35s';
+
+  @override
+  String get playingDoubleTapStopHint => 'STOP AT 6.7s';
+
+  @override
+  String get resultsNextAttempt => 'Next Attempt';
+
+  @override
+  String resultsCalibrationAttempt(int current, int total) {
+    return 'Attempt $current / $total';
+  }
+
+  @override
+  String get resultsCalibrationSummary => 'CALIBRATION SUMMARY';
+
+  @override
+  String get resultsCalibrationAttemptLabel => 'Attempt';
+
+  @override
+  String get resultsCalibrationAvgDeviation => 'Avg Deviation';
+
+  @override
+  String get resultsPressureCleared => 'ROUND CLEARED ✓';
+
+  @override
+  String get resultsPressureEliminated => 'ELIMINATED ✗';
+
+  @override
+  String get resultsPressureRounds => 'Rounds Survived';
+
+  @override
+  String get resultsPressureNextTolerance => 'Next Tolerance';
+
+  @override
+  String get resultsPressureNextRound => 'Next Round';
+
+  @override
   String get authSignIn => 'Sign In';
 
   @override
