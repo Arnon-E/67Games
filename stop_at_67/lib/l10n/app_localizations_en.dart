@@ -435,8 +435,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get resultsNextAttempt => 'Next Attempt';
 
   @override
-  String resultsCalibrationAttempt(int current, int total) =>
-      'Attempt $current / $total';
+  String resultsCalibrationAttempt(int current, int total) {
+    return 'Attempt $current / $total';
+  }
 
   @override
   String get resultsCalibrationSummary => 'CALIBRATION SUMMARY';

@@ -419,8 +419,7 @@ class AppLocalizationsHe extends AppLocalizations {
   String get modePressureName => 'לחץ';
 
   @override
-  String get modePressureDesc =>
-      'פגע בתוך הסבילות — היא מצטמצמת בכל הצלחה';
+  String get modePressureDesc => 'פגע בתוך הסבילות — היא מצטמצמת בכל הצלחה';
 
   @override
   String get playingDoubleTapMidHint => 'הקש ב-3.35 שנ׳';
@@ -432,8 +431,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get resultsNextAttempt => 'ניסיון הבא';
 
   @override
-  String resultsCalibrationAttempt(int current, int total) =>
-      'ניסיון $current / $total';
+  String resultsCalibrationAttempt(int current, int total) {
+    return 'ניסיון $current / $total';
+  }
 
   @override
   String get resultsCalibrationSummary => 'סיכום כיול';
