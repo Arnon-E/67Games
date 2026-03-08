@@ -86,7 +86,7 @@ class AppLocalizationsHe extends AppLocalizations {
   String get modeSelectTitle => 'בחר מצב';
 
   @override
-  String get modeSelectBack => '→ חזור';
+  String get modeSelectBack => '← חזור';
 
   @override
   String get countdownGetReady => 'היה מוכן';
@@ -413,19 +413,19 @@ class AppLocalizationsHe extends AppLocalizations {
   String get modeMovingTargetName => 'מטרה נעה';
 
   @override
-  String get modeMovingTargetDesc => 'כל סיבוב המטרה משתנה — הישאר מסתגל';
+  String get modeMovingTargetDesc => 'כל סיבוב המטרה משתנה — שמור על גמישות';
 
   @override
   String get modeCalibrationName => 'כיול';
 
   @override
-  String get modeCalibrationDesc => '5 ניסיונות ממוצעים — עקוב אחר עקביותך';
+  String get modeCalibrationDesc => '5 ניסיונות ממוצעים — בדוק את היציבות שלך';
 
   @override
   String get modePressureName => 'לחץ';
 
   @override
-  String get modePressureDesc => 'פגע בתוך הסבילות — היא מצטמצמת בכל הצלחה';
+  String get modePressureDesc => 'פגע בתוך הטווח - זה  מתהדק בכל הצלחה';
 
   @override
   String get playingDoubleTapMidHint => 'הקש ב-3.35 שנ׳';
@@ -460,7 +460,7 @@ class AppLocalizationsHe extends AppLocalizations {
   String get resultsPressureRounds => 'סיבובים שרדת';
 
   @override
-  String get resultsPressureNextTolerance => 'סבילות הבאה';
+  String get resultsPressureNextTolerance => 'טווח הבא';
 
   @override
   String get resultsPressureNextRound => 'סיבוב הבא';

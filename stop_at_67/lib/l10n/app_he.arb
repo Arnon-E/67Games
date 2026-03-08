@@ -34,7 +34,7 @@
   "menuSessionCoins": "מטבעות",
 
   "modeSelectTitle": "בחר מצב",
-  "modeSelectBack": "→ חזור",
+  "modeSelectBack": "← חזור",
 
   "countdownGetReady": "היה מוכן",
 
@@ -175,11 +175,11 @@
   "modeDoubleTapName": "Double Tap",
   "modeDoubleTapDesc": "הקש ב-3.35 שנ׳ ואז עצור ב-6.7 — בדוק את הקצב שלך",
   "modeMovingTargetName": "מטרה נעה",
-  "modeMovingTargetDesc": "כל סיבוב המטרה משתנה — הישאר מסתגל",
+  "modeMovingTargetDesc": "כל סיבוב המטרה משתנה — שמור על גמישות",
   "modeCalibrationName": "כיול",
-  "modeCalibrationDesc": "5 ניסיונות ממוצעים — עקוב אחר עקביותך",
+  "modeCalibrationDesc": "5 ניסיונות ממוצעים — בדוק את היציבות שלך",
   "modePressureName": "לחץ",
-  "modePressureDesc": "פגע בתוך הסבילות — היא מצטמצמת בכל הצלחה",
+  "modePressureDesc": "פגע בתוך הטווח - זה  מתהדק בכל הצלחה",
 
   "playingDoubleTapMidHint": "הקש ב-3.35 שנ׳",
   "playingDoubleTapStopHint": "עצור ב-6.7 שנ׳",
@@ -198,7 +198,7 @@
   "resultsPressureCleared": "סיבוב הושלם ✓",
   "resultsPressureEliminated": "הודחת ✗",
   "resultsPressureRounds": "סיבובים שרדת",
-  "resultsPressureNextTolerance": "סבילות הבאה",
+  "resultsPressureNextTolerance": "טווח הבא",
   "resultsPressureNextRound": "סיבוב הבא",
 
   "authSignIn": "התחבר",

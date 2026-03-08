@@ -552,15 +552,7 @@ class GameState extends ChangeNotifier {
 
     _lastResult = null;
     _surgePendingReset = false;
-    _screen = AppScreen.countdown;
-    notifyListeners();
-
-    // Show interstitial every 5 games the user actively chooses to play again
-    final gamesSinceLastAd = _stats.totalGames - _gamesAtLastAd;
-    if (gamesSinceLastAd > 0 && gamesSinceLastAd % 5 == 0) {
-      _gamesAtLastAd = _stats.totalGames;
-      await _ads.showInterstitial();
-    }
+    await startCountdown();
   }
 
   void returnToMenu() {
