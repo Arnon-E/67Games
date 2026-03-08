@@ -210,7 +210,14 @@ class GameState extends ChangeNotifier {
     notifyListeners();
   }
 
-  void startCountdown() {
+  Future<void> startCountdown() async {
+    // Show interstitial every 5 games before starting the next round
+    final gamesSinceLastAd = _stats.totalGames - _gamesAtLastAd;
+    if (gamesSinceLastAd > 0 && gamesSinceLastAd % 5 == 0) {
+      _gamesAtLastAd = _stats.totalGames;
+      await _ads.showInterstitial();
+    }
+
     _screen = AppScreen.countdown;
     _countdownValue = 3;
     _isBlindMode = false;
@@ -544,20 +551,15 @@ class GameState extends ChangeNotifier {
     }
 
     _lastResult = null;
-    _isBlindMode = false;
-    _countdownValue = 3;
-    _timerState = TimerState.initial();
     _surgePendingReset = false;
     _screen = AppScreen.countdown;
     notifyListeners();
 
-    // Show interstitial every 5 games (skip for mid-run continuations)
-    if (!calibrationContinue && !pressureContinue) {
-      final gamesSinceLastAd = _stats.totalGames - _gamesAtLastAd;
-      if (gamesSinceLastAd > 0 && gamesSinceLastAd % 5 == 0) {
-        _gamesAtLastAd = _stats.totalGames;
-        await _ads.showInterstitial();
-      }
+    // Show interstitial every 5 games the user actively chooses to play again
+    final gamesSinceLastAd = _stats.totalGames - _gamesAtLastAd;
+    if (gamesSinceLastAd > 0 && gamesSinceLastAd % 5 == 0) {
+      _gamesAtLastAd = _stats.totalGames;
+      await _ads.showInterstitial();
     }
   }
 

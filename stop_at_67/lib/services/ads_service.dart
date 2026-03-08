@@ -67,22 +67,25 @@ class AdsService {
       _preloadInterstitial();
       return false;
     }
+    final completer = Completer<bool>();
     _interstitial!.fullScreenContentCallback = FullScreenContentCallback(
       onAdDismissedFullScreenContent: (ad) {
         ad.dispose();
         _interstitial = null;
         _interstitialReady = false;
         _preloadInterstitial();
+        completer.complete(true);
       },
       onAdFailedToShowFullScreenContent: (ad, _) {
         ad.dispose();
         _interstitial = null;
         _interstitialReady = false;
         _preloadInterstitial();
+        completer.complete(false);
       },
     );
     await _interstitial!.show();
-    return true;
+    return completer.future;
   }
 
   Future<bool> showRewarded(void Function(RewardItem reward) onRewarded) async {

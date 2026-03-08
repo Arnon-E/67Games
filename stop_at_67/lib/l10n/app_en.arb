@@ -129,6 +129,8 @@
     }
   },
   "shopOwned": "Owned",
+  "shopEquipped": "Equipped",
+  "shopEquip": "Equip",
   "shopPurchased": "{name} purchased!",
   "@shopPurchased": {
     "placeholders": {

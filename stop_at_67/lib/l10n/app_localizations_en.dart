@@ -305,6 +305,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get shopOwned => 'Owned';
 
   @override
+  String get shopEquipped => 'Equipped';
+
+  @override
+  String get shopEquip => 'Equip';
+
+  @override
   String shopPurchased(String name) {
     return '$name purchased!';
   }

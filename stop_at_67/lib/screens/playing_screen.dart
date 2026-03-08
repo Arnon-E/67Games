@@ -63,6 +63,7 @@ class _PlayingScreenState extends State<PlayingScreen> {
       child: Scaffold(
         backgroundColor: Colors.transparent,
         body: AppGradientBackground(
+          backgroundSkin: gs.loadout.background,
           child: SafeArea(
             child: Stack(
               children: [
@@ -138,6 +139,7 @@ class _PlayingScreenState extends State<PlayingScreen> {
                       displayTime: timerState.displayTime,
                       isBlind: gs.isBlindMode,
                       targetLabel: null, // shown in title instead
+                      timerSkin: gs.loadout.timerSkin,
                     ),
 
                     // Double Tap hint label below timer

@@ -2,12 +2,20 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
 
+/// Returns the accent color for a timer skin ID.
+Color timerSkinColor(String skinId) => switch (skinId) {
+  'timer_skin_neon' => const Color(0xFF00FFCC),
+  'timer_skin_gold' => const Color(0xFFFFD700),
+  _ => AppColors.gold, // default
+};
+
 class TimerDisplay extends StatelessWidget {
   final String displayTime;
   final bool isBlind;
   final Color? ratingColor;
   final String? targetLabel;
   final String? blindModeLabel;
+  final String timerSkin;
 
   const TimerDisplay({
     super.key,
@@ -16,13 +24,15 @@ class TimerDisplay extends StatelessWidget {
     this.ratingColor,
     this.targetLabel,
     this.blindModeLabel,
+    this.timerSkin = 'timer_skin_default',
   });
 
   @override
   Widget build(BuildContext context) {
+    final skinColor = timerSkinColor(timerSkin);
     final textColor = isBlind
         ? AppColors.textDisabled
-        : (ratingColor ?? AppColors.gold);
+        : (ratingColor ?? skinColor);
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -42,7 +52,7 @@ class TimerDisplay extends StatelessWidget {
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
-                      color: AppColors.orange.withValues(alpha: 0.25),
+                      color: skinColor.withValues(alpha: 0.25),
                       blurRadius: 60,
                       spreadRadius: 20,
                     ),
@@ -55,6 +65,7 @@ class TimerDisplay extends StatelessWidget {
                 painter: _NeonRingPainter(
                   isBlind: isBlind,
                   ratingColor: ratingColor,
+                  skinColor: skinColor,
                 ),
               ),
               // Timer text + glow
@@ -101,7 +112,7 @@ class TimerDisplay extends StatelessWidget {
                                         blurRadius: 12,
                                       ),
                                       Shadow(
-                                        color: AppColors.orange.withValues(alpha: 0.4),
+                                        color: skinColor.withValues(alpha: 0.4),
                                         blurRadius: 30,
                                       ),
                                     ],
@@ -153,8 +164,9 @@ class TimerDisplay extends StatelessWidget {
 class _NeonRingPainter extends CustomPainter {
   final bool isBlind;
   final Color? ratingColor;
+  final Color skinColor;
 
-  const _NeonRingPainter({required this.isBlind, this.ratingColor});
+  const _NeonRingPainter({required this.isBlind, this.ratingColor, this.skinColor = AppColors.gold});
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -172,15 +184,15 @@ class _NeonRingPainter extends CustomPainter {
       return;
     }
 
-    // ── Outer orange arc (270°, starting from bottom-left, clockwise) ──
+    // ── Outer arc (270°, starting from bottom-left, clockwise) ──
     final orangePaint = Paint()
       ..shader = SweepGradient(
         colors: [
-          AppColors.orange.withValues(alpha: 0.0),
-          AppColors.gold,
-          AppColors.orange,
-          AppColors.goldWarm,
-          AppColors.orange.withValues(alpha: 0.0),
+          skinColor.withValues(alpha: 0.0),
+          skinColor,
+          skinColor.withValues(alpha: 0.85),
+          skinColor.withValues(alpha: 0.6),
+          skinColor.withValues(alpha: 0.0),
         ],
         stops: const [0.0, 0.2, 0.55, 0.8, 1.0],
         startAngle: math.pi * 0.6,
@@ -241,7 +253,7 @@ class _NeonRingPainter extends CustomPainter {
 
     // ── Tick marks on outer ring (dashed segment, bottom-right area) ──
     final tickPaint = Paint()
-      ..color = AppColors.gold.withValues(alpha: 0.5)
+      ..color = skinColor.withValues(alpha: 0.5)
       ..strokeWidth = 2
       ..strokeCap = StrokeCap.round;
 
@@ -258,7 +270,7 @@ class _NeonRingPainter extends CustomPainter {
 
     // ── Outer ring glow (blur layer) ──
     final glowPaint = Paint()
-      ..color = AppColors.orange.withValues(alpha: 0.3)
+      ..color = skinColor.withValues(alpha: 0.3)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 16
       ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 8);
@@ -274,5 +286,5 @@ class _NeonRingPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(_NeonRingPainter old) =>
-      old.isBlind != isBlind || old.ratingColor != ratingColor;
+      old.isBlind != isBlind || old.ratingColor != ratingColor || old.skinColor != skinColor;
 }
