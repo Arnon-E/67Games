@@ -130,6 +130,8 @@
     }
   },
   "shopOwned": "נרכש",
+  "shopEquipped": "מצויד",
+  "shopEquip": "צייד",
   "shopPurchased": "{name} נרכש!",
   "@shopPurchased": {
     "placeholders": {

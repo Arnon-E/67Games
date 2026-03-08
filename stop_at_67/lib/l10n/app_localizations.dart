@@ -676,6 +676,18 @@ abstract class AppLocalizations {
   /// **'Owned'**
   String get shopOwned;
 
+  /// No description provided for @shopEquipped.
+  ///
+  /// In en, this message translates to:
+  /// **'Equipped'**
+  String get shopEquipped;
+
+  /// No description provided for @shopEquip.
+  ///
+  /// In en, this message translates to:
+  /// **'Equip'**
+  String get shopEquip;
+
   /// No description provided for @shopPurchased.
   ///
   /// In en, this message translates to:

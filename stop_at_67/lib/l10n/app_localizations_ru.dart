@@ -306,6 +306,12 @@ class AppLocalizationsRu extends AppLocalizations {
   String get shopOwned => 'Куплено';
 
   @override
+  String get shopEquipped => 'Надет';
+
+  @override
+  String get shopEquip => 'Надеть';
+
+  @override
   String shopPurchased(String name) {
     return '$name куплено!';
   }

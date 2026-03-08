@@ -129,6 +129,8 @@
     }
   },
   "shopOwned": "Куплено",
+  "shopEquipped": "Надет",
+  "shopEquip": "Надеть",
   "shopPurchased": "{name} куплено!",
   "@shopPurchased": {
     "placeholders": {

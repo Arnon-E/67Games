@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../l10n/app_localizations.dart';
 import '../state/game_state.dart';
+import '../state/auth_state.dart';
 import '../engine/constants.dart';
 import '../engine/scoring.dart';
 import '../theme/app_colors.dart';
@@ -12,9 +13,15 @@ import '../widgets/screen_header.dart';
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
 
+  Future<void> _handleSignOut(BuildContext context, AuthState auth, GameState gs) async {
+    await auth.signOut();
+    if (context.mounted) gs.setScreen(AppScreen.menu);
+  }
+
   @override
   Widget build(BuildContext context) {
     final gs = context.watch<GameState>();
+    final auth = context.watch<AuthState>();
     final l10n = AppLocalizations.of(context);
     final stats = gs.stats;
     final levelInfo = levelFromXp(stats.totalXp);
@@ -52,6 +59,19 @@ class ProfileScreen extends StatelessWidget {
                             child: const Icon(Icons.person, color: AppColors.textPrimary, size: 40),
                           ),
                           const SizedBox(height: 12),
+                          if (auth.isSignedIn) ...[
+                            Text(
+                              auth.userName,
+                              style: const TextStyle(
+                                  fontSize: 20, fontWeight: FontWeight.w400, color: AppColors.textPrimary),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              auth.user?.isAnonymous == true ? 'Guest' : 'Google',
+                              style: const TextStyle(fontSize: 12, color: AppColors.textDisabled),
+                            ),
+                            const SizedBox(height: 8),
+                          ],
                           Text(l10n.profileLevel(levelInfo.level),
                               style: const TextStyle(
                                   fontSize: 24, fontWeight: FontWeight.w200, color: AppColors.textPrimary)),
@@ -132,6 +152,28 @@ class ProfileScreen extends StatelessWidget {
                         ],
                       ),
                     ),
+                    const SizedBox(height: 32),
+                    if (auth.isSignedIn)
+                      GestureDetector(
+                        onTap: () => _handleSignOut(context, auth, gs),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          decoration: BoxDecoration(
+                            color: AppColors.darkCard,
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                                color: AppColors.orange.withValues(alpha: 0.3)),
+                          ),
+                          alignment: Alignment.center,
+                          child: const Text(
+                            'Sign Out',
+                            style: TextStyle(
+                                color: AppColors.orange,
+                                fontSize: 15,
+                                fontWeight: FontWeight.w500),
+                          ),
+                        ),
+                      ),
                     const SizedBox(height: 32),
                   ],
                 ),
