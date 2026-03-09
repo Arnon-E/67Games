@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../services/auth_service.dart';
 
@@ -53,8 +54,18 @@ class AuthState extends ChangeNotifier {
       _isLoading = false;
       notifyListeners();
       return user != null;
+    } on PlatformException catch (e) {
+      if (e.code == 'sign_in_canceled') {
+        _error = null;
+      } else {
+        _error = 'Sign-in failed. Please try again.';
+      }
+      _isLoading = false;
+      notifyListeners();
+      return false;
     } catch (e) {
-      _error = e.toString();
+      debugPrint('signInWithGoogle error: $e');
+      _error = 'Sign-in failed. Please try again.';
       _isLoading = false;
       notifyListeners();
       return false;
