@@ -431,10 +431,12 @@ class GameState extends ChangeNotifier {
 
     // Surge: update game counter and fail streak
     if (mode.id == 'surge') {
-      _surgeGamesInSession++;
       if (result.finalScore < 700) {
+        // On a miss the speed level stays the same; only increment the fail streak
         _surgeFailStreak++;
       } else {
+        // On a success, advance to the next speed level and reset the fail streak
+        _surgeGamesInSession++;
         _surgeFailStreak = 0;
       }
       if (_surgeFailStreak >= 3) {
@@ -562,7 +564,8 @@ class GameState extends ChangeNotifier {
     _lastResult = null;
     _isBlindMode = false;
     _timerState = TimerState.initial();
-    _surgeGamesInSession = 0;
+    // Preserve _surgeGamesInSession so the player resumes at the same speed
+    // level when they return to Surge from the lobby.
     _surgeFailStreak = 0;
     _surgePendingReset = false;
     // Reset new-mode state
@@ -595,9 +598,9 @@ class GameState extends ChangeNotifier {
     if (success && rewarded) {
       _surgeFailStreak = 0;
       _surgePendingReset = false;
-      // Undo the last failed game's speed increment so the player
-      // resumes at the speed they had before that failed round.
-      if (_surgeGamesInSession > 0) _surgeGamesInSession--;
+      // Speed level (_surgeGamesInSession) is already correct: misses no longer
+      // increment the counter, so the player naturally resumes at the same
+      // speed they had before the fail streak.
       // Reset the interstitial counter so the next ad is 5 games away
       _gamesAtLastAd = _stats.totalGames;
     } else {
