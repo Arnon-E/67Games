@@ -199,7 +199,11 @@
   "resultsPressureEliminated": "הודחת ✗",
   "resultsPressureRounds": "סיבובים שרדת",
   "resultsPressureNextTolerance": "טווח הבא",
+  "resultsPressureCurrentTolerance": "טווח נוכחי",
   "resultsPressureNextRound": "סיבוב הבא",
+  "pressureRetry": "נסה שוב",
+  "pressureWatchAd": "צפה בפרסומת — ניסיון נוסף",
+  "pressureGameOver": "קבל הפסד",
 
   "authSignIn": "התחבר",
   "authCompeteGlobally": "התחרה גלובלית",

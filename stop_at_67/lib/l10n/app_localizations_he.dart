@@ -463,7 +463,19 @@ class AppLocalizationsHe extends AppLocalizations {
   String get resultsPressureNextTolerance => 'טווח הבא';
 
   @override
+  String get resultsPressureCurrentTolerance => 'טווח נוכחי';
+
+  @override
   String get resultsPressureNextRound => 'סיבוב הבא';
+
+  @override
+  String get pressureRetry => 'נסה שוב';
+
+  @override
+  String get pressureWatchAd => 'צפה בפרסומת — ניסיון נוסף';
+
+  @override
+  String get pressureGameOver => 'קבל הפסד';
 
   @override
   String get authSignIn => 'התחבר';

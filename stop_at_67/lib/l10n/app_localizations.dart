@@ -976,11 +976,35 @@ abstract class AppLocalizations {
   /// **'Next Tolerance'**
   String get resultsPressureNextTolerance;
 
+  /// No description provided for @resultsPressureCurrentTolerance.
+  ///
+  /// In en, this message translates to:
+  /// **'Current Tolerance'**
+  String get resultsPressureCurrentTolerance;
+
   /// No description provided for @resultsPressureNextRound.
   ///
   /// In en, this message translates to:
   /// **'Next Round'**
   String get resultsPressureNextRound;
+
+  /// No description provided for @pressureRetry.
+  ///
+  /// In en, this message translates to:
+  /// **'TRY AGAIN'**
+  String get pressureRetry;
+
+  /// No description provided for @pressureWatchAd.
+  ///
+  /// In en, this message translates to:
+  /// **'WATCH AD — EXTRA ATTEMPT'**
+  String get pressureWatchAd;
+
+  /// No description provided for @pressureGameOver.
+  ///
+  /// In en, this message translates to:
+  /// **'ACCEPT GAME OVER'**
+  String get pressureGameOver;
 
   /// No description provided for @authSignIn.
   ///
