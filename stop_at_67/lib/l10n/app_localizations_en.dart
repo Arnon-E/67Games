@@ -467,7 +467,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get resultsPressureNextTolerance => 'Next Tolerance';
 
   @override
+  String get resultsPressureCurrentTolerance => 'Current Tolerance';
+
+  @override
   String get resultsPressureNextRound => 'Next Round';
+
+  @override
+  String get pressureRetry => 'TRY AGAIN';
+
+  @override
+  String get pressureWatchAd => 'WATCH AD — EXTRA ATTEMPT';
+
+  @override
+  String get pressureGameOver => 'ACCEPT GAME OVER';
 
   @override
   String get authSignIn => 'Sign In';

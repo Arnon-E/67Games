@@ -470,7 +470,19 @@ class AppLocalizationsRu extends AppLocalizations {
   String get resultsPressureNextTolerance => 'Следующий допуск';
 
   @override
+  String get resultsPressureCurrentTolerance => 'Текущий допуск';
+
+  @override
   String get resultsPressureNextRound => 'Следующий раунд';
+
+  @override
+  String get pressureRetry => 'ПОВТОРИТЬ';
+
+  @override
+  String get pressureWatchAd => 'СМОТРЕТЬ РЕКЛАМУ — ЕЩЁ ПОПЫТКА';
+
+  @override
+  String get pressureGameOver => 'ПРИНЯТЬ ПОРАЖЕНИЕ';
 
   @override
   String get authSignIn => 'Войти';
