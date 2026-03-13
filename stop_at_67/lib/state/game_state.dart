@@ -110,6 +110,9 @@ class GameState extends ChangeNotifier {
 
   // ── Moving Target mode ──────────────────────────────────────
   int _movingTargetRound = 0; // 0-indexed round counter
+  int _movingTargetRetries = 0; // failed attempts on current target
+  static const int _movingTargetHitThresholdMs = 500; // deviation ≤ this = success
+  static const int _movingTargetAdAfterRetries = 2; // show ad after N retries
   int get movingTargetCurrentMs {
     final mode = _currentMode;
     if (mode == null || !mode.movingTarget) return 6700;
@@ -200,6 +203,7 @@ class GameState extends ChangeNotifier {
     _currentMode = mode;
     // Reset any per-run state for the newly selected mode
     _movingTargetRound = 0;
+    _movingTargetRetries = 0;
     _calibrationResults = [];
     _pressureTolerance = _pressureInitialToleranceMs;
     _pressureRoundsSucceeded = 0;
@@ -275,14 +279,19 @@ class GameState extends ChangeNotifier {
 
   /// Called from the playing screen when the user taps at the midpoint
   /// during Double Tap mode. Records the mid-tap time and advances phase.
-  void doubleTapMid() {
+  /// Returns true if the mid-tap was a miss (>100ms off 3.35s) — caller
+  /// should immediately call stopGame() to end the round.
+  static const int _doubleTapMidToleranceMs = 100;
+  bool doubleTapMid() {
     final timer = _precisionTimer;
-    if (timer == null || _doubleTapPhase != 1) return;
+    if (timer == null || _doubleTapPhase != 1) return false;
     // getStoppedValue(0) returns _virtualElapsed without stopping the timer
     _doubleTapMidMs = timer.getStoppedValue(0);
     _doubleTapPhase = 2;
     Haptics.vibrate(HapticsType.medium).catchError((_) {});
     notifyListeners();
+    final midDev = (_doubleTapMidMs - _doubleTapMidpointMs).abs();
+    return midDev > _doubleTapMidToleranceMs;
   }
 
   // Called from playing screen when user taps
@@ -431,10 +440,10 @@ class GameState extends ChangeNotifier {
 
     // Surge: update game counter and fail streak
     if (mode.id == 'surge') {
-      _surgeGamesInSession++;
       if (result.finalScore < 700) {
         _surgeFailStreak++;
       } else {
+        _surgeGamesInSession++; // speed only increases on success
         _surgeFailStreak = 0;
       }
       if (_surgeFailStreak >= 3) {
@@ -442,9 +451,14 @@ class GameState extends ChangeNotifier {
       }
     }
 
-    // Moving Target: advance round
+    // Moving Target: advance round only on success; track retries on failure
     if (mode.movingTarget) {
-      _movingTargetRound++;
+      if (effectiveDeviation <= _movingTargetHitThresholdMs) {
+        _movingTargetRound++;
+        _movingTargetRetries = 0;
+      } else {
+        _movingTargetRetries++;
+      }
     }
 
     // Session
@@ -550,8 +564,21 @@ class GameState extends ChangeNotifier {
       _pressureLastRoundSuccess = false;
     }
 
+    // Moving Target: show ad after every N retries on the same target
+    bool movingTargetAd = false;
+    if (mode.movingTarget &&
+        _movingTargetRetries > 0 &&
+        _movingTargetRetries % _movingTargetAdAfterRetries == 0) {
+      movingTargetAd = true;
+    }
+
     _lastResult = null;
     _surgePendingReset = false;
+
+    if (movingTargetAd) {
+      await _ads.showInterstitial();
+    }
+
     await startCountdown();
   }
 
@@ -569,6 +596,7 @@ class GameState extends ChangeNotifier {
     _doubleTapPhase = 0;
     _doubleTapMidMs = 0;
     _movingTargetRound = 0;
+    _movingTargetRetries = 0;
     _calibrationResults = [];
     _pressureTolerance = _pressureInitialToleranceMs;
     _pressureRoundsSucceeded = 0;
@@ -591,17 +619,14 @@ class GameState extends ChangeNotifier {
 
   Future<void> surgeWatchAdRetry() async {
     bool rewarded = false;
-    final success = await _ads.showRewarded((_) { rewarded = true; });
-    if (success && rewarded) {
-      _surgeFailStreak = 0;
-      _surgePendingReset = false;
-      // Undo the last failed game's speed increment so the player
-      // resumes at the speed they had before that failed round.
-      if (_surgeGamesInSession > 0) _surgeGamesInSession--;
+    await _ads.showRewarded((_) { rewarded = true; });
+    // Whether the ad showed or not, clear the fail streak and keep the speed.
+    // A missing ad (not loaded yet) should not punish the player with a reset.
+    _surgeFailStreak = 0;
+    _surgePendingReset = false;
+    if (rewarded) {
       // Reset the interstitial counter so the next ad is 5 games away
       _gamesAtLastAd = _stats.totalGames;
-    } else {
-      surgeAcceptReset();
     }
     notifyListeners();
   }

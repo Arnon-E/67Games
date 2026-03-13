@@ -465,7 +465,9 @@ class _ResultsScreenState extends State<ResultsScreen> {
     final bestScore = gs.stats.bestScores[mode.id] ?? 0;
     final isPersonalBest = result.finalScore > 0 && result.finalScore == bestScore;
     final isPerfect = deviation == 0;
-    final showFireworks = _isExcellent(result.rating.tier);
+    // Never show celebration visuals on pressure elimination
+    final bool showFireworks = _isExcellent(result.rating.tier) &&
+        !(mode.isPressure && !gs.pressureLastRoundSuccess);
 
     // Use celebration background for excellent+, regular background otherwise
     final Widget background = showFireworks
@@ -536,8 +538,9 @@ class _ResultsScreenState extends State<ResultsScreen> {
 
     // ── Pressure: failure (game over) ───────────────────────
     if (mode.isPressure && !gs.pressureLastRoundSuccess) {
+      // Never show celebratory fireworks/bouncy score on elimination
       return _buildPressureFailureContent(context, gs, l10n, result,
-          isPersonalBest, showFireworks);
+          isPersonalBest, false);
     }
 
     // ── Normal result ────────────────────────────────────────
@@ -800,9 +803,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
         ),
         const SizedBox(height: 16),
         const Spacer(),
-        showFireworks
-            ? _BouncyScore(child: ScoreDisplay(result: result))
-            : ScoreDisplay(result: result),
+        ScoreDisplay(result: result, forceMiss: true),
         const SizedBox(height: 40),
         _detailRow(
           l10n.resultsPressureRounds,

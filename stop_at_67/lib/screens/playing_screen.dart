@@ -26,8 +26,9 @@ class _PlayingScreenState extends State<PlayingScreen> {
 
     // Double Tap: first user tap records the midpoint, second stops the timer
     if (mode != null && mode.doubleTap && gs.doubleTapPhase == 1) {
-      gs.doubleTapMid();
-      return; // Do not stop yet; wait for the second tap
+      final midMissed = gs.doubleTapMid();
+      if (!midMissed) return; // good mid-tap — wait for the second tap
+      // Mid-tap missed — fall through to stopGame() to end the round now
     }
 
     _stopped = true;

@@ -4,12 +4,14 @@ import '../engine/scoring.dart';
 
 class ScoreDisplay extends StatelessWidget {
   final ScoreResult result;
+  /// When true, always shows MISS rating regardless of actual deviation.
+  final bool forceMiss;
 
-  const ScoreDisplay({super.key, required this.result});
+  const ScoreDisplay({super.key, required this.result, this.forceMiss = false});
 
   @override
   Widget build(BuildContext context) {
-    final rating = result.rating;
+    final rating = forceMiss ? getRating(999999) : result.rating;
 
     return Column(
       mainAxisSize: MainAxisSize.min,
