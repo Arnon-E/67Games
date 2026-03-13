@@ -92,38 +92,31 @@ class _StopButtonState extends State<StopButton>
               Container(
                 width: 120,
                 height: 120,
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   shape: BoxShape.circle,
-                  gradient: RadialGradient(
-                    center: const Alignment(-0.3, -0.4),
-                    radius: 0.85,
+                  color: AppColors.orange, // fallback if gradient fails
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
                     colors: [
-                      Colors.white.withValues(alpha: 0.35),
                       AppColors.goldWarm,
                       AppColors.orange,
                       AppColors.goldDark,
                     ],
-                    stops: const [0.0, 0.25, 0.6, 1.0],
+                    stops: [0.0, 0.5, 1.0],
                   ),
                 ),
               ),
               // Specular highlight (top-left crescent)
               Positioned(
-                top: 20,
-                left: 24,
+                top: 22,
+                left: 26,
                 child: Container(
-                  width: 36,
-                  height: 18,
+                  width: 34,
+                  height: 16,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(12),
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [
-                        Colors.white.withValues(alpha: 0.28),
-                        Colors.white.withValues(alpha: 0.0),
-                      ],
-                    ),
+                    color: Colors.white24,
                   ),
                 ),
               ),
