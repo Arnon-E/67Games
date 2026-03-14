@@ -21,6 +21,9 @@ jobs:
       contents: write   # needed to upload assets to the GitHub Release
 
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
       - name: Create tag (manual trigger only)
         if: github.event_name == 'workflow_dispatch'
         run: |
@@ -28,9 +31,6 @@ jobs:
           git config user.email "github-actions@github.com"
           git tag ${{ github.event.inputs.tag }}
           git push origin ${{ github.event.inputs.tag }}
-
-      - name: Checkout
-        uses: actions/checkout@v4
 
       # ── Java ─────────────────────────────────────────────────────────────
       - name: Set up Java 17
