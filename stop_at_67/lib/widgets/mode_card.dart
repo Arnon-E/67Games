@@ -141,7 +141,7 @@ class ModeCard extends StatelessWidget {
                       fontWeight: FontWeight.w500,
                     ),
                   ),
-                  if (unlockLabel != null) ...[
+                  if (isLocked && unlockLabel != null) ...[
                     const SizedBox(height: 6),
                     Row(
                       children: [

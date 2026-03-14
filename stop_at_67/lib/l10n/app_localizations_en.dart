@@ -289,6 +289,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get profileAchievements => 'Achievements';
 
   @override
+  String get profileGuest => 'Guest';
+
+  @override
+  String get profileSignOut => 'Sign Out';
+
+  @override
   String profileAchievementsUnlocked(int unlocked, int total) {
     return '$unlocked / $total unlocked';
   }

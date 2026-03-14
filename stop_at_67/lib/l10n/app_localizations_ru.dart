@@ -290,6 +290,12 @@ class AppLocalizationsRu extends AppLocalizations {
   String get profileAchievements => 'Достижения';
 
   @override
+  String get profileGuest => 'Гость';
+
+  @override
+  String get profileSignOut => 'Выйти';
+
+  @override
   String profileAchievementsUnlocked(int unlocked, int total) {
     return '$unlocked / $total получено';
   }

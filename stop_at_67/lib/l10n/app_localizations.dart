@@ -652,6 +652,18 @@ abstract class AppLocalizations {
   /// **'Achievements'**
   String get profileAchievements;
 
+  /// No description provided for @profileGuest.
+  ///
+  /// In en, this message translates to:
+  /// **'Guest'**
+  String get profileGuest;
+
+  /// No description provided for @profileSignOut.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign Out'**
+  String get profileSignOut;
+
   /// No description provided for @profileAchievementsUnlocked.
   ///
   /// In en, this message translates to:

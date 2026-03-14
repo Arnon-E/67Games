@@ -289,6 +289,12 @@ class AppLocalizationsHe extends AppLocalizations {
   String get profileAchievements => 'הישגים';
 
   @override
+  String get profileGuest => 'אורח';
+
+  @override
+  String get profileSignOut => 'התנתק';
+
+  @override
   String profileAchievementsUnlocked(int unlocked, int total) {
     return '$unlocked / $total ננעלו';
   }

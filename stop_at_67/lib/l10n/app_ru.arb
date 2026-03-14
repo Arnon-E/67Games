@@ -113,6 +113,8 @@
   "profileTotalXp": "Всего опыта",
   "profileBestScores": "Лучшие результаты",
   "profileAchievements": "Достижения",
+  "profileGuest": "Гость",
+  "profileSignOut": "Выйти",
   "profileAchievementsUnlocked": "{unlocked} / {total} получено",
   "@profileAchievementsUnlocked": {
     "placeholders": {

@@ -113,6 +113,8 @@
   "profileTotalXp": "Total XP",
   "profileBestScores": "Best Scores",
   "profileAchievements": "Achievements",
+  "profileGuest": "Guest",
+  "profileSignOut": "Sign Out",
   "profileAchievementsUnlocked": "{unlocked} / {total} unlocked",
   "@profileAchievementsUnlocked": {
     "placeholders": {
