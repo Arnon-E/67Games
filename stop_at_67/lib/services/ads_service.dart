@@ -1,13 +1,15 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 class AdsService {
-  static const bool _useTestAds =
-      bool.fromEnvironment('USE_TEST_ADS', defaultValue: false);
-  static const _interstitialAdUnitId = _useTestAds
+  // kDebugMode is a Flutter compile-time const: true in debug, false in release.
+  // This guarantees real ad IDs are always used in release builds without
+  // requiring any --dart-define flag.
+  static const _interstitialAdUnitId = kDebugMode
       ? 'ca-app-pub-3940256099942544/1033173712' // Google test interstitial
       : 'ca-app-pub-6676728509237934/8213370504';
-  static const _rewardedAdUnitId = _useTestAds
+  static const _rewardedAdUnitId = kDebugMode
       ? 'ca-app-pub-3940256099942544/5224354917' // Google test rewarded
       : 'ca-app-pub-6676728509237934/8993875800';
 
@@ -25,7 +27,7 @@ class AdsService {
         maxAdContentRating: MaxAdContentRating.pg,
         tagForChildDirectedTreatment: TagForChildDirectedTreatment.unspecified,
         tagForUnderAgeOfConsent: TagForUnderAgeOfConsent.unspecified,
-        testDeviceIds: _useTestAds ? ['5922B42B9D123D00A7A94867C6E5E6A0'] : [],
+        testDeviceIds: kDebugMode ? ['5922B42B9D123D00A7A94867C6E5E6A0'] : [],
       ),
     );
     _initialized = true;
