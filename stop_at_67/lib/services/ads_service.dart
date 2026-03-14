@@ -3,7 +3,7 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 class AdsService {
   static const bool _useTestAds =
-      bool.fromEnvironment('USE_TEST_ADS', defaultValue: true);
+      bool.fromEnvironment('USE_TEST_ADS', defaultValue: false);
   static const _interstitialAdUnitId = _useTestAds
       ? 'ca-app-pub-3940256099942544/1033173712' // Google test interstitial
       : 'ca-app-pub-6676728509237934/8213370504';
