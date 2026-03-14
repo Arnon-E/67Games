@@ -104,7 +104,7 @@ jobs:
 
       - name: Build release AAB
         working-directory: stop_at_67
-        run: flutter build appbundle --release --dart-define=USE_TEST_ADS=false
+        run: flutter build appbundle --release
 
       # ── Publish ──────────────────────────────────────────────────────────
       - name: Upload AAB to GitHub Release
