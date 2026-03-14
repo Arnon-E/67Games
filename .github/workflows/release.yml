@@ -7,6 +7,11 @@ on:
   push:
     tags:
       - 'v*.*.*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Version tag (e.g. v1.0.1)'
+        required: true
 
 jobs:
   build-android:
