@@ -67,7 +67,7 @@ class ProfileScreen extends StatelessWidget {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              auth.user?.isAnonymous == true ? 'Guest' : 'Google',
+                              auth.user?.isAnonymous == true ? l10n.profileGuest : 'Google',
                               style: const TextStyle(fontSize: 12, color: AppColors.textDisabled),
                             ),
                             const SizedBox(height: 8),
@@ -165,9 +165,9 @@ class ProfileScreen extends StatelessWidget {
                                 color: AppColors.orange.withValues(alpha: 0.3)),
                           ),
                           alignment: Alignment.center,
-                          child: const Text(
-                            'Sign Out',
-                            style: TextStyle(
+                          child: Text(
+                            l10n.profileSignOut,
+                            style: const TextStyle(
                                 color: AppColors.orange,
                                 fontSize: 15,
                                 fontWeight: FontWeight.w500),

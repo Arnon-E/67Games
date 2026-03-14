@@ -114,6 +114,8 @@
   "profileTotalXp": "סה\"כ נק' ניסיון",
   "profileBestScores": "ניקודים מקסימליים",
   "profileAchievements": "הישגים",
+  "profileGuest": "אורח",
+  "profileSignOut": "התנתק",
   "profileAchievementsUnlocked": "{unlocked} / {total} ננעלו",
   "@profileAchievementsUnlocked": {
     "placeholders": {

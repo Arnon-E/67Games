@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 import '../l10n/app_localizations.dart';
 
@@ -8,8 +9,23 @@ import '../theme/app_colors.dart';
 import '../widgets/app_gradient_background.dart';
 import '../widgets/screen_header.dart';
 
-class SettingsScreen extends StatelessWidget {
+class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
+
+  @override
+  State<SettingsScreen> createState() => _SettingsScreenState();
+}
+
+class _SettingsScreenState extends State<SettingsScreen> {
+  String _version = '';
+
+  @override
+  void initState() {
+    super.initState();
+    PackageInfo.fromPlatform().then((info) {
+      if (mounted) setState(() => _version = info.version);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -43,7 +59,7 @@ class SettingsScreen extends StatelessWidget {
                     // Version
                     Center(
                       child: Text(
-                        l10n.settingsVersion,
+                        'Stop at 67 v${_version.isEmpty ? '…' : _version}',
                         style: const TextStyle(color: AppColors.textHint, fontSize: 12),
                       ),
                     ),
