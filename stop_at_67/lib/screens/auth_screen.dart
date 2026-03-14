@@ -44,6 +44,7 @@ class _AuthScreenState extends State<AuthScreen> {
 
     return Scaffold(
       backgroundColor: Colors.transparent,
+      resizeToAvoidBottomInset: true,
       body: AppGradientBackground(
         child: SafeArea(
           child: Column(
@@ -54,11 +55,12 @@ class _AuthScreenState extends State<AuthScreen> {
                 onBack: () => gs.setScreen(AppScreen.leaderboard),
               ),
               Expanded(
-                child: Padding(
+                child: SingleChildScrollView(
                   padding: const EdgeInsets.symmetric(horizontal: 32),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
+                      const SizedBox(height: 48),
                       const Icon(Icons.emoji_events_outlined,
                           color: AppColors.orange, size: 64),
                       const SizedBox(height: 24),
@@ -144,6 +146,7 @@ class _AuthScreenState extends State<AuthScreen> {
                           ),
                         ),
                       ],
+                      const SizedBox(height: 48),
                     ],
                   ),
                 ),

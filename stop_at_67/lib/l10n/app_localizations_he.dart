@@ -403,7 +403,7 @@ class AppLocalizationsHe extends AppLocalizations {
   String get modeSurgeDesc => 'הטיימר מאיץ בכל משחק — כמה זמן תחזיק?';
 
   @override
-  String get modeDoubleTapName => 'Double Tap';
+  String get modeDoubleTapName => 'הקשה כפולה';
 
   @override
   String get modeDoubleTapDesc =>

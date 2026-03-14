@@ -565,19 +565,27 @@ class GameState extends ChangeNotifier {
   }
 
   void _playResultFeedback(ScoreResult result) {
-    final deviation = result.deviationMs;
-    if (deviation == 0) {
-      Haptics.vibrate(HapticsType.success).catchError((_) {});
-      _sound.play('perfect');
-    } else if (deviation <= 50) {
-      Haptics.vibrate(HapticsType.medium).catchError((_) {});
-      _sound.play('excellent');
-    } else if (deviation <= 250) {
-      Haptics.vibrate(HapticsType.light).catchError((_) {});
-      _sound.play('good');
-    } else {
-      Haptics.vibrate(HapticsType.error).catchError((_) {});
-      _sound.play('miss');
+    final tier = result.rating.tier;
+    switch (tier) {
+      case 'perfect':
+        Haptics.vibrate(HapticsType.success).catchError((_) {});
+        _sound.play('perfect');
+      case 'incredible':
+      case 'excellent':
+        Haptics.vibrate(HapticsType.medium).catchError((_) {});
+        _sound.play('excellent');
+      case 'great':
+        Haptics.vibrate(HapticsType.medium).catchError((_) {});
+        _sound.play('great');
+      case 'good':
+        Haptics.vibrate(HapticsType.light).catchError((_) {});
+        _sound.play('good');
+      case 'ok':
+        Haptics.vibrate(HapticsType.light).catchError((_) {});
+        _sound.play('ok');
+      default: // miss
+        Haptics.vibrate(HapticsType.error).catchError((_) {});
+        _sound.play('miss');
     }
   }
 

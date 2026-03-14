@@ -29,11 +29,21 @@ class SoundService {
           await _tts.speak('Perrrrfect!');
         case 'excellent':
           await _playSixSeven();
+        case 'great':
+          await _tts.stop();
+          await _tts.setPitch(1.1);
+          await _tts.setSpeechRate(0.9);
+          await _tts.speak('Great');
         case 'good':
           await _tts.stop();
           await _tts.setPitch(1.0);
           await _tts.setSpeechRate(1.0);
           await _tts.speak('Good');
+        case 'ok':
+          await _tts.stop();
+          await _tts.setPitch(0.9);
+          await _tts.setSpeechRate(1.0);
+          await _tts.speak('Ok');
         case 'miss':
           await _tts.stop();
           await _tts.setPitch(0.8);
