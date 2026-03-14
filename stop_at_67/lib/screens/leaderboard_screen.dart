@@ -51,6 +51,10 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
       'reverse100' => l10n.modeReverse100Name,
       'daily' => l10n.modeDailyName,
       'surge' => l10n.modeSurgeName,
+      'doubletap' => l10n.modeDoubleTapName,
+      'movingtarget' => l10n.modeMovingTargetName,
+      'calibration' => l10n.modeCalibrationName,
+      'pressure' => l10n.modePressureName,
       _ => modeId,
     };
   }

@@ -26,8 +26,14 @@ class _PlayingScreenState extends State<PlayingScreen> {
 
     // Double Tap: first user tap records the midpoint, second stops the timer
     if (mode != null && mode.doubleTap && gs.doubleTapPhase == 1) {
-      gs.doubleTapMid();
-      return; // Do not stop yet; wait for the second tap
+      final bool midHit = gs.doubleTapMid();
+      if (!midHit) {
+        // Midpoint missed too badly — end the game immediately
+        _stopped = true;
+        Haptics.vibrate(HapticsType.error).catchError((_) {});
+        await gs.stopGame();
+      }
+      return; // Either way, do not fall through to normal stop handling
     }
 
     _stopped = true;

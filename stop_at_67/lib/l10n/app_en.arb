@@ -198,7 +198,11 @@
   "resultsPressureEliminated": "ELIMINATED ✗",
   "resultsPressureRounds": "Rounds Survived",
   "resultsPressureNextTolerance": "Next Tolerance",
+  "resultsPressureCurrentTolerance": "Current Tolerance",
   "resultsPressureNextRound": "Next Round",
+  "pressureRetry": "TRY AGAIN",
+  "pressureWatchAd": "WATCH AD — EXTRA ATTEMPT",
+  "pressureGameOver": "ACCEPT GAME OVER",
 
   "authSignIn": "Sign In",
   "authCompeteGlobally": "Compete Globally",

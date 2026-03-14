@@ -31,15 +31,15 @@ class _Item {
 
 const _items = [
   _Item(id: 'timer_skin_neon', nameKey: 'neonTimer', descKey: 'neonTimerDesc',
-      price: 100, categoryKey: 'timerSkins', equipType: 'timerSkin', color: Color(0xFF00FFCC)),
+      price: 1200, categoryKey: 'timerSkins', equipType: 'timerSkin', color: Color(0xFF00FFCC)),
   _Item(id: 'timer_skin_gold', nameKey: 'goldTimer', descKey: 'goldTimerDesc',
-      price: 200, categoryKey: 'timerSkins', equipType: 'timerSkin', color: Color(0xFFFFD700)),
+      price: 2400, categoryKey: 'timerSkins', equipType: 'timerSkin', color: Color(0xFFFFD700)),
   _Item(id: 'bg_purple', nameKey: 'purpleHaze', descKey: 'purpleHazeDesc',
-      price: 150, categoryKey: 'backgrounds', equipType: 'background', color: Color(0xFF8B5CF6)),
+      price: 1800, categoryKey: 'backgrounds', equipType: 'background', color: Color(0xFF8B5CF6)),
   _Item(id: 'bg_ocean', nameKey: 'oceanDeep', descKey: 'oceanDeepDesc',
-      price: 150, categoryKey: 'backgrounds', equipType: 'background', color: Color(0xFF0EA5E9)),
+      price: 1800, categoryKey: 'backgrounds', equipType: 'background', color: Color(0xFF0EA5E9)),
   _Item(id: 'celebration_fireworks', nameKey: 'fireworks', descKey: 'fireworksDesc',
-      price: 250, categoryKey: 'celebrations', equipType: 'celebration', color: Color(0xFFFF6B35),
+      price: 3000, categoryKey: 'celebrations', equipType: 'celebration', color: Color(0xFFFF6B35),
       comingSoon: true),
 ];
 

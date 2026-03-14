@@ -534,7 +534,17 @@ class _ResultsScreenState extends State<ResultsScreen> {
       return _buildPressureSuccessContent(context, gs, l10n, result);
     }
 
-    // ── Pressure: failure (game over) ───────────────────────
+    // ── Pressure: first failure — free retry ─────────────────
+    if (mode.isPressure && !gs.pressureLastRoundSuccess && gs.pressureFailAttempts == 1 && !gs.pressurePendingAdRetry) {
+      return _buildPressureFreeRetryContent(context, gs, l10n, result);
+    }
+
+    // ── Pressure: second failure — ad retry offered ──────────
+    if (mode.isPressure && !gs.pressureLastRoundSuccess && gs.pressurePendingAdRetry) {
+      return _buildPressureAdRetryContent(context, gs, l10n, result);
+    }
+
+    // ── Pressure: failure (game over, all retries exhausted) ─
     if (mode.isPressure && !gs.pressureLastRoundSuccess) {
       return _buildPressureFailureContent(context, gs, l10n, result,
           isPersonalBest, showFireworks);
@@ -775,6 +785,62 @@ class _ResultsScreenState extends State<ResultsScreen> {
     );
   }
 
+  // ── Pressure: first failure — free retry ─────────────────
+
+  Widget _buildPressureFreeRetryContent(
+    BuildContext context,
+    GameState gs,
+    AppLocalizations l10n,
+    ScoreResult result,
+  ) {
+    return Column(
+      children: [
+        const SizedBox(height: 24),
+        _badge(l10n.resultsPressureEliminated, Colors.redAccent),
+        const SizedBox(height: 16),
+        const Spacer(),
+        ScoreDisplay(result: result),
+        const SizedBox(height: 40),
+        _detailRow(l10n.resultsPressureRounds, '${gs.pressureRoundsSucceeded}'),
+        const SizedBox(height: 8),
+        _detailRow(l10n.resultsDeviation, formatDeviation(result.deviationMs)),
+        const SizedBox(height: 8),
+        _detailRow(l10n.resultsPressureCurrentTolerance, '±${gs.pressureTolerance}ms'),
+        const Spacer(),
+        GameButton(
+          label: l10n.pressureRetry,
+          onPressed: () => gs.pressureFreeRetry(),
+          width: double.infinity,
+        ),
+        const SizedBox(height: 12),
+        GameButton(
+          label: l10n.commonMenu,
+          onPressed: () => gs.returnToMenu(),
+          primary: false,
+          width: double.infinity,
+        ),
+        const SizedBox(height: 24),
+      ],
+    );
+  }
+
+  // ── Pressure: second failure — ad retry ──────────────────
+
+  Widget _buildPressureAdRetryContent(
+    BuildContext context,
+    GameState gs,
+    AppLocalizations l10n,
+    ScoreResult result,
+  ) {
+    return _PressureAdRetryContent(
+      gs: gs,
+      l10n: l10n,
+      result: result,
+      buildBadge: _badge,
+      buildDetailRow: _detailRow,
+    );
+  }
+
   // ── Pressure failure (game over) ─────────────────────────
 
   Widget _buildPressureFailureContent(
@@ -878,6 +944,99 @@ class _ResultsScreenState extends State<ResultsScreen> {
           'Can you beat me?';
       await Share.share(text);
     } catch (_) {}
+  }
+}
+
+// ── Pressure ad retry content ────────────────────────────────
+
+class _PressureAdRetryContent extends StatefulWidget {
+  final GameState gs;
+  final AppLocalizations l10n;
+  final ScoreResult result;
+  final Widget Function(String, Color) buildBadge;
+  final Widget Function(String, String) buildDetailRow;
+
+  const _PressureAdRetryContent({
+    required this.gs,
+    required this.l10n,
+    required this.result,
+    required this.buildBadge,
+    required this.buildDetailRow,
+  });
+
+  @override
+  State<_PressureAdRetryContent> createState() => _PressureAdRetryContentState();
+}
+
+class _PressureAdRetryContentState extends State<_PressureAdRetryContent> {
+  bool _isLoading = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final gs = widget.gs;
+    final l10n = widget.l10n;
+    final result = widget.result;
+    return Column(
+      children: [
+        const SizedBox(height: 24),
+        widget.buildBadge(l10n.resultsPressureEliminated, Colors.redAccent),
+        const SizedBox(height: 16),
+        const Spacer(),
+        ScoreDisplay(result: result),
+        const SizedBox(height: 40),
+        widget.buildDetailRow(l10n.resultsPressureRounds, '${gs.pressureRoundsSucceeded}'),
+        const SizedBox(height: 8),
+        widget.buildDetailRow(l10n.resultsDeviation, formatDeviation(result.deviationMs)),
+        const SizedBox(height: 8),
+        widget.buildDetailRow(l10n.resultsPressureCurrentTolerance, '±${gs.pressureTolerance}ms'),
+        const Spacer(),
+        SizedBox(
+          width: double.infinity,
+          child: TextButton(
+            onPressed: _isLoading
+                ? null
+                : () async {
+                    setState(() => _isLoading = true);
+                    await gs.pressureWatchAdRetry();
+                    if (mounted) setState(() => _isLoading = false);
+                  },
+            style: TextButton.styleFrom(
+              backgroundColor: AppColors.cyan.withValues(alpha: 0.15),
+              foregroundColor: AppColors.cyan,
+              disabledForegroundColor: AppColors.cyan.withValues(alpha: 0.4),
+              disabledBackgroundColor: AppColors.cyan.withValues(alpha: 0.07),
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            ),
+            child: _isLoading
+                ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.cyan),
+                  )
+                : Text(
+                    l10n.pressureWatchAd,
+                    style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15, letterSpacing: 1),
+                  ),
+          ),
+        ),
+        const SizedBox(height: 12),
+        GameButton(
+          label: l10n.pressureGameOver,
+          onPressed: () => gs.pressureAcceptGameOver(),
+          primary: false,
+          width: double.infinity,
+        ),
+        const SizedBox(height: 12),
+        GameButton(
+          label: l10n.commonMenu,
+          onPressed: () => gs.returnToMenu(),
+          primary: false,
+          width: double.infinity,
+        ),
+        const SizedBox(height: 24),
+      ],
+    );
   }
 }
 

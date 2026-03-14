@@ -198,7 +198,11 @@
   "resultsPressureEliminated": "ВЫБЫЛИ ✗",
   "resultsPressureRounds": "Выживших раундов",
   "resultsPressureNextTolerance": "Следующий допуск",
+  "resultsPressureCurrentTolerance": "Текущий допуск",
   "resultsPressureNextRound": "Следующий раунд",
+  "pressureRetry": "ПОВТОРИТЬ",
+  "pressureWatchAd": "СМОТРЕТЬ РЕКЛАМУ — ЕЩЁ ПОПЫТКА",
+  "pressureGameOver": "ПРИНЯТЬ ПОРАЖЕНИЕ",
 
   "authSignIn": "Войти",
   "authCompeteGlobally": "Соревнуйтесь глобально",

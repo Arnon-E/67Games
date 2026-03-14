@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:haptic_feedback/haptic_feedback.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
@@ -104,17 +105,19 @@ class GameState extends ChangeNotifier {
   // Phase: 0=not active, 1=running (waiting for mid-tap), 2=mid-done (waiting for stop)
   static const int _doubleTapMidpointMs = 3350;
   static const int _doubleTapDeviationDivisor = 2; // average mid-tap + stop deviation
+  /// Maximum deviation from the midpoint that still lets the game continue.
+  static const int _doubleTapMidToleranceMs = 500;
   int _doubleTapPhase = 0;
   int _doubleTapMidMs = 0; // virtual elapsed ms recorded at mid-tap
   int get doubleTapPhase => _doubleTapPhase;
 
   // ── Moving Target mode ──────────────────────────────────────
-  int _movingTargetRound = 0; // 0-indexed round counter
-  int get movingTargetCurrentMs {
-    final mode = _currentMode;
-    if (mode == null || !mode.movingTarget) return 6700;
-    return mode.targetMs + _movingTargetRound * mode.movingTargetStep;
-  }
+  static const int _movingTargetMinMs = 5000;
+  static const int _movingTargetMaxMs = 9000;
+  static const int _movingTargetStepMs = 100;
+  int _movingTargetCurrentTarget = 6500; // random target for the current round
+  final Random _rng = Random();
+  int get movingTargetCurrentMs => _movingTargetCurrentTarget;
 
   // ── Calibration mode ────────────────────────────────────────
   List<ScoreResult> _calibrationResults = [];
@@ -128,9 +131,18 @@ class GameState extends ChangeNotifier {
   int _pressureTolerance = _pressureInitialToleranceMs;
   int _pressureRoundsSucceeded = 0;
   bool _pressureLastRoundSuccess = false;
+  /// Consecutive failed attempts at the current pressure level (resets on success).
+  int _pressureFailAttempts = 0;
+  /// True when the player has used their free retry and an ad retry is being offered.
+  bool _pressurePendingAdRetry = false;
+  /// True after all retries are exhausted — shows the final game-over result screen.
+  bool _pressureGameOver = false;
   int get pressureTolerance => _pressureTolerance;
   int get pressureRoundsSucceeded => _pressureRoundsSucceeded;
   bool get pressureLastRoundSuccess => _pressureLastRoundSuccess;
+  int get pressureFailAttempts => _pressureFailAttempts;
+  bool get pressurePendingAdRetry => _pressurePendingAdRetry;
+  bool get pressureGameOver => _pressureGameOver;
 
   // ── Internal ────────────────────────────────────────────────
   final StreakManager _streakManager = StreakManager();
@@ -199,11 +211,14 @@ class GameState extends ChangeNotifier {
     if (mode == null) return;
     _currentMode = mode;
     // Reset any per-run state for the newly selected mode
-    _movingTargetRound = 0;
+    _movingTargetCurrentTarget = mode.movingTarget ? _randomMovingTarget() : 6500;
     _calibrationResults = [];
     _pressureTolerance = _pressureInitialToleranceMs;
     _pressureRoundsSucceeded = 0;
     _pressureLastRoundSuccess = false;
+    _pressureFailAttempts = 0;
+    _pressurePendingAdRetry = false;
+    _pressureGameOver = false;
     _doubleTapPhase = 0;
     _doubleTapMidMs = 0;
     _screen = AppScreen.modeSelect;
@@ -249,6 +264,11 @@ class GameState extends ChangeNotifier {
       _doubleTapMidMs = 0;
     }
 
+    // Moving Target: pick a new random target for this round
+    if (mode.movingTarget) {
+      _movingTargetCurrentTarget = _randomMovingTarget();
+    }
+
     _precisionTimer = PrecisionTimer(onTick: _onTimerTick);
     if (mode.countdownFrom != null) {
       _precisionTimer!.setCountdown(true, mode.countdownFrom!);
@@ -261,6 +281,18 @@ class GameState extends ChangeNotifier {
 
   double _computeSurgeMultiplier() =>
       (1.0 + _surgeGamesInSession * 0.067).clamp(1.0, 3.0);
+
+  /// Returns a random moving-target value within [_movingTargetMinMs, _movingTargetMaxMs],
+  /// rounded to the nearest [_movingTargetStepMs], and different from the current target.
+  int _randomMovingTarget() {
+    final numSteps =
+        (_movingTargetMaxMs - _movingTargetMinMs) ~/ _movingTargetStepMs;
+    int target;
+    do {
+      target = _movingTargetMinMs + _rng.nextInt(numSteps + 1) * _movingTargetStepMs;
+    } while (target == _movingTargetCurrentTarget && numSteps > 0);
+    return target;
+  }
 
   void _onTimerTick(TimerState state) {
     _timerState = state;
@@ -275,14 +307,25 @@ class GameState extends ChangeNotifier {
 
   /// Called from the playing screen when the user taps at the midpoint
   /// during Double Tap mode. Records the mid-tap time and advances phase.
-  void doubleTapMid() {
+  ///
+  /// Returns `true` if the tap was close enough to the midpoint target
+  /// (game continues to the second tap), or `false` if the deviation exceeds
+  /// [_doubleTapMidToleranceMs] and the game should end immediately.
+  bool doubleTapMid() {
     final timer = _precisionTimer;
-    if (timer == null || _doubleTapPhase != 1) return;
+    if (timer == null || _doubleTapPhase != 1) return false;
     // getStoppedValue(0) returns _virtualElapsed without stopping the timer
     _doubleTapMidMs = timer.getStoppedValue(0);
+    final midDev = (_doubleTapMidMs - _doubleTapMidpointMs).abs();
+    if (midDev > _doubleTapMidToleranceMs) {
+      // Too far from the midpoint — game will end; phase stays at 1 so that
+      // stopGame() can still compute the combined-deviation score correctly.
+      return false;
+    }
     _doubleTapPhase = 2;
     Haptics.vibrate(HapticsType.medium).catchError((_) {});
     notifyListeners();
+    return true;
   }
 
   // Called from playing screen when user taps
@@ -348,11 +391,24 @@ class GameState extends ChangeNotifier {
       final hitTolerance = effectiveDeviation <= _pressureTolerance;
       _pressureLastRoundSuccess = hitTolerance;
       if (hitTolerance) {
+        // Success: advance level, reset fail counter
         _pressureRoundsSucceeded++;
+        _pressureFailAttempts = 0;
+        _pressurePendingAdRetry = false;
         _pressureTolerance = (_pressureTolerance - _pressureToleranceStepMs)
                 .clamp(_pressureMinToleranceMs, _pressureInitialToleranceMs);
       } else {
-        // Game over: override final score with rounds-survived score
+        // Failure: track consecutive fail attempts at this level
+        _pressureFailAttempts++;
+        if (_pressureFailAttempts >= 2 && !_pressurePendingAdRetry) {
+          // Second natural failure: offer the ad retry
+          _pressurePendingAdRetry = true;
+        } else if (_pressureFailAttempts >= 3) {
+          // All retries exhausted (ad retry attempt also failed): final game over
+          _pressureGameOver = true;
+          _pressurePendingAdRetry = false;
+        }
+        // Score is based on rounds already survived (not incremented on failure)
         final pressureScore =
             (_pressureRoundsSucceeded * _pressurePointsPerRound)
                 .clamp(0, kScoringConfig.maxScore);
@@ -431,10 +487,12 @@ class GameState extends ChangeNotifier {
 
     // Surge: update game counter and fail streak
     if (mode.id == 'surge') {
-      _surgeGamesInSession++;
       if (result.finalScore < 700) {
+        // On a miss the speed level stays the same; only increment the fail streak
         _surgeFailStreak++;
       } else {
+        // On a success, advance to the next speed level and reset the fail streak
+        _surgeGamesInSession++;
         _surgeFailStreak = 0;
       }
       if (_surgeFailStreak >= 3) {
@@ -442,10 +500,7 @@ class GameState extends ChangeNotifier {
       }
     }
 
-    // Moving Target: advance round
-    if (mode.movingTarget) {
-      _movingTargetRound++;
-    }
+    // Moving Target: next target is randomized on _startPrecisionTimer; nothing to track here.
 
     // Session
     final newSession = SessionStats(
@@ -510,19 +565,27 @@ class GameState extends ChangeNotifier {
   }
 
   void _playResultFeedback(ScoreResult result) {
-    final deviation = result.deviationMs;
-    if (deviation == 0) {
-      Haptics.vibrate(HapticsType.success).catchError((_) {});
-      _sound.play('perfect');
-    } else if (deviation <= 50) {
-      Haptics.vibrate(HapticsType.medium).catchError((_) {});
-      _sound.play('excellent');
-    } else if (deviation <= 250) {
-      Haptics.vibrate(HapticsType.light).catchError((_) {});
-      _sound.play('good');
-    } else {
-      Haptics.vibrate(HapticsType.error).catchError((_) {});
-      _sound.play('miss');
+    final tier = result.rating.tier;
+    switch (tier) {
+      case 'perfect':
+        Haptics.vibrate(HapticsType.success).catchError((_) {});
+        _sound.play('perfect');
+      case 'incredible':
+      case 'excellent':
+        Haptics.vibrate(HapticsType.medium).catchError((_) {});
+        _sound.play('excellent');
+      case 'great':
+        Haptics.vibrate(HapticsType.medium).catchError((_) {});
+        _sound.play('great');
+      case 'good':
+        Haptics.vibrate(HapticsType.light).catchError((_) {});
+        _sound.play('good');
+      case 'ok':
+        Haptics.vibrate(HapticsType.light).catchError((_) {});
+        _sound.play('ok');
+      default: // miss
+        Haptics.vibrate(HapticsType.error).catchError((_) {});
+        _sound.play('miss');
     }
   }
 
@@ -543,11 +606,14 @@ class GameState extends ChangeNotifier {
       _calibrationResults = [];
     }
 
-    // Reset pressure state when starting a new run (failure = game over)
-    if (mode.isPressure && !pressureContinue) {
+    // Reset pressure state when starting a brand-new run after final game over
+    if (mode.isPressure && _pressureGameOver) {
       _pressureTolerance = _pressureInitialToleranceMs;
       _pressureRoundsSucceeded = 0;
       _pressureLastRoundSuccess = false;
+      _pressureFailAttempts = 0;
+      _pressurePendingAdRetry = false;
+      _pressureGameOver = false;
     }
 
     _lastResult = null;
@@ -562,19 +628,22 @@ class GameState extends ChangeNotifier {
     _lastResult = null;
     _isBlindMode = false;
     _timerState = TimerState.initial();
-    _surgeGamesInSession = 0;
+    // Preserve _surgeGamesInSession so the player resumes at the same speed
+    // level when they return to Surge from the lobby.
     _surgeFailStreak = 0;
     _surgePendingReset = false;
     // Reset new-mode state
     _doubleTapPhase = 0;
     _doubleTapMidMs = 0;
-    _movingTargetRound = 0;
     _calibrationResults = [];
     _pressureTolerance = _pressureInitialToleranceMs;
     _pressureRoundsSucceeded = 0;
     _pressureLastRoundSuccess = false;
+    _pressureFailAttempts = 0;
+    _pressurePendingAdRetry = false;
+    _pressureGameOver = false;
     _screen = AppScreen.menu;
-    WakelockPlus.disable().catchError((_) {});
+    WakelockPlus.disable().catchError((_) {}); 
     notifyListeners();
   }
 
@@ -595,9 +664,9 @@ class GameState extends ChangeNotifier {
     if (success && rewarded) {
       _surgeFailStreak = 0;
       _surgePendingReset = false;
-      // Undo the last failed game's speed increment so the player
-      // resumes at the speed they had before that failed round.
-      if (_surgeGamesInSession > 0) _surgeGamesInSession--;
+      // Speed level (_surgeGamesInSession) is already correct: misses no longer
+      // increment the counter, so the player naturally resumes at the same
+      // speed they had before the fail streak.
       // Reset the interstitial counter so the next ad is 5 games away
       _gamesAtLastAd = _stats.totalGames;
     } else {
@@ -605,6 +674,49 @@ class GameState extends ChangeNotifier {
     }
     notifyListeners();
   }
+
+  // ═══════════════════════════════════════════════════════════
+  // PRESSURE ACTIONS
+  // ═══════════════════════════════════════════════════════════
+
+  /// Retry the current pressure level for free (after the first failure).
+  Future<void> pressureFreeRetry() async {
+    _pressureLastRoundSuccess = false;
+    _lastResult = null;
+    _surgePendingReset = false;
+    await startCountdown();
+  }
+
+  /// Show a rewarded ad. If the ad is rewarded, grant one extra attempt at the
+  /// current pressure level. Otherwise treat as a full game-over.
+  Future<void> pressureWatchAdRetry() async {
+    bool rewarded = false;
+    final success = await _ads.showRewarded((_) { rewarded = true; });
+    if (success && rewarded) {
+      _pressurePendingAdRetry = false;
+      // Keep _pressureFailAttempts at 2 so that a subsequent fail increments to 3
+      // and triggers _pressureGameOver in stopGame().
+      _gamesAtLastAd = _stats.totalGames;
+      _lastResult = null;
+      await startCountdown();
+    } else {
+      // Ad not shown or not rewarded — mark as final game over
+      _pressureAcceptGameOver();
+    }
+  }
+
+  /// Dismiss the pressure retry options and accept the game-over outcome.
+  void pressureAcceptGameOver() {
+    _pressureTolerance = _pressureInitialToleranceMs;
+    _pressureRoundsSucceeded = 0;
+    _pressureLastRoundSuccess = false;
+    _pressureFailAttempts = 0;
+    _pressurePendingAdRetry = false;
+    _pressureGameOver = true;
+    notifyListeners();
+  }
+
+  void _pressureAcceptGameOver() => pressureAcceptGameOver();
 
   // ═══════════════════════════════════════════════════════════
   // DAILY REWARD
