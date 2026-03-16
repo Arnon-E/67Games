@@ -506,7 +506,7 @@ class GameState extends ChangeNotifier {
           tier == 'perfect' || tier == 'incredible' || tier == 'excellent';
 
       if (isExcellentOrBetter) {
-        // Excellent+: gain a life (no cap) and advance speed
+        // Excellent+: gain a life (lives effectively capped at 999) and advance speed
         _surgeLives++;
         _surgeGamesInSession++;
         _surgeFailStreak = 0;
