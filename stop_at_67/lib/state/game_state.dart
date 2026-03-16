@@ -231,6 +231,7 @@ class GameState extends ChangeNotifier {
     if (modeId == 'surge') {
       _surgeLives = 3;
       _surgeCumulativeScore = 0;
+      _surgeGamesInSession = 0;
     }
     _screen = AppScreen.modeSelect;
     notifyListeners();
