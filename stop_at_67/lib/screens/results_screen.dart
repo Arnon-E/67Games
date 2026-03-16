@@ -606,9 +606,9 @@ class _ResultsScreenState extends State<ResultsScreen> {
         const SizedBox(height: 8),
         // Accelerate: show cumulative score and lives instead of streak
         if (isSurge) ...[
-          _detailRow('Total Score', '${gs.surgeCumulativeScore}'),
+          _detailRow(l10n.resultsTotalScore, '${gs.surgeCumulativeScore}'),
           const SizedBox(height: 8),
-          _detailRow('Lives', '❤️ ${gs.surgeLives}'),
+          _detailRow(l10n.resultsLives, '${l10n.resultsLivesHeartEmoji} ${gs.surgeLives}'),
         ] else ...[
           _detailRow(l10n.resultsStreak,
               '${gs.currentStreakValue > 1 ? "🔥 " : ""}${gs.currentStreakValue}'),
