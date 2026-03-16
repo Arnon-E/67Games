@@ -652,8 +652,6 @@ class GameState extends ChangeNotifier {
     // level when they return to Accelerate from the lobby.
     _surgeFailStreak = 0;
     _surgePendingReset = false;
-    _surgeLives = 3;
-    _surgeCumulativeScore = 0;
     // Reset new-mode state
     _doubleTapPhase = 0;
     _doubleTapMidMs = 0;
