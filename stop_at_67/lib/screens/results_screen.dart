@@ -434,7 +434,8 @@ class _ResultsScreenState extends State<ResultsScreen> {
       barrierDismissible: false,
       builder: (ctx) => _SurgeResetDialog(
         title: l10n.surgeResetTitle,
-        body: '${l10n.surgeResetBody}\n\nTotal Score: ${gs.surgeCumulativeScore}',
+        body:
+            '${l10n.surgeResetBody}\n\n${l10n.surgeResetTotalScore(gs.surgeCumulativeScore)}',
         watchAdLabel: l10n.surgeResetWatchAd,
         acceptLabel: l10n.surgeResetAccept,
         onAccept: () {
