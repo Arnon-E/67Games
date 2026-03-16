@@ -403,7 +403,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get modeDailyDesc => 'One attempt per day - compete globally';
 
   @override
-  String get modeSurgeName => 'Surge';
+  String get modeSurgeName => 'Accelerate';
 
   @override
   String get modeSurgeDesc =>
@@ -510,14 +510,31 @@ class AppLocalizationsEn extends AppLocalizations {
   String get authEnterDisplayName => 'Enter your display name';
 
   @override
-  String get surgeResetTitle => 'SURGE RESET';
+  String get surgeResetTitle => 'ACCELERATE RESET';
 
   @override
-  String get surgeResetBody => '3 fails in a row.\nSpeed resets to 1×.';
+  String get surgeResetBody => 'No lives left!\nSpeed resets to 1×.';
 
   @override
-  String get surgeResetWatchAd => 'WATCH AD — KEEP SPEED';
+  String get surgeResetWatchAd => 'WATCH AD — GET 1 LIFE';
 
   @override
   String get surgeResetAccept => 'OK, RESET TO 1×';
+
+  @override
+  String surgeResetTotalScore(int score) {
+    return 'Total score: $score';
+  }
+
+  @override
+  String get surgeFailLabel => 'GAME OVER';
+
+  @override
+  String get resultsTotalScore => 'Total Score';
+
+  @override
+  String get resultsLives => 'Lives';
+
+  @override
+  String get resultsLivesHeartEmoji => '❤️';
 }

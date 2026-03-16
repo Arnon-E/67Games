@@ -434,7 +434,8 @@ class _ResultsScreenState extends State<ResultsScreen> {
       barrierDismissible: false,
       builder: (ctx) => _SurgeResetDialog(
         title: l10n.surgeResetTitle,
-        body: l10n.surgeResetBody,
+        body:
+            '${l10n.surgeResetBody}\n\n${l10n.surgeResetTotalScore(gs.surgeCumulativeScore)}',
         watchAdLabel: l10n.surgeResetWatchAd,
         acceptLabel: l10n.surgeResetAccept,
         onAccept: () {
@@ -551,6 +552,15 @@ class _ResultsScreenState extends State<ResultsScreen> {
     }
 
     // ── Normal result ────────────────────────────────────────
+
+    // Accelerate mode: show FAIL for anything below excellent
+    final bool isSurge = mode.id == 'surge';
+    final bool surgeIsFail = isSurge && !_isExcellent(result.rating.tier);
+    final String? surgeLabelOverride =
+        surgeIsFail ? l10n.surgeFailLabel : null;
+    final Color? surgeColorOverride =
+        surgeIsFail ? const Color(0xFFFF4444) : null;
+
     return Column(
       children: [
         const SizedBox(height: 24),
@@ -574,8 +584,18 @@ class _ResultsScreenState extends State<ResultsScreen> {
 
         // Bouncy score for excellent+, regular for others
         showFireworks
-            ? _BouncyScore(child: ScoreDisplay(result: result))
-            : ScoreDisplay(result: result),
+            ? _BouncyScore(
+                child: ScoreDisplay(
+                  result: result,
+                  labelOverride: surgeLabelOverride,
+                  labelColorOverride: surgeColorOverride,
+                ),
+              )
+            : ScoreDisplay(
+                result: result,
+                labelOverride: surgeLabelOverride,
+                labelColorOverride: surgeColorOverride,
+              ),
 
         const SizedBox(height: 40),
 
@@ -584,8 +604,15 @@ class _ResultsScreenState extends State<ResultsScreen> {
         const SizedBox(height: 8),
         _detailRow(l10n.resultsDeviation, formatDeviation(result.deviationMs)),
         const SizedBox(height: 8),
-        _detailRow(l10n.resultsStreak,
-            '${gs.currentStreakValue > 1 ? "🔥 " : ""}${gs.currentStreakValue}'),
+        // Accelerate: show cumulative score and lives instead of streak
+        if (isSurge) ...[
+          _detailRow(l10n.resultsTotalScore, '${gs.surgeCumulativeScore}'),
+          const SizedBox(height: 8),
+          _detailRow(l10n.resultsLives, '${l10n.resultsLivesHeartEmoji} ${gs.surgeLives}'),
+        ] else ...[
+          _detailRow(l10n.resultsStreak,
+              '${gs.currentStreakValue > 1 ? "🔥 " : ""}${gs.currentStreakValue}'),
+        ],
         const SizedBox(height: 8),
         _detailRow(l10n.resultsXp, '+${result.xpEarned} XP'),
 
@@ -1068,84 +1095,87 @@ class _SurgeResetDialogState extends State<_SurgeResetDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return Dialog(
-      backgroundColor: AppColors.darkCard,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      child: Padding(
-        padding: const EdgeInsets.all(28),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text('⚡', style: TextStyle(fontSize: 40)),
-            const SizedBox(height: 12),
-            Text(
-              widget.title,
-              style: const TextStyle(
-                color: AppColors.textPrimary,
-                fontSize: 20,
-                fontWeight: FontWeight.w700,
-                letterSpacing: 2,
+    return PopScope(
+      canPop: false,
+      child: Dialog(
+        backgroundColor: AppColors.darkCard,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        child: Padding(
+          padding: const EdgeInsets.all(28),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text('⚡', style: TextStyle(fontSize: 40)),
+              const SizedBox(height: 12),
+              Text(
+                widget.title,
+                style: const TextStyle(
+                  color: AppColors.textPrimary,
+                  fontSize: 20,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 2,
+                ),
               ),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              widget.body,
-              textAlign: TextAlign.center,
-              style: const TextStyle(color: AppColors.textDisabled, fontSize: 15, height: 1.5),
-            ),
-            const SizedBox(height: 28),
-            SizedBox(
-              width: double.infinity,
-              child: TextButton(
-                onPressed: _isLoading
-                    ? null
-                    : () async {
-                        setState(() => _isLoading = true);
-                        await widget.onWatchAd();
-                        if (mounted) Navigator.of(context).pop();
-                      },
-                style: TextButton.styleFrom(
-                  backgroundColor: AppColors.cyan.withValues(alpha: 0.15),
-                  foregroundColor: AppColors.cyan,
-                  disabledForegroundColor: AppColors.cyan.withValues(alpha: 0.4),
-                  disabledBackgroundColor: AppColors.cyan.withValues(alpha: 0.07),
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    side: const BorderSide(color: AppColors.cyan, width: 1),
+              const SizedBox(height: 12),
+              Text(
+                widget.body,
+                textAlign: TextAlign.center,
+                style: const TextStyle(color: AppColors.textDisabled, fontSize: 15, height: 1.5),
+              ),
+              const SizedBox(height: 28),
+              SizedBox(
+                width: double.infinity,
+                child: TextButton(
+                  onPressed: _isLoading
+                      ? null
+                      : () async {
+                          setState(() => _isLoading = true);
+                          await widget.onWatchAd();
+                          if (mounted) Navigator.of(context).pop();
+                        },
+                  style: TextButton.styleFrom(
+                    backgroundColor: AppColors.cyan.withValues(alpha: 0.15),
+                    foregroundColor: AppColors.cyan,
+                    disabledForegroundColor: AppColors.cyan.withValues(alpha: 0.4),
+                    disabledBackgroundColor: AppColors.cyan.withValues(alpha: 0.07),
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      side: const BorderSide(color: AppColors.cyan, width: 1),
+                    ),
+                  ),
+                  child: _isLoading
+                      ? const SizedBox(
+                          height: 18,
+                          width: 18,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor: AlwaysStoppedAnimation<Color>(AppColors.cyan),
+                          ),
+                        )
+                      : Text(
+                          widget.watchAdLabel,
+                          style: const TextStyle(fontWeight: FontWeight.w600, letterSpacing: 1),
+                        ),
+                ),
+              ),
+              const SizedBox(height: 10),
+              SizedBox(
+                width: double.infinity,
+                child: TextButton(
+                  onPressed: _isLoading ? null : widget.onAccept,
+                  style: TextButton.styleFrom(
+                    foregroundColor: AppColors.textDisabled,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                  ),
+                  child: Text(
+                    widget.acceptLabel,
+                    style: const TextStyle(fontWeight: FontWeight.w500, letterSpacing: 1),
                   ),
                 ),
-                child: _isLoading
-                    ? const SizedBox(
-                        height: 18,
-                        width: 18,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          valueColor: AlwaysStoppedAnimation<Color>(AppColors.cyan),
-                        ),
-                      )
-                    : Text(
-                        widget.watchAdLabel,
-                        style: const TextStyle(fontWeight: FontWeight.w600, letterSpacing: 1),
-                      ),
               ),
-            ),
-            const SizedBox(height: 10),
-            SizedBox(
-              width: double.infinity,
-              child: TextButton(
-                onPressed: _isLoading ? null : widget.onAccept,
-                style: TextButton.styleFrom(
-                  foregroundColor: AppColors.textDisabled,
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                ),
-                child: Text(
-                  widget.acceptLabel,
-                  style: const TextStyle(fontWeight: FontWeight.w500, letterSpacing: 1),
-                ),
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
