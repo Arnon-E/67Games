@@ -556,7 +556,8 @@ class _ResultsScreenState extends State<ResultsScreen> {
     // Accelerate mode: show FAIL for anything below excellent
     final bool isSurge = mode.id == 'surge';
     final bool surgeIsFail = isSurge && !_isExcellent(result.rating.tier);
-    final String? surgeLabelOverride = surgeIsFail ? 'FAIL' : null;
+    final String? surgeLabelOverride =
+        surgeIsFail ? l10n.surgeFailLabel : null;
     final Color? surgeColorOverride =
         surgeIsFail ? const Color(0xFFFF4444) : null;
 
