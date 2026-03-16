@@ -1,16 +1,17 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:share_plus/share_plus.dart';
 import '../l10n/app_localizations.dart';
 
 import '../state/game_state.dart';
+import '../state/auth_state.dart';
 import '../engine/scoring.dart';
 import '../engine/types.dart';
 import '../theme/app_colors.dart';
 import '../widgets/app_gradient_background.dart';
 import '../widgets/score_display.dart';
 import '../widgets/game_button.dart';
+import '../widgets/share_card_widget.dart';
 
 // ── Fireworks particle system ────────────────────────────────
 
@@ -964,13 +965,16 @@ class _ResultsScreenState extends State<ResultsScreen> {
   }
 
   Future<void> _share(
-      BuildContext context, result, String modeName, AppLocalizations l10n) async {
-    try {
-      final text = 'I scored ${result.finalScore} in Stop at 67 ($modeName mode)!\n'
-          'Deviation: ${formatDeviation(result.deviationMs)}\n'
-          'Can you beat me?';
-      await Share.share(text);
-    } catch (_) {}
+      BuildContext context, ScoreResult result, String modeName, AppLocalizations l10n) async {
+    final auth = context.read<AuthState>();
+    final playerName = auth.isSignedIn ? auth.userName : '';
+    if (!context.mounted) return;
+    await showShareCard(
+      context: context,
+      result: result,
+      modeName: modeName,
+      playerName: playerName,
+    );
   }
 }
 

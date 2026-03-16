@@ -26,6 +26,7 @@ dependencies:
   google_sign_in: ^6.2.1
   cloud_firestore: ^5.4.4
   package_info_plus: ^9.0.0
+  path_provider: ^2.1.4
 
 dev_dependencies:
   flutter_test:

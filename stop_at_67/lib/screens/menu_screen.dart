@@ -4,6 +4,7 @@ import '../l10n/app_localizations.dart';
 
 import '../state/game_state.dart';
 import '../engine/constants.dart';
+import '../engine/types.dart';
 import '../theme/app_colors.dart';
 import '../widgets/app_gradient_background.dart';
 import '../widgets/daily_reward_modal.dart';
@@ -312,6 +313,11 @@ class _MenuScreenState extends State<MenuScreen>
                 ],
               ),
 
+              const SizedBox(height: 8),
+
+              // Weekly missions card
+              const _WeeklyMissionsCard(),
+
               const Spacer(),
 
               // Daily reward button (if available)
@@ -390,6 +396,288 @@ class _MenuScreenState extends State<MenuScreen>
             Text(label, style: const TextStyle(color: AppColors.textDisabled, fontSize: 12)),
           ],
         ),
+      ),
+    );
+  }
+}
+
+// ── Weekly Missions Card ─────────────────────────────────────
+
+class _WeeklyMissionsCard extends StatefulWidget {
+  const _WeeklyMissionsCard();
+
+  @override
+  State<_WeeklyMissionsCard> createState() => _WeeklyMissionsCardState();
+}
+
+class _WeeklyMissionsCardState extends State<_WeeklyMissionsCard> {
+  bool _expanded = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final gs = context.watch<GameState>();
+    final missionsState = gs.weeklyMissions;
+    final missions = missionsState.missions;
+    if (missions.isEmpty) return const SizedBox.shrink();
+
+    // Count completed (progress >= target) and claimed
+    int completed = 0;
+    int claimed = 0;
+    for (final mp in missions) {
+      final def = kWeeklyMissions.firstWhere(
+        (d) => d.id == mp.missionId,
+        orElse: () => const WeeklyMissionDef(
+          id: '', label: '', description: '', target: 0, type: '', rewardCoins: 0,
+        ),
+      );
+      if (def.id.isEmpty) continue;
+      if (mp.progress >= def.target) completed++;
+      if (mp.claimed) claimed++;
+    }
+    final total = missions.length;
+    final hasUnclaimed = completed > claimed;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      child: GestureDetector(
+        onTap: () => setState(() => _expanded = !_expanded),
+        child: Container(
+          decoration: BoxDecoration(
+            color: AppColors.darkCard,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: hasUnclaimed
+                  ? AppColors.gold.withValues(alpha: 0.5)
+                  : AppColors.darkElevated,
+            ),
+          ),
+          child: Column(
+            children: [
+              // Header row
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                child: Row(
+                  children: [
+                    const Text('📋', style: TextStyle(fontSize: 16)),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'WEEKLY MISSIONS',
+                            style: TextStyle(
+                              color: AppColors.textSecondary,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 1.5,
+                            ),
+                          ),
+                          Text(
+                            '$completed / $total complete',
+                            style: TextStyle(
+                              color: hasUnclaimed ? AppColors.gold : AppColors.textHint,
+                              fontSize: 11,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    if (hasUnclaimed)
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                        decoration: BoxDecoration(
+                          color: AppColors.gold.withValues(alpha: 0.15),
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(color: AppColors.gold.withValues(alpha: 0.4)),
+                        ),
+                        child: Text(
+                          'CLAIM!',
+                          style: const TextStyle(
+                            color: AppColors.gold,
+                            fontSize: 10,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: 1,
+                          ),
+                        ),
+                      ),
+                    const SizedBox(width: 8),
+                    Icon(
+                      _expanded ? Icons.expand_less : Icons.expand_more,
+                      color: AppColors.textHint,
+                      size: 20,
+                    ),
+                  ],
+                ),
+              ),
+
+              // Progress bar
+              Padding(
+                padding: const EdgeInsets.only(left: 16, right: 16, bottom: 12),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(4),
+                  child: LinearProgressIndicator(
+                    value: total > 0 ? completed / total : 0,
+                    backgroundColor: AppColors.darkElevated,
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      hasUnclaimed ? AppColors.gold : AppColors.orange,
+                    ),
+                    minHeight: 4,
+                  ),
+                ),
+              ),
+
+              // Expanded mission list
+              if (_expanded)
+                ...missions.map((mp) {
+                  final def = kWeeklyMissions.firstWhere(
+                    (d) => d.id == mp.missionId,
+                    orElse: () => const WeeklyMissionDef(
+                      id: '', label: '', description: '', target: 0, type: '', rewardCoins: 0,
+                    ),
+                  );
+                  if (def.id.isEmpty) return const SizedBox.shrink();
+                  return _MissionRow(
+                    def: def,
+                    progress: mp,
+                    onClaim: () async {
+                      await gs.claimMissionReward(def.id);
+                    },
+                  );
+                }),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _MissionRow extends StatelessWidget {
+  final WeeklyMissionDef def;
+  final WeeklyMissionProgress progress;
+  final VoidCallback onClaim;
+
+  const _MissionRow({
+    required this.def,
+    required this.progress,
+    required this.onClaim,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final isDone = progress.progress >= def.target;
+    final isClaimed = progress.claimed;
+    final pct = (progress.progress / def.target).clamp(0.0, 1.0);
+
+    return Container(
+      margin: const EdgeInsets.only(left: 16, right: 16, bottom: 10),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: AppColors.darkElevated,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: isDone && !isClaimed
+              ? AppColors.gold.withValues(alpha: 0.4)
+              : Colors.transparent,
+        ),
+      ),
+      child: Row(
+        children: [
+          // Icon
+          Text(
+            isClaimed ? '✅' : isDone ? '🎁' : '🎯',
+            style: const TextStyle(fontSize: 18),
+          ),
+          const SizedBox(width: 10),
+
+          // Text + progress bar
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  def.label,
+                  style: TextStyle(
+                    color: isClaimed ? AppColors.textHint : AppColors.textSecondary,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    decoration: isClaimed ? TextDecoration.lineThrough : null,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  def.description,
+                  style: const TextStyle(color: AppColors.textHint, fontSize: 11),
+                ),
+                const SizedBox(height: 6),
+                Row(
+                  children: [
+                    Expanded(
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(3),
+                        child: LinearProgressIndicator(
+                          value: pct,
+                          backgroundColor: AppColors.darkCard,
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            isClaimed ? AppColors.textHint : AppColors.orange,
+                          ),
+                          minHeight: 3,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      '${progress.progress.clamp(0, def.target)}/${def.target}',
+                      style: const TextStyle(color: AppColors.textHint, fontSize: 10),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+
+          // Reward + claim button
+          const SizedBox(width: 10),
+          Column(
+            children: [
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.circle, color: AppColors.gold, size: 10),
+                  const SizedBox(width: 3),
+                  Text(
+                    '${def.rewardCoins}',
+                    style: const TextStyle(color: AppColors.gold, fontSize: 12, fontWeight: FontWeight.w600),
+                  ),
+                ],
+              ),
+              if (isDone && !isClaimed) ...[
+                const SizedBox(height: 6),
+                GestureDetector(
+                  onTap: onClaim,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: AppColors.gold.withValues(alpha: 0.2),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: AppColors.gold.withValues(alpha: 0.5)),
+                    ),
+                    child: const Text(
+                      'CLAIM',
+                      style: TextStyle(
+                        color: AppColors.gold,
+                        fontSize: 10,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ],
       ),
     );
   }

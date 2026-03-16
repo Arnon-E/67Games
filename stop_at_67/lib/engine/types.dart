@@ -338,6 +338,110 @@ class LeaderboardEntry {
 }
 
 // ============================================================
+// WEEKLY MISSIONS
+// ============================================================
+
+/// Defines a mission that resets each week.
+class WeeklyMissionDef {
+  final String id;
+  final String label;
+  final String description;
+  final int target;
+  final String type; // 'games' | 'perfects' | 'modes' | 'score' | 'streak'
+  final int rewardCoins;
+
+  const WeeklyMissionDef({
+    required this.id,
+    required this.label,
+    required this.description,
+    required this.target,
+    required this.type,
+    required this.rewardCoins,
+  });
+}
+
+/// Tracks per-player progress on a single mission this week.
+class WeeklyMissionProgress {
+  final String missionId;
+  final int progress;
+  final bool claimed;
+
+  const WeeklyMissionProgress({
+    required this.missionId,
+    this.progress = 0,
+    this.claimed = false,
+  });
+
+  WeeklyMissionProgress copyWith({int? progress, bool? claimed}) =>
+      WeeklyMissionProgress(
+        missionId: missionId,
+        progress: progress ?? this.progress,
+        claimed: claimed ?? this.claimed,
+      );
+
+  Map<String, dynamic> toJson() => {
+    'missionId': missionId,
+    'progress': progress,
+    'claimed': claimed,
+  };
+
+  factory WeeklyMissionProgress.fromJson(Map<String, dynamic> json) =>
+      WeeklyMissionProgress(
+        missionId: json['missionId'] as String,
+        progress: (json['progress'] as num?)?.toInt() ?? 0,
+        claimed: json['claimed'] as bool? ?? false,
+      );
+}
+
+class WeeklyMissionsState {
+  final String weekId; // e.g. '2026-W11'
+  final List<WeeklyMissionProgress> missions;
+  /// Distinct mode IDs played this week (for the 'modes' mission).
+  final List<String> playedModeIds;
+
+  const WeeklyMissionsState({
+    required this.weekId,
+    required this.missions,
+    this.playedModeIds = const [],
+  });
+
+  factory WeeklyMissionsState.initial(String weekId, List<WeeklyMissionDef> defs) =>
+      WeeklyMissionsState(
+        weekId: weekId,
+        missions: defs.map((d) => WeeklyMissionProgress(missionId: d.id)).toList(),
+        playedModeIds: const [],
+      );
+
+  WeeklyMissionsState copyWith({
+    List<WeeklyMissionProgress>? missions,
+    List<String>? playedModeIds,
+  }) =>
+      WeeklyMissionsState(
+        weekId: weekId,
+        missions: missions ?? this.missions,
+        playedModeIds: playedModeIds ?? this.playedModeIds,
+      );
+
+  Map<String, dynamic> toJson() => {
+    'weekId': weekId,
+    'missions': missions.map((m) => m.toJson()).toList(),
+    'playedModeIds': playedModeIds,
+  };
+
+  factory WeeklyMissionsState.fromJson(Map<String, dynamic> json) =>
+      WeeklyMissionsState(
+        weekId: json['weekId'] as String,
+        missions: (json['missions'] as List<dynamic>)
+            .map((m) => WeeklyMissionProgress.fromJson(m as Map<String, dynamic>))
+            .toList(),
+        playedModeIds: (json['playedModeIds'] as List<dynamic>?)
+            ?.map((e) => e as String)
+            .toList() ??
+            [],
+      );
+}
+
+// ============================================================
 // SESSION STATS
 // ============================================================
 
