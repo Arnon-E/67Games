@@ -96,10 +96,16 @@ class GameState extends ChangeNotifier {
   int _surgeGamesInSession = 0;
   int _surgeFailStreak = 0;
   bool _surgePendingReset = false;
+  /// Cumulative score across all rounds in the current Accelerate session.
+  int _surgeCumulativeScore = 0;
+  /// Number of lives remaining (starts at 3, excellent+ adds 1, anything else subtracts 1).
+  int _surgeLives = 3;
 
   double get surgeSpeedMultiplier => _computeSurgeMultiplier();
   int get surgeFailStreak => _surgeFailStreak;
   bool get surgePendingReset => _surgePendingReset;
+  int get surgeCumulativeScore => _surgeCumulativeScore;
+  int get surgeLives => _surgeLives;
 
   // ── Double Tap mode ─────────────────────────────────────────
   // Phase: 0=not active, 1=running (waiting for mid-tap), 2=mid-done (waiting for stop)
@@ -221,6 +227,11 @@ class GameState extends ChangeNotifier {
     _pressureGameOver = false;
     _doubleTapPhase = 0;
     _doubleTapMidMs = 0;
+    // Reset Accelerate session state when selecting a new mode
+    if (modeId == 'surge') {
+      _surgeLives = 3;
+      _surgeCumulativeScore = 0;
+    }
     _screen = AppScreen.modeSelect;
     notifyListeners();
   }
@@ -485,17 +496,26 @@ class GameState extends ChangeNotifier {
     final coinsEarned = persistStats ? resultToSave.finalScore ~/ 10 : 0;
     final newCoins = _coins + coinsEarned;
 
-    // Surge: update game counter and fail streak
+    // Surge / Accelerate: update lives, speed level, and cumulative score
     if (mode.id == 'surge') {
-      if (result.finalScore < 700) {
-        // On a miss the speed level stays the same; only increment the fail streak
-        _surgeFailStreak++;
-      } else {
-        // On a success, advance to the next speed level and reset the fail streak
+      // Accumulate the round score into the session total
+      _surgeCumulativeScore += result.finalScore;
+
+      final tier = result.rating.tier;
+      final isExcellentOrBetter =
+          tier == 'perfect' || tier == 'incredible' || tier == 'excellent';
+
+      if (isExcellentOrBetter) {
+        // Excellent+: gain a life (no cap) and advance speed
+        _surgeLives++;
         _surgeGamesInSession++;
         _surgeFailStreak = 0;
+      } else {
+        // Anything below excellent: lose a life
+        _surgeLives = (_surgeLives - 1).clamp(0, 999);
+        _surgeFailStreak++;
       }
-      if (_surgeFailStreak >= 3) {
+      if (_surgeLives <= 0) {
         _surgePendingReset = true;
       }
     }
@@ -629,9 +649,11 @@ class GameState extends ChangeNotifier {
     _isBlindMode = false;
     _timerState = TimerState.initial();
     // Preserve _surgeGamesInSession so the player resumes at the same speed
-    // level when they return to Surge from the lobby.
+    // level when they return to Accelerate from the lobby.
     _surgeFailStreak = 0;
     _surgePendingReset = false;
+    _surgeLives = 3;
+    _surgeCumulativeScore = 0;
     // Reset new-mode state
     _doubleTapPhase = 0;
     _doubleTapMidMs = 0;
@@ -655,6 +677,8 @@ class GameState extends ChangeNotifier {
     _surgeGamesInSession = 0;
     _surgeFailStreak = 0;
     _surgePendingReset = false;
+    _surgeLives = 3;
+    _surgeCumulativeScore = 0;
     notifyListeners();
   }
 
@@ -662,11 +686,10 @@ class GameState extends ChangeNotifier {
     bool rewarded = false;
     final success = await _ads.showRewarded((_) { rewarded = true; });
     if (success && rewarded) {
+      // Ad rewards exactly 1 life — speed and cumulative score are preserved
+      _surgeLives = 1;
       _surgeFailStreak = 0;
       _surgePendingReset = false;
-      // Speed level (_surgeGamesInSession) is already correct: misses no longer
-      // increment the counter, so the player naturally resumes at the same
-      // speed they had before the fail streak.
       // Reset the interstitial counter so the next ad is 5 games away
       _gamesAtLastAd = _stats.totalGames;
     } else {

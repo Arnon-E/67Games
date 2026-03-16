@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:haptic_feedback/haptic_feedback.dart';
 import 'package:provider/provider.dart';
@@ -68,8 +69,9 @@ class _PlayingScreenState extends State<PlayingScreen> {
       },
       child: Scaffold(
         backgroundColor: Colors.transparent,
-        body: AppGradientBackground(
+        body: _SurgeAwareBackground(
           backgroundSkin: gs.loadout.background,
+          surgeMultiplier: mode?.id == 'surge' ? gs.surgeSpeedMultiplier : 1.0,
           child: SafeArea(
             child: Stack(
               children: [
@@ -177,14 +179,14 @@ class _PlayingScreenState extends State<PlayingScreen> {
                   ),
                 ),
 
-                // Surge badge (top-right overlay)
+                // Surge / Accelerate badge (top-right overlay)
                 if (mode?.id == 'surge')
                   Positioned(
                     top: 16,
                     right: 20,
                     child: _SurgeSpeedBadge(
                       multiplier: timerState.speedMultiplier,
-                      failStreak: gs.surgeFailStreak,
+                      lives: gs.surgeLives,
                     ),
                   ),
 
@@ -229,13 +231,12 @@ class _PlayingScreenState extends State<PlayingScreen> {
 
 class _SurgeSpeedBadge extends StatelessWidget {
   final double multiplier;
-  final int failStreak;
+  final int lives;
 
-  const _SurgeSpeedBadge({required this.multiplier, required this.failStreak});
+  const _SurgeSpeedBadge({required this.multiplier, required this.lives});
 
   @override
   Widget build(BuildContext context) {
-    final livesLeft = (3 - failStreak).clamp(0, 3);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
@@ -259,17 +260,22 @@ class _SurgeSpeedBadge extends StatelessWidget {
         const SizedBox(height: 6),
         Row(
           mainAxisSize: MainAxisSize.min,
-          children: List.generate(3, (i) {
-            final filled = i < livesLeft;
-            return Padding(
-              padding: const EdgeInsets.only(left: 4),
-              child: Icon(
-                filled ? Icons.favorite : Icons.favorite_border,
-                size: 14,
-                color: filled ? Colors.redAccent : AppColors.textHint,
+          children: [
+            Icon(
+              Icons.favorite,
+              size: 14,
+              color: lives > 0 ? Colors.redAccent : AppColors.textHint,
+            ),
+            const SizedBox(width: 2),
+            Text(
+              '×$lives',
+              style: TextStyle(
+                fontSize: 12,
+                color: lives > 0 ? Colors.redAccent : AppColors.textHint,
+                fontWeight: FontWeight.w600,
               ),
-            );
-          }),
+            ),
+          ],
         ),
       ],
     );
@@ -301,6 +307,112 @@ class _CalibrationBadge extends StatelessWidget {
           letterSpacing: 1,
         ),
       ),
+    );
+  }
+}
+
+// ── Surge-aware background ────────────────────────────────────
+//
+// < 2×  : normal gradient (AppGradientBackground)
+// ≥ 2×  : glowing colour-shifting background
+// ≥ 3×  : same glow + a rapid flicker overlay
+
+class _SurgeAwareBackground extends StatelessWidget {
+  final Widget child;
+  final String backgroundSkin;
+  final double surgeMultiplier;
+
+  const _SurgeAwareBackground({
+    required this.child,
+    required this.backgroundSkin,
+    required this.surgeMultiplier,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    if (surgeMultiplier < 2.0) {
+      return AppGradientBackground(backgroundSkin: backgroundSkin, child: child);
+    }
+    // ≥ 2×: glowing background (optionally with flicker at ≥ 3×)
+    return _SurgeGlowBackground(
+      flicker: surgeMultiplier >= 3.0,
+      child: child,
+    );
+  }
+}
+
+/// Animated colour-shifting "glow" background for Accelerate mode at ≥2× speed.
+class _SurgeGlowBackground extends StatefulWidget {
+  final Widget child;
+  final bool flicker;
+
+  const _SurgeGlowBackground({required this.child, required this.flicker});
+
+  @override
+  State<_SurgeGlowBackground> createState() => _SurgeGlowBackgroundState();
+}
+
+class _SurgeGlowBackgroundState extends State<_SurgeGlowBackground>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+
+  static const List<List<Color>> _glowSets = [
+    [Color(0xFF1a0040), Color(0xFF3d0080), Color(0xFF0a0025)],
+    [Color(0xFF002040), Color(0xFF0060a0), Color(0xFF001030)],
+    [Color(0xFF200040), Color(0xFF5000a0), Color(0xFF100020)],
+    [Color(0xFF003040), Color(0xFF0080b0), Color(0xFF001520)],
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 4),
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) {
+        final t = _controller.value;
+        final idx = (t * _glowSets.length).floor() % _glowSets.length;
+        final nextIdx = (idx + 1) % _glowSets.length;
+        final blend = (t * _glowSets.length) - idx;
+
+        final colors = List.generate(3, (i) =>
+          Color.lerp(_glowSets[idx][i], _glowSets[nextIdx][i], blend)!,
+        );
+
+        // Flicker: rapid opacity oscillation when at max speed (≥ 3×)
+        final flickerAlpha = widget.flicker
+            ? 0.85 + 0.15 * sin(t * 2 * pi * 8) // 8 Hz flicker
+            : 1.0;
+
+        return Opacity(
+          opacity: flickerAlpha.clamp(0.0, 1.0),
+          child: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: colors,
+                stops: const [0.0, 0.5, 1.0],
+              ),
+            ),
+            child: child,
+          ),
+        );
+      },
+      child: widget.child,
     );
   }
 }

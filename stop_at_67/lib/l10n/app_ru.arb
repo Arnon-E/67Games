@@ -171,7 +171,7 @@
   "modeReverse100Desc": "Обратный отсчёт со 100 — остановитесь на 33",
   "modeDailyName": "Ежедневный вызов",
   "modeDailyDesc": "Одна попытка в день — соревнуйтесь глобально",
-  "modeSurgeName": "Волна",
+  "modeSurgeName": "Ускорение",
   "modeSurgeDesc": "Таймер ускоряется каждую игру — как долго продержитесь?",
   "modeDoubleTapName": "Двойное касание",
   "modeDoubleTapDesc": "Нажмите на 3.35с, затем остановитесь на 6.7с — проверьте ритм",
@@ -214,8 +214,8 @@
   "authPlayAsGuest": "Играть как гость",
   "authEnterDisplayName": "Введите отображаемое имя",
 
-  "surgeResetTitle": "СБРОС ВОЛНЫ",
-  "surgeResetBody": "3 неудачи подряд.\nСкорость сбрасывается до 1×.",
-  "surgeResetWatchAd": "СМОТРЕТЬ РЕКЛАМУ — СОХРАНИТЬ СКОРОСТЬ",
+  "surgeResetTitle": "СБРОС УСКОРЕНИЯ",
+  "surgeResetBody": "Жизни закончились!\nСкорость сбрасывается до 1×.",
+  "surgeResetWatchAd": "СМОТРЕТЬ РЕКЛАМУ — ПОЛУЧИТЬ 1 ЖИЗНЬ",
   "surgeResetAccept": "ОК, СБРОСИТЬ ДО 1×"
 }

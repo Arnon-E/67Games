@@ -434,7 +434,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
       barrierDismissible: false,
       builder: (ctx) => _SurgeResetDialog(
         title: l10n.surgeResetTitle,
-        body: l10n.surgeResetBody,
+        body: '${l10n.surgeResetBody}\n\nTotal Score: ${gs.surgeCumulativeScore}',
         watchAdLabel: l10n.surgeResetWatchAd,
         acceptLabel: l10n.surgeResetAccept,
         onAccept: () {
@@ -551,6 +551,14 @@ class _ResultsScreenState extends State<ResultsScreen> {
     }
 
     // ── Normal result ────────────────────────────────────────
+
+    // Accelerate mode: show FAIL for anything below excellent
+    final bool isSurge = mode.id == 'surge';
+    final bool surgeIsFail = isSurge && !_isExcellent(result.rating.tier);
+    final String? surgeLabelOverride = surgeIsFail ? 'FAIL' : null;
+    final Color? surgeColorOverride =
+        surgeIsFail ? const Color(0xFFFF4444) : null;
+
     return Column(
       children: [
         const SizedBox(height: 24),
@@ -574,8 +582,18 @@ class _ResultsScreenState extends State<ResultsScreen> {
 
         // Bouncy score for excellent+, regular for others
         showFireworks
-            ? _BouncyScore(child: ScoreDisplay(result: result))
-            : ScoreDisplay(result: result),
+            ? _BouncyScore(
+                child: ScoreDisplay(
+                  result: result,
+                  labelOverride: surgeLabelOverride,
+                  labelColorOverride: surgeColorOverride,
+                ),
+              )
+            : ScoreDisplay(
+                result: result,
+                labelOverride: surgeLabelOverride,
+                labelColorOverride: surgeColorOverride,
+              ),
 
         const SizedBox(height: 40),
 
@@ -584,8 +602,15 @@ class _ResultsScreenState extends State<ResultsScreen> {
         const SizedBox(height: 8),
         _detailRow(l10n.resultsDeviation, formatDeviation(result.deviationMs)),
         const SizedBox(height: 8),
-        _detailRow(l10n.resultsStreak,
-            '${gs.currentStreakValue > 1 ? "🔥 " : ""}${gs.currentStreakValue}'),
+        // Accelerate: show cumulative score and lives instead of streak
+        if (isSurge) ...[
+          _detailRow('Total Score', '${gs.surgeCumulativeScore}'),
+          const SizedBox(height: 8),
+          _detailRow('Lives', '❤️ ${gs.surgeLives}'),
+        ] else ...[
+          _detailRow(l10n.resultsStreak,
+              '${gs.currentStreakValue > 1 ? "🔥 " : ""}${gs.currentStreakValue}'),
+        ],
         const SizedBox(height: 8),
         _detailRow(l10n.resultsXp, '+${result.xpEarned} XP'),
 

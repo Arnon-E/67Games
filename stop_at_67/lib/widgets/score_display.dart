@@ -4,23 +4,34 @@ import '../engine/scoring.dart';
 
 class ScoreDisplay extends StatelessWidget {
   final ScoreResult result;
+  /// Optional label override (e.g. "FAIL" for Accelerate mode).
+  final String? labelOverride;
+  /// Optional colour override for the label.
+  final Color? labelColorOverride;
 
-  const ScoreDisplay({super.key, required this.result});
+  const ScoreDisplay({
+    super.key,
+    required this.result,
+    this.labelOverride,
+    this.labelColorOverride,
+  });
 
   @override
   Widget build(BuildContext context) {
     final rating = result.rating;
+    final displayLabel = labelOverride ?? rating.label;
+    final displayColor = labelColorOverride ?? rating.color;
 
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         // Rating label
         Text(
-          rating.label,
+          displayLabel,
           style: TextStyle(
             fontSize: 28,
             fontWeight: FontWeight.w700,
-            color: rating.color,
+            color: displayColor,
             letterSpacing: 2,
           ),
         ),
