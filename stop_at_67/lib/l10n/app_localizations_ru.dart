@@ -406,7 +406,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get modeDailyDesc => 'Одна попытка в день — соревнуйтесь глобально';
 
   @override
-  String get modeSurgeName => 'Волна';
+  String get modeSurgeName => 'Ускорение';
 
   @override
   String get modeSurgeDesc =>
@@ -513,14 +513,14 @@ class AppLocalizationsRu extends AppLocalizations {
   String get authEnterDisplayName => 'Введите отображаемое имя';
 
   @override
-  String get surgeResetTitle => 'СБРОС ВОЛНЫ';
+  String get surgeResetTitle => 'СБРОС УСКОРЕНИЯ';
 
   @override
   String get surgeResetBody =>
-      '3 неудачи подряд.\nСкорость сбрасывается до 1×.';
+      'Жизни закончились!\nСкорость сбрасывается до 1×.';
 
   @override
-  String get surgeResetWatchAd => 'СМОТРЕТЬ РЕКЛАМУ — СОХРАНИТЬ СКОРОСТЬ';
+  String get surgeResetWatchAd => 'СМОТРЕТЬ РЕКЛАМУ — ПОЛУЧИТЬ 1 ЖИЗНЬ';
 
   @override
   String get surgeResetAccept => 'ОК, СБРОСИТЬ ДО 1×';

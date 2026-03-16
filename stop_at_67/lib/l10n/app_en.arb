@@ -171,7 +171,7 @@
   "modeReverse100Desc": "Countdown from 100 - stop at 33",
   "modeDailyName": "Daily Challenge",
   "modeDailyDesc": "One attempt per day - compete globally",
-  "modeSurgeName": "Surge",
+  "modeSurgeName": "Accelerate",
   "modeSurgeDesc": "Timer speeds up every game — how long can you keep up?",
   "modeDoubleTapName": "Double Tap",
   "modeDoubleTapDesc": "Tap at 3.35s then stop at 6.7s — test your rhythm",
@@ -214,8 +214,8 @@
   "authPlayAsGuest": "Play as Guest",
   "authEnterDisplayName": "Enter your display name",
 
-  "surgeResetTitle": "SURGE RESET",
-  "surgeResetBody": "3 fails in a row.\nSpeed resets to 1×.",
-  "surgeResetWatchAd": "WATCH AD — KEEP SPEED",
+  "surgeResetTitle": "ACCELERATE RESET",
+  "surgeResetBody": "No lives left!\nSpeed resets to 1×.",
+  "surgeResetWatchAd": "WATCH AD — GET 1 LIFE",
   "surgeResetAccept": "OK, RESET TO 1×"
 }

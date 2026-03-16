@@ -61,7 +61,7 @@ const Map<String, GameMode> kGameModes = {
   ),
   'surge': GameMode(
     id: 'surge',
-    name: 'Surge',
+    name: 'Accelerate',
     targetMs: 6700,
     displayTarget: '6.700s',
     description: 'Timer speeds up every game — how long can you keep up?',

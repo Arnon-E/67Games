@@ -403,7 +403,7 @@ class AppLocalizationsHe extends AppLocalizations {
   String get modeDailyDesc => 'ניסיון אחד ביום - התחרה גלובלית';
 
   @override
-  String get modeSurgeName => 'גל';
+  String get modeSurgeName => 'האצה';
 
   @override
   String get modeSurgeDesc => 'הטיימר מאיץ בכל משחק — כמה זמן תחזיק?';
@@ -506,13 +506,13 @@ class AppLocalizationsHe extends AppLocalizations {
   String get authEnterDisplayName => 'הזן שם תצוגה';
 
   @override
-  String get surgeResetTitle => 'איפוס גל';
+  String get surgeResetTitle => 'איפוס האצה';
 
   @override
-  String get surgeResetBody => '3 כישלונות ברצף.\nהמהירות מתאפסת ל-1×.';
+  String get surgeResetBody => 'נגמרו החיים!\nהמהירות מתאפסת ל-1×.';
 
   @override
-  String get surgeResetWatchAd => 'צפה בפרסומת — שמור מהירות';
+  String get surgeResetWatchAd => 'צפה בפרסומת — קבל חיים 1';
 
   @override
   String get surgeResetAccept => 'אישור, אפס ל-1×';

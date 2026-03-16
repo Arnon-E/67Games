@@ -172,7 +172,7 @@
   "modeReverse100Desc": "ספירה לאחור מ-100 - עצור על 33",
   "modeDailyName": "אתגר יומי",
   "modeDailyDesc": "ניסיון אחד ביום - התחרה גלובלית",
-  "modeSurgeName": "גל",
+  "modeSurgeName": "האצה",
   "modeSurgeDesc": "הטיימר מאיץ בכל משחק — כמה זמן תחזיק?",
   "modeDoubleTapName": "הקשה כפולה",
   "modeDoubleTapDesc": "הקש ב-3.35 שנ׳ ואז עצור ב-6.7 — בדוק את הקצב שלך",
@@ -215,8 +215,8 @@
   "authPlayAsGuest": "שחק כאורח",
   "authEnterDisplayName": "הזן שם תצוגה",
 
-  "surgeResetTitle": "איפוס גל",
-  "surgeResetBody": "3 כישלונות ברצף.\nהמהירות מתאפסת ל-1×.",
-  "surgeResetWatchAd": "צפה בפרסומת — שמור מהירות",
+  "surgeResetTitle": "איפוס האצה",
+  "surgeResetBody": "נגמרו החיים!\nהמהירות מתאפסת ל-1×.",
+  "surgeResetWatchAd": "צפה בפרסומת — קבל חיים 1",
   "surgeResetAccept": "אישור, אפס ל-1×"
 }
