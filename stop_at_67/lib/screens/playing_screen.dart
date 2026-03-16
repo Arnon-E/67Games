@@ -397,19 +397,26 @@ class _SurgeGlowBackgroundState extends State<_SurgeGlowBackground>
             ? 0.85 + 0.15 * sin(t * 2 * pi * 8) // 8 Hz flicker
             : 1.0;
 
-        return Opacity(
-          opacity: flickerAlpha.clamp(0.0, 1.0),
-          child: Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: colors,
-                stops: const [0.0, 0.5, 1.0],
+        return Stack(
+          fit: StackFit.expand,
+          children: [
+            Positioned.fill(
+              child: Opacity(
+                opacity: flickerAlpha.clamp(0.0, 1.0),
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: colors,
+                      stops: const [0.0, 0.5, 1.0],
+                    ),
+                  ),
+                ),
               ),
             ),
-            child: child,
-          ),
+            widget.child,
+          ],
         );
       },
       child: widget.child,
