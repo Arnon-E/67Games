@@ -520,4 +520,21 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get surgeResetAccept => 'OK, RESET TO 1×';
+
+  @override
+  String surgeResetTotalScore(int score) {
+    return 'Total score: $score';
+  }
+
+  @override
+  String get surgeFailLabel => 'GAME OVER';
+
+  @override
+  String get resultsTotalScore => 'Total Score';
+
+  @override
+  String get resultsLives => 'Lives';
+
+  @override
+  String get resultsLivesHeartEmoji => '❤️';
 }

@@ -586,6 +586,12 @@ class GameState extends ChangeNotifier {
   }
 
   void _playResultFeedback(ScoreResult result) {
+    // Surge game-over overrides any positive sound — it's a fail state
+    if (_surgePendingReset) {
+      Haptics.vibrate(HapticsType.error).catchError((_) {});
+      _sound.play('miss');
+      return;
+    }
     final tier = result.rating.tier;
     switch (tier) {
       case 'perfect':

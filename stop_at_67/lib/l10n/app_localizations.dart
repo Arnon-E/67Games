@@ -865,7 +865,7 @@ abstract class AppLocalizations {
   /// No description provided for @modeSurgeName.
   ///
   /// In en, this message translates to:
-  /// **'Surge'**
+  /// **'Accelerate'**
   String get modeSurgeName;
 
   /// No description provided for @modeSurgeDesc.
@@ -1063,19 +1063,19 @@ abstract class AppLocalizations {
   /// No description provided for @surgeResetTitle.
   ///
   /// In en, this message translates to:
-  /// **'SURGE RESET'**
+  /// **'ACCELERATE RESET'**
   String get surgeResetTitle;
 
   /// No description provided for @surgeResetBody.
   ///
   /// In en, this message translates to:
-  /// **'3 fails in a row.\nSpeed resets to 1×.'**
+  /// **'No lives left!\nSpeed resets to 1×.'**
   String get surgeResetBody;
 
   /// No description provided for @surgeResetWatchAd.
   ///
   /// In en, this message translates to:
-  /// **'WATCH AD — KEEP SPEED'**
+  /// **'WATCH AD — GET 1 LIFE'**
   String get surgeResetWatchAd;
 
   /// No description provided for @surgeResetAccept.
@@ -1083,6 +1083,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'OK, RESET TO 1×'**
   String get surgeResetAccept;
+
+  /// No description provided for @surgeResetTotalScore.
+  ///
+  /// In en, this message translates to:
+  /// **'Total score: {score}'**
+  String surgeResetTotalScore(int score);
+
+  /// No description provided for @surgeFailLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'GAME OVER'**
+  String get surgeFailLabel;
+
+  /// No description provided for @resultsTotalScore.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Score'**
+  String get resultsTotalScore;
+
+  /// No description provided for @resultsLives.
+  ///
+  /// In en, this message translates to:
+  /// **'Lives'**
+  String get resultsLives;
+
+  /// No description provided for @resultsLivesHeartEmoji.
+  ///
+  /// In en, this message translates to:
+  /// **'❤️'**
+  String get resultsLivesHeartEmoji;
 }
 
 class _AppLocalizationsDelegate

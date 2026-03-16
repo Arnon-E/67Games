@@ -217,5 +217,15 @@
   "surgeResetTitle": "ACCELERATE RESET",
   "surgeResetBody": "No lives left!\nSpeed resets to 1×.",
   "surgeResetWatchAd": "WATCH AD — GET 1 LIFE",
-  "surgeResetAccept": "OK, RESET TO 1×"
+  "surgeResetAccept": "OK, RESET TO 1×",
+  "surgeResetTotalScore": "Total score: {score}",
+  "@surgeResetTotalScore": {
+    "placeholders": {
+      "score": { "type": "int" }
+    }
+  },
+  "surgeFailLabel": "GAME OVER",
+  "resultsTotalScore": "Total Score",
+  "resultsLives": "Lives",
+  "resultsLivesHeartEmoji": "❤️"
 }
