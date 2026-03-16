@@ -392,10 +392,21 @@ class _SurgeGlowBackgroundState extends State<_SurgeGlowBackground>
           Color.lerp(_glowSets[idx][i], _glowSets[nextIdx][i], blend)!,
         );
 
-        // Flicker: rapid opacity oscillation when at max speed (≥ 3×)
-        final flickerAlpha = widget.flicker
-            ? 0.85 + 0.15 * sin(t * 2 * pi * 8) // 8 Hz flicker
-            : 1.0;
+        // Respect global animation preferences and avoid high-frequency flicker.
+        final bool disableAnimations = MediaQuery.disableAnimationsOf(context);
+
+        // Flicker: opacity oscillation when at max speed (≥ 3×), unless animations are disabled.
+        final double flickerAlpha;
+        if (disableAnimations) {
+          // Keep opacity constant when animations are disabled for accessibility.
+          flickerAlpha = 1.0;
+        } else if (widget.flicker) {
+          // Use a safer, lower-frequency flicker (e.g., 2 Hz) to reduce risk for photosensitive users.
+          const double flickerFrequencyHz = 2.0;
+          flickerAlpha = 0.85 + 0.15 * sin(t * 2 * pi * flickerFrequencyHz);
+        } else {
+          flickerAlpha = 1.0;
+        }
 
         return Stack(
           fit: StackFit.expand,
