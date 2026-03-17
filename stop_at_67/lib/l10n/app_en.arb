@@ -110,7 +110,7 @@
   "profileGames": "Games",
   "profileBestStreak": "Best Streak",
   "profilePerfects": "Perfects",
-  "profileTotalXp": "Total XP",
+  "profileTotalXp": "Total Score",
   "profileBestScores": "Best Scores",
   "profileAchievements": "Achievements",
   "profileGuest": "Guest",
@@ -227,5 +227,60 @@
   "surgeFailLabel": "GAME OVER",
   "resultsTotalScore": "Total Score",
   "resultsLives": "Lives",
-  "resultsLivesHeartEmoji": "❤️"
+  "resultsLivesHeartEmoji": "❤️",
+
+  "weeklyMissionsTitle": "WEEKLY MISSIONS",
+  "weeklyMissionPlay10Label": "Game Grinder",
+  "weeklyMissionPlay10Desc": "Play 10 games in any mode",
+  "weeklyMissionPerfect3Label": "Perfectionist",
+  "weeklyMissionPerfect3Desc": "Get 3 Perfect stops (0ms off)",
+  "weeklyMissionModes3Label": "Explorer",
+  "weeklyMissionModes3Desc": "Play 3 different game modes",
+  "weeklyMissionScore900Label": "Sharpshooter",
+  "weeklyMissionScore900Desc": "Score 900+ in a single game",
+  "weeklyMissionStreak5Label": "On Fire",
+  "weeklyMissionStreak5Desc": "Reach a streak of 5 in one session",
+
+  "leaderboardAllTime": "ALL TIME",
+  "leaderboardThisWeek": "🏆 THIS WEEK",
+  "leaderboardWeeklyTournament": "🏆  Weekly Tournament",
+  "leaderboardResetsIn": "Resets in {time}",
+  "@leaderboardResetsIn": {
+    "placeholders": {
+      "time": { "type": "String" }
+    }
+  },
+  "weeklyMissionsProgress": "{completed} / {total} complete",
+  "@weeklyMissionsProgress": {
+    "placeholders": {
+      "completed": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
+  "weeklyMissionsClaim": "CLAIM!",
+  "weeklyMissionsClaimButton": "CLAIM",
+
+  "settingsHowToPlay": "How to Play",
+  "settingsHowToPlayIntro": "Tap the screen to stop the timer at exactly the target time. The closer you are, the higher your score (up to 1000). A perfect stop (0ms off) earns a streak bonus.",
+
+  "settingsRulesClassicTitle": "Classic",
+  "settingsRulesClassicBody": "Stop the timer at exactly 6.700 seconds. The game that started it all.",
+
+  "settingsRulesBlindTitle": "Blind",
+  "settingsRulesBlindBody": "The timer displays for 3 seconds, then hides. Stop it at 6.700 seconds without being able to see the clock.",
+
+  "settingsRulesSurgeTitle": "Accelerate",
+  "settingsRulesSurgeBody": "Same 6.700s target, but the timer speeds up a little after each game. See how many rounds you can keep up.",
+
+  "settingsRulesDoubleTapTitle": "Double Tap",
+  "settingsRulesDoubleTapBody": "Tap once at 3.350 seconds, then tap again to stop at 6.700 seconds. Both taps count toward your score.",
+
+  "settingsRulesMovingTargetTitle": "Moving Target",
+  "settingsRulesMovingTargetBody": "The target time shifts every round. Stay adaptable — you won't know exactly where to stop until the round begins.",
+
+  "settingsRulesCalibrationTitle": "Calibration",
+  "settingsRulesCalibrationBody": "Make 5 attempts in a row. Your score is based on the average deviation across all 5 — consistency is everything.",
+
+  "settingsRulesPressureTitle": "Pressure",
+  "settingsRulesPressureBody": "Stop within the allowed tolerance window. Each success tightens the window. Survive as many rounds as you can."
 }

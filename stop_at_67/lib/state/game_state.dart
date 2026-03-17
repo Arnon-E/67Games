@@ -107,6 +107,11 @@ class GameState extends ChangeNotifier {
   int get surgeCumulativeScore => _surgeCumulativeScore;
   int get surgeLives => _surgeLives;
 
+  // ── Session score ────────────────────────────────────────────
+  int _sessionScore = 0;
+  String? _sessionModeId; // which mode the session belongs to
+  int get sessionScore => _sessionScore;
+
   // ── Double Tap mode ─────────────────────────────────────────
   // Phase: 0=not active, 1=running (waiting for mid-tap), 2=mid-done (waiting for stop)
   static const int _doubleTapMidpointMs = 3350;
@@ -149,6 +154,13 @@ class GameState extends ChangeNotifier {
   int get pressureFailAttempts => _pressureFailAttempts;
   bool get pressurePendingAdRetry => _pressurePendingAdRetry;
   bool get pressureGameOver => _pressureGameOver;
+
+  // ── Weekly missions ─────────────────────────────────────────
+  WeeklyMissionsState _weeklyMissions = const WeeklyMissionsState(
+    weekId: '',
+    missions: [],
+  );
+  WeeklyMissionsState get weeklyMissions => _weeklyMissions;
 
   // ── Internal ────────────────────────────────────────────────
   final StreakManager _streakManager = StreakManager();
@@ -194,9 +206,18 @@ class GameState extends ChangeNotifier {
     );
 
     _checkDailyReward();
+    _weeklyMissions = await _loadOrInitWeeklyMissions();
     _sessionStats = SessionStats.initial();
 
     notifyListeners();
+  }
+
+  Future<WeeklyMissionsState> _loadOrInitWeeklyMissions() async {
+    final currentWeek = weekIdForDate(DateTime.now());
+    final saved = await _storage.loadWeeklyMissions();
+    if (saved != null && saved.weekId == currentWeek) return saved;
+    // New week — start fresh
+    return WeeklyMissionsState.initial(currentWeek, kWeeklyMissions);
   }
 
   // ═══════════════════════════════════════════════════════════
@@ -232,6 +253,11 @@ class GameState extends ChangeNotifier {
       _surgeLives = 3;
       _surgeCumulativeScore = 0;
       _surgeGamesInSession = 0;
+    }
+    // Reset session score when switching to a different mode
+    if (modeId != _sessionModeId) {
+      _sessionScore = 0;
+      _sessionModeId = modeId;
     }
     _screen = AppScreen.modeSelect;
     notifyListeners();
@@ -297,7 +323,7 @@ class GameState extends ChangeNotifier {
   /// Returns a random moving-target value within [_movingTargetMinMs, _movingTargetMaxMs],
   /// rounded to the nearest [_movingTargetStepMs], and different from the current target.
   int _randomMovingTarget() {
-    final numSteps =
+    const numSteps =
         (_movingTargetMaxMs - _movingTargetMinMs) ~/ _movingTargetStepMs;
     int target;
     do {
@@ -460,10 +486,16 @@ class GameState extends ChangeNotifier {
     );
 
     // ── Update stats ─────────────────────────────────────────
-    // For calibration, only persist stats after the final attempt.
-    // For pressure success rounds, persist each round normally.
-    final bool persistStats = !mode.isCalibration ||
-        _calibrationResults.length >= mode.calibrationRounds;
+    // For calibration: only persist after the final attempt.
+    // For surge: only persist at game-over (when _surgePendingReset triggers).
+    // For pressure: only persist at game-over (when _pressureGameOver triggers).
+    final bool persistStats = switch (true) {
+      _ when mode.isCalibration =>
+        _calibrationResults.length >= mode.calibrationRounds,
+      _ when mode.id == 'surge' => _surgePendingReset,
+      _ when mode.isPressure => _pressureGameOver,
+      _ => true,
+    };
 
     // Use averaged result for calibration final persistence
     ScoreResult resultToSave = result;
@@ -489,7 +521,7 @@ class GameState extends ChangeNotifier {
       );
     }
 
-    final newStats = persistStats
+    var newStats = persistStats
         ? updateStats(_stats, resultToSave, mode.id, streakResult.newStreak)
         : _stats;
 
@@ -523,6 +555,25 @@ class GameState extends ChangeNotifier {
 
     // Moving Target: next target is randomized on _startPrecisionTimer; nothing to track here.
 
+    // ── Session score ────────────────────────────────────────────
+    // Only update session score for non-pressure, non-calibration, non-surge normal rounds
+    if (!mode.isPressure && !mode.isCalibration && mode.id != 'surge') {
+      final tier = result.rating.tier;
+      if (tier == 'great' || tier == 'excellent' || tier == 'incredible' || tier == 'perfect') {
+        _sessionScore += result.finalScore;
+      } else if (tier == 'miss') {
+        _sessionScore = (_sessionScore - 200).clamp(0, 999999);
+      }
+      // good / ok: no change
+
+      // If the session total now beats the stored best, patch newStats so it
+      // gets persisted and submitted to the leaderboard.
+      if (persistStats && _sessionScore > (newStats.bestScores[mode.id] ?? 0)) {
+        final patchedBest = Map<String, int>.from(newStats.bestScores)..[mode.id] = _sessionScore;
+        newStats = newStats.copyWith(bestScores: patchedBest);
+      }
+    }
+
     // Session
     final newSession = SessionStats(
       gamesPlayed: _sessionStats.gamesPlayed + 1,
@@ -535,6 +586,16 @@ class GameState extends ChangeNotifier {
           ? _surgeGamesInSession
           : _sessionStats.surgeGamesPlayed,
     );
+
+    // ── Update weekly missions ────────────────────────────────
+    if (persistStats) {
+      _weeklyMissions = _advanceMissions(
+        _weeklyMissions,
+        result: resultToSave,
+        modeId: mode.id,
+        newStreak: streakResult.newStreak,
+      );
+    }
 
     // Persist
     if (persistStats) {
@@ -549,6 +610,7 @@ class GameState extends ChangeNotifier {
           streakResult.newStreak,
           _streakManager.getBestStreak(),
         ),
+        _storage.saveWeeklyMissions(_weeklyMissions),
       ]);
     }
 
@@ -573,15 +635,28 @@ class GameState extends ChangeNotifier {
     // Sound feedback
     _playResultFeedback(resultToSave);
 
-    // Submit to online leaderboard if signed in and new personal best
-    if (resultToSave.isNewBest && _authState.isSignedIn) {
+    // Submit to online leaderboard if signed in.
+    // For normal modes: submit the session cumulative score when it beats the stored best.
+    // For surge/pressure/calibration: submit the single-round score as before.
+    if (_authState.isSignedIn) {
       final uid = _authState.user!.uid;
-      _leaderboard.submitScore(
-        uid: uid,
-        modeId: mode.id,
-        score: resultToSave.finalScore,
-        displayName: _authState.userName,
-      );
+      final bool isSessionMode = !mode.isPressure && !mode.isCalibration && mode.id != 'surge';
+      final int scoreToSubmit = isSessionMode ? _sessionScore : resultToSave.finalScore;
+      final bool isNewBest = scoreToSubmit > bestScore;
+
+      if (isNewBest) {
+        _leaderboard.submitScore(
+          uid: uid,
+          modeId: mode.id,
+          score: scoreToSubmit,
+          displayName: _authState.userName,
+        );
+        _leaderboard.submitTournamentScore(
+          uid: uid,
+          displayName: _authState.userName,
+          score: scoreToSubmit,
+        );
+      }
     }
   }
 
@@ -625,9 +700,6 @@ class GameState extends ChangeNotifier {
         _calibrationResults.isNotEmpty &&
         _calibrationResults.length < mode.calibrationRounds;
 
-    // Determine if we are continuing a pressure run (last round was a success)
-    final bool pressureContinue = mode.isPressure && _pressureLastRoundSuccess;
-
     // Reset completed calibration run so next "Play Again" starts fresh
     if (mode.isCalibration && !calibrationContinue) {
       _calibrationResults = [];
@@ -669,6 +741,8 @@ class GameState extends ChangeNotifier {
     _pressureFailAttempts = 0;
     _pressurePendingAdRetry = false;
     _pressureGameOver = false;
+    _sessionScore = 0;
+    _sessionModeId = null;
     _screen = AppScreen.menu;
     WakelockPlus.disable().catchError((_) {}); 
     notifyListeners();
@@ -833,6 +907,98 @@ class GameState extends ChangeNotifier {
 
   void setSoundEnabled(bool enabled) {
     _sound.setEnabled(enabled);
+  }
+
+  // ═══════════════════════════════════════════════════════════
+  // WEEKLY MISSIONS
+  // ═══════════════════════════════════════════════════════════
+
+  /// Advance mission progress based on the game just played.
+  WeeklyMissionsState _advanceMissions(
+    WeeklyMissionsState state, {
+    required ScoreResult result,
+    required String modeId,
+    required int newStreak,
+  }) {
+    final updatedMissions = state.missions.map((mp) {
+      if (mp.claimed) return mp;
+      final def = kWeeklyMissions.firstWhere(
+        (d) => d.id == mp.missionId,
+        orElse: () => const WeeklyMissionDef(
+          id: '', label: '', description: '', target: 0, type: '', rewardCoins: 0,
+        ),
+      );
+      if (def.id.isEmpty || def.type == 'modes') return mp;
+
+      if (def.type == 'games') {
+        return mp.copyWith(progress: (mp.progress + 1).clamp(0, def.target));
+      } else if (def.type == 'perfects') {
+        if (result.deviationMs == 0) {
+          return mp.copyWith(progress: (mp.progress + 1).clamp(0, def.target));
+        }
+      } else if (def.type == 'score') {
+        if (result.finalScore >= def.target && mp.progress < def.target) {
+          return mp.copyWith(progress: def.target);
+        }
+      } else if (def.type == 'streak') {
+        if (newStreak > mp.progress) {
+          return mp.copyWith(progress: newStreak.clamp(0, def.target));
+        }
+      }
+      return mp;
+    }).toList();
+
+    // Handle the 'modes' mission using the persisted playedModeIds list
+    final newPlayedModeIds = List<String>.from(state.playedModeIds);
+    if (!newPlayedModeIds.contains(modeId)) {
+      newPlayedModeIds.add(modeId);
+    }
+    final modesMissionIdx = updatedMissions.indexWhere(
+      (m) => m.missionId == 'modes_3',
+    );
+    if (modesMissionIdx != -1) {
+      final mp = updatedMissions[modesMissionIdx];
+      if (!mp.claimed) {
+        final count = newPlayedModeIds.length.clamp(0, 3);
+        if (count > mp.progress) {
+          updatedMissions[modesMissionIdx] = mp.copyWith(progress: count);
+        }
+      }
+    }
+
+    return state.copyWith(missions: updatedMissions, playedModeIds: newPlayedModeIds);
+  }
+
+  /// Claim the coin reward for a completed mission.
+  Future<bool> claimMissionReward(String missionId) async {
+    final missionIdx = _weeklyMissions.missions.indexWhere(
+      (m) => m.missionId == missionId && !m.claimed,
+    );
+    if (missionIdx == -1) return false;
+
+    final def = kWeeklyMissions.firstWhere(
+      (d) => d.id == missionId,
+      orElse: () => const WeeklyMissionDef(
+        id: '', label: '', description: '', target: 0, type: '', rewardCoins: 0,
+      ),
+    );
+    if (def.id.isEmpty) return false;
+
+    final mp = _weeklyMissions.missions[missionIdx];
+    if (mp.progress < def.target) return false;
+
+    final updatedMissions = List<WeeklyMissionProgress>.from(_weeklyMissions.missions);
+    updatedMissions[missionIdx] = mp.copyWith(claimed: true);
+    _weeklyMissions = _weeklyMissions.copyWith(missions: updatedMissions);
+    _coins += def.rewardCoins;
+
+    await Future.wait([
+      _storage.saveWeeklyMissions(_weeklyMissions),
+      _storage.saveCoins(_coins),
+    ]);
+
+    notifyListeners();
+    return true;
   }
 
   // ═══════════════════════════════════════════════════════════

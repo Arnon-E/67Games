@@ -54,6 +54,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
                     const SizedBox(height: 24),
 
+                    // How to Play
+                    _section(l10n.settingsHowToPlay),
+                    _howToPlaySection(),
+
                     const SizedBox(height: 32),
 
                     // Version
@@ -70,6 +74,82 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _howToPlaySection() {
+    final l10n = AppLocalizations.of(context);
+    final modes = [
+      (l10n.settingsRulesClassicTitle, l10n.settingsRulesClassicBody, '⏱'),
+      (l10n.settingsRulesBlindTitle, l10n.settingsRulesBlindBody, '🙈'),
+      (l10n.settingsRulesSurgeTitle, l10n.settingsRulesSurgeBody, '⚡'),
+      (l10n.settingsRulesDoubleTapTitle, l10n.settingsRulesDoubleTapBody, '👆'),
+      (l10n.settingsRulesMovingTargetTitle, l10n.settingsRulesMovingTargetBody, '🎯'),
+      (l10n.settingsRulesCalibrationTitle, l10n.settingsRulesCalibrationBody, '📊'),
+      (l10n.settingsRulesPressureTitle, l10n.settingsRulesPressureBody, '🔥'),
+    ];
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      decoration: BoxDecoration(
+        color: AppColors.darkCard,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 14, 16, 10),
+            child: Text(
+              l10n.settingsHowToPlayIntro,
+              style: const TextStyle(
+                color: AppColors.textSecondary,
+                fontSize: 13,
+                height: 1.5,
+              ),
+            ),
+          ),
+          const Divider(color: AppColors.darkElevated, height: 1),
+          ...modes.map((m) => _ruleRow(m.$3, m.$1, m.$2)),
+        ],
+      ),
+    );
+  }
+
+  Widget _ruleRow(String emoji, String title, String body) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(emoji, style: const TextStyle(fontSize: 20)),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(
+                    color: AppColors.textPrimary,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  body,
+                  style: const TextStyle(
+                    color: AppColors.textDisabled,
+                    fontSize: 12,
+                    height: 1.4,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

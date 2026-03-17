@@ -22,23 +22,62 @@ class LeaderboardScreen extends StatefulWidget {
 
 class _LeaderboardScreenState extends State<LeaderboardScreen> {
   String _selectedModeId = 'classic';
+  bool _showTournament = false;
   Future<List<LeaderboardEntry>>? _scoresFuture;
 
   @override
   void initState() {
     super.initState();
-    _loadScores();
+    _syncLocalBests(); // uploads missing bests, then loads list when done
   }
 
-  void _loadScores() {
+  /// Upload any local best scores that were never submitted to Firestore
+  /// (e.g. due to the previous isNewBest comparison bug).
+  Future<void> _syncLocalBests() async {
+    final auth = context.read<AuthState>();
+    if (!auth.isSignedIn) {
+      _loadScores(forceRefresh: true);
+      return;
+    }
+    final gs = context.read<GameState>();
     final leaderboard = context.read<LeaderboardService>();
+    final uid = auth.user!.uid;
+    final displayName = auth.userName;
+    final futures = <Future<void>>[];
+    for (final entry in gs.stats.bestScores.entries) {
+      if (entry.value > 0) {
+        futures.add(leaderboard.submitScore(
+          uid: uid,
+          modeId: entry.key,
+          score: entry.value,
+          displayName: displayName,
+        ));
+      }
+    }
+    await Future.wait(futures);
+    if (mounted) _loadScores(forceRefresh: true);
+  }
+
+  void _loadScores({bool forceRefresh = false}) {
+    final leaderboard = context.read<LeaderboardService>();
+    if (forceRefresh) {
+      leaderboard.invalidate(_selectedModeId);
+      leaderboard.invalidate('tournament:${weekIdForDate(DateTime.now())}');
+    }
     setState(() {
-      _scoresFuture = leaderboard.getTopScores(_selectedModeId);
+      _scoresFuture = _showTournament
+          ? leaderboard.getTournamentTopScores()
+          : leaderboard.getTopScores(_selectedModeId);
     });
   }
 
   void _selectMode(String modeId) {
     _selectedModeId = modeId;
+    _loadScores();
+  }
+
+  void _toggleTournament(bool val) {
+    _showTournament = val;
     _loadScores();
   }
 
@@ -79,8 +118,70 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                 onBack: () => gs.setScreen(AppScreen.menu),
               ),
 
-              // Mode tabs
-              SizedBox(
+              // All Time / Tournament toggle
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 4),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () => _toggleTournament(false),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 8),
+                          decoration: BoxDecoration(
+                            color: !_showTournament ? AppColors.orange : AppColors.darkElevated,
+                            borderRadius: const BorderRadius.horizontal(left: Radius.circular(12)),
+                          ),
+                          alignment: Alignment.center,
+                          child: Text(
+                            l10n.leaderboardAllTime,
+                            style: TextStyle(
+                              color: !_showTournament ? AppColors.textPrimary : AppColors.textDisabled,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 1.5,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () => _toggleTournament(true),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 8),
+                          decoration: BoxDecoration(
+                            color: _showTournament ? AppColors.orange : AppColors.darkElevated,
+                            borderRadius: const BorderRadius.horizontal(right: Radius.circular(12)),
+                          ),
+                          alignment: Alignment.center,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                l10n.leaderboardThisWeek,
+                                style: TextStyle(
+                                  color: _showTournament ? AppColors.textPrimary : AppColors.textDisabled,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w700,
+                                  letterSpacing: 1.5,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // Tournament countdown banner
+              if (_showTournament) _TournamentCountdown(),
+              if (_showTournament) const SizedBox(height: 4),
+
+              // Mode tabs (only shown in All Time view)
+              if (!_showTournament) SizedBox(
                 height: 44,
                 child: ListView(
                   scrollDirection: Axis.horizontal,
@@ -149,9 +250,13 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                                   color: AppColors.textDisabled, fontSize: 12),
                             ),
                             Text(
-                              bestScores[_selectedModeId] != null
-                                  ? formatScore(bestScores[_selectedModeId]!)
-                                  : '—',
+                              _showTournament
+                                  ? (bestScores.isNotEmpty
+                                      ? formatScore(bestScores.values.reduce((a, b) => a > b ? a : b))
+                                      : '—')
+                                  : (bestScores[_selectedModeId] != null
+                                      ? formatScore(bestScores[_selectedModeId]!)
+                                      : '—'),
                               style: const TextStyle(
                                   color: AppColors.textPrimary,
                                   fontSize: 24,
@@ -248,6 +353,67 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+// ── Tournament countdown widget ───────────────────────────────
+
+class _TournamentCountdown extends StatelessWidget {
+  // ignore: prefer_const_constructors_in_immutables
+  _TournamentCountdown();
+
+  /// Returns the time remaining until next Monday 00:00 UTC
+  String _timeUntilReset() {
+    final now = DateTime.now().toUtc();
+    // weekday: 1=Mon … 7=Sun
+    final daysUntilMonday = (8 - now.weekday) % 7;
+    final nextMonday = DateTime.utc(now.year, now.month, now.day + daysUntilMonday);
+    final diff = nextMonday.difference(now);
+    if (diff.inDays > 1) {
+      return '${diff.inDays}d ${diff.inHours % 24}h';
+    } else if (diff.inHours > 0) {
+      return '${diff.inHours}h ${diff.inMinutes % 60}m';
+    }
+    return '${diff.inMinutes}m';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 4),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+        decoration: BoxDecoration(
+          color: AppColors.gold.withValues(alpha: 0.08),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: AppColors.gold.withValues(alpha: 0.25)),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              l10n.leaderboardWeeklyTournament,
+              style: const TextStyle(
+                color: AppColors.gold,
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            Row(
+              children: [
+                const Icon(Icons.timer_outlined, color: AppColors.textHint, size: 14),
+                const SizedBox(width: 4),
+                Text(
+                  l10n.leaderboardResetsIn(_timeUntilReset()),
+                  style: const TextStyle(color: AppColors.textHint, fontSize: 12),
+                ),
+              ],
+            ),
+          ],
         ),
       ),
     );

@@ -280,7 +280,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get profilePerfects => 'Perfects';
 
   @override
-  String get profileTotalXp => 'Total XP';
+  String get profileTotalXp => 'Total Score';
 
   @override
   String get profileBestScores => 'Best Scores';
@@ -537,4 +537,118 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get resultsLivesHeartEmoji => '❤️';
+
+  @override
+  String get weeklyMissionsTitle => 'WEEKLY MISSIONS';
+
+  @override
+  String get weeklyMissionPlay10Label => 'Game Grinder';
+
+  @override
+  String get weeklyMissionPlay10Desc => 'Play 10 games in any mode';
+
+  @override
+  String get weeklyMissionPerfect3Label => 'Perfectionist';
+
+  @override
+  String get weeklyMissionPerfect3Desc => 'Get 3 Perfect stops (0ms off)';
+
+  @override
+  String get weeklyMissionModes3Label => 'Explorer';
+
+  @override
+  String get weeklyMissionModes3Desc => 'Play 3 different game modes';
+
+  @override
+  String get weeklyMissionScore900Label => 'Sharpshooter';
+
+  @override
+  String get weeklyMissionScore900Desc => 'Score 900+ in a single game';
+
+  @override
+  String get weeklyMissionStreak5Label => 'On Fire';
+
+  @override
+  String get weeklyMissionStreak5Desc => 'Reach a streak of 5 in one session';
+
+  @override
+  String get leaderboardAllTime => 'ALL TIME';
+
+  @override
+  String get leaderboardThisWeek => '🏆 THIS WEEK';
+
+  @override
+  String get leaderboardWeeklyTournament => '🏆  Weekly Tournament';
+
+  @override
+  String leaderboardResetsIn(String time) {
+    return 'Resets in $time';
+  }
+
+  @override
+  String weeklyMissionsProgress(int completed, int total) {
+    return '$completed / $total complete';
+  }
+
+  @override
+  String get weeklyMissionsClaim => 'CLAIM!';
+
+  @override
+  String get weeklyMissionsClaimButton => 'CLAIM';
+
+  @override
+  String get settingsHowToPlay => 'How to Play';
+
+  @override
+  String get settingsHowToPlayIntro =>
+      'Tap the screen to stop the timer at exactly the target time. The closer you are, the higher your score (up to 1000). A perfect stop (0ms off) earns a streak bonus.';
+
+  @override
+  String get settingsRulesClassicTitle => 'Classic';
+
+  @override
+  String get settingsRulesClassicBody =>
+      'Stop the timer at exactly 6.700 seconds. The game that started it all.';
+
+  @override
+  String get settingsRulesBlindTitle => 'Blind';
+
+  @override
+  String get settingsRulesBlindBody =>
+      'The timer displays for 3 seconds, then hides. Stop it at 6.700 seconds without being able to see the clock.';
+
+  @override
+  String get settingsRulesSurgeTitle => 'Accelerate';
+
+  @override
+  String get settingsRulesSurgeBody =>
+      'Same 6.700s target, but the timer speeds up a little after each game. See how many rounds you can keep up.';
+
+  @override
+  String get settingsRulesDoubleTapTitle => 'Double Tap';
+
+  @override
+  String get settingsRulesDoubleTapBody =>
+      'Tap once at 3.350 seconds, then tap again to stop at 6.700 seconds. Both taps count toward your score.';
+
+  @override
+  String get settingsRulesMovingTargetTitle => 'Moving Target';
+
+  @override
+  String get settingsRulesMovingTargetBody =>
+      'The target time shifts every round. Stay adaptable — you won\'t know exactly where to stop until the round begins.';
+
+  @override
+  String get settingsRulesCalibrationTitle => 'Calibration';
+
+  @override
+  String get settingsRulesCalibrationBody =>
+      'Make 5 attempts in a row. Your score is based on the average deviation across all 5 — consistency is everything.';
+
+  @override
+  String get settingsRulesPressureTitle => 'Pressure';
+
+  @override
+  String get settingsRulesPressureBody =>
+      'Stop within the allowed tolerance window. Each success tightens the window. Survive as many rounds as you can.';
 }

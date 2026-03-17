@@ -637,7 +637,7 @@ abstract class AppLocalizations {
   /// No description provided for @profileTotalXp.
   ///
   /// In en, this message translates to:
-  /// **'Total XP'**
+  /// **'Total Score'**
   String get profileTotalXp;
 
   /// No description provided for @profileBestScores.
@@ -1113,6 +1113,210 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'❤️'**
   String get resultsLivesHeartEmoji;
+
+  /// No description provided for @weeklyMissionsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'WEEKLY MISSIONS'**
+  String get weeklyMissionsTitle;
+
+  /// No description provided for @weeklyMissionPlay10Label.
+  ///
+  /// In en, this message translates to:
+  /// **'Game Grinder'**
+  String get weeklyMissionPlay10Label;
+
+  /// No description provided for @weeklyMissionPlay10Desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Play 10 games in any mode'**
+  String get weeklyMissionPlay10Desc;
+
+  /// No description provided for @weeklyMissionPerfect3Label.
+  ///
+  /// In en, this message translates to:
+  /// **'Perfectionist'**
+  String get weeklyMissionPerfect3Label;
+
+  /// No description provided for @weeklyMissionPerfect3Desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Get 3 Perfect stops (0ms off)'**
+  String get weeklyMissionPerfect3Desc;
+
+  /// No description provided for @weeklyMissionModes3Label.
+  ///
+  /// In en, this message translates to:
+  /// **'Explorer'**
+  String get weeklyMissionModes3Label;
+
+  /// No description provided for @weeklyMissionModes3Desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Play 3 different game modes'**
+  String get weeklyMissionModes3Desc;
+
+  /// No description provided for @weeklyMissionScore900Label.
+  ///
+  /// In en, this message translates to:
+  /// **'Sharpshooter'**
+  String get weeklyMissionScore900Label;
+
+  /// No description provided for @weeklyMissionScore900Desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Score 900+ in a single game'**
+  String get weeklyMissionScore900Desc;
+
+  /// No description provided for @weeklyMissionStreak5Label.
+  ///
+  /// In en, this message translates to:
+  /// **'On Fire'**
+  String get weeklyMissionStreak5Label;
+
+  /// No description provided for @weeklyMissionStreak5Desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Reach a streak of 5 in one session'**
+  String get weeklyMissionStreak5Desc;
+
+  /// No description provided for @leaderboardAllTime.
+  ///
+  /// In en, this message translates to:
+  /// **'ALL TIME'**
+  String get leaderboardAllTime;
+
+  /// No description provided for @leaderboardThisWeek.
+  ///
+  /// In en, this message translates to:
+  /// **'🏆 THIS WEEK'**
+  String get leaderboardThisWeek;
+
+  /// No description provided for @leaderboardWeeklyTournament.
+  ///
+  /// In en, this message translates to:
+  /// **'🏆  Weekly Tournament'**
+  String get leaderboardWeeklyTournament;
+
+  /// No description provided for @leaderboardResetsIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Resets in {time}'**
+  String leaderboardResetsIn(String time);
+
+  /// No description provided for @weeklyMissionsProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'{completed} / {total} complete'**
+  String weeklyMissionsProgress(int completed, int total);
+
+  /// No description provided for @weeklyMissionsClaim.
+  ///
+  /// In en, this message translates to:
+  /// **'CLAIM!'**
+  String get weeklyMissionsClaim;
+
+  /// No description provided for @weeklyMissionsClaimButton.
+  ///
+  /// In en, this message translates to:
+  /// **'CLAIM'**
+  String get weeklyMissionsClaimButton;
+
+  /// No description provided for @settingsHowToPlay.
+  ///
+  /// In en, this message translates to:
+  /// **'How to Play'**
+  String get settingsHowToPlay;
+
+  /// No description provided for @settingsHowToPlayIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap the screen to stop the timer at exactly the target time. The closer you are, the higher your score (up to 1000). A perfect stop (0ms off) earns a streak bonus.'**
+  String get settingsHowToPlayIntro;
+
+  /// No description provided for @settingsRulesClassicTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Classic'**
+  String get settingsRulesClassicTitle;
+
+  /// No description provided for @settingsRulesClassicBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop the timer at exactly 6.700 seconds. The game that started it all.'**
+  String get settingsRulesClassicBody;
+
+  /// No description provided for @settingsRulesBlindTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Blind'**
+  String get settingsRulesBlindTitle;
+
+  /// No description provided for @settingsRulesBlindBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The timer displays for 3 seconds, then hides. Stop it at 6.700 seconds without being able to see the clock.'**
+  String get settingsRulesBlindBody;
+
+  /// No description provided for @settingsRulesSurgeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Accelerate'**
+  String get settingsRulesSurgeTitle;
+
+  /// No description provided for @settingsRulesSurgeBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Same 6.700s target, but the timer speeds up a little after each game. See how many rounds you can keep up.'**
+  String get settingsRulesSurgeBody;
+
+  /// No description provided for @settingsRulesDoubleTapTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Double Tap'**
+  String get settingsRulesDoubleTapTitle;
+
+  /// No description provided for @settingsRulesDoubleTapBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap once at 3.350 seconds, then tap again to stop at 6.700 seconds. Both taps count toward your score.'**
+  String get settingsRulesDoubleTapBody;
+
+  /// No description provided for @settingsRulesMovingTargetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Moving Target'**
+  String get settingsRulesMovingTargetTitle;
+
+  /// No description provided for @settingsRulesMovingTargetBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The target time shifts every round. Stay adaptable — you won\'t know exactly where to stop until the round begins.'**
+  String get settingsRulesMovingTargetBody;
+
+  /// No description provided for @settingsRulesCalibrationTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Calibration'**
+  String get settingsRulesCalibrationTitle;
+
+  /// No description provided for @settingsRulesCalibrationBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Make 5 attempts in a row. Your score is based on the average deviation across all 5 — consistency is everything.'**
+  String get settingsRulesCalibrationBody;
+
+  /// No description provided for @settingsRulesPressureTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Pressure'**
+  String get settingsRulesPressureTitle;
+
+  /// No description provided for @settingsRulesPressureBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop within the allowed tolerance window. Each success tightens the window. Survive as many rounds as you can.'**
+  String get settingsRulesPressureBody;
 }
 
 class _AppLocalizationsDelegate

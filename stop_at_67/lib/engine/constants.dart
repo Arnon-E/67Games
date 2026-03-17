@@ -382,3 +382,65 @@ int totalXpForLevel(int level) {
 
   return (level: kLevelConfig.maxLevel, currentXp: remainingXp, nextLevelXp: 0);
 }
+
+
+// ============================================================
+// WEEKLY MISSIONS
+// ============================================================
+
+const List<WeeklyMissionDef> kWeeklyMissions = [
+  WeeklyMissionDef(
+    id: 'play_10',
+    label: 'Game Grinder',
+    description: 'Play 10 games in any mode',
+    target: 10,
+    type: 'games',
+    rewardCoins: 300,
+  ),
+  WeeklyMissionDef(
+    id: 'perfect_3',
+    label: 'Perfectionist',
+    description: 'Get 3 Perfect stops (0ms off)',
+    target: 3,
+    type: 'perfects',
+    rewardCoins: 5000,
+  ),
+  WeeklyMissionDef(
+    id: 'modes_3',
+    label: 'Explorer',
+    description: 'Play 3 different game modes',
+    target: 3,
+    type: 'modes',
+    rewardCoins: 400,
+  ),
+  WeeklyMissionDef(
+    id: 'score_900',
+    label: 'Sharpshooter',
+    description: 'Score 900+ in a single game',
+    target: 900,
+    type: 'score',
+    rewardCoins: 350,
+  ),
+  WeeklyMissionDef(
+    id: 'streak_5',
+    label: 'On Fire',
+    description: 'Reach a streak of 5 in one session',
+    target: 5,
+    type: 'streak',
+    rewardCoins: 250,
+  ),
+];
+
+/// Returns the ISO week ID string for a given date, e.g. '2026-W11'.
+String weekIdForDate(DateTime date) {
+  // ISO week number: Jan 4 is always in week 1
+  final jan4 = DateTime(date.year, 1, 4);
+  final startOfWeek1 = jan4.subtract(Duration(days: jan4.weekday - 1));
+  final diff = date.difference(startOfWeek1).inDays;
+  if (diff < 0) {
+    // Belongs to last year's final week
+    return weekIdForDate(DateTime(date.year - 1, 12, 31));
+  }
+  final week = diff ~/ 7 + 1;
+  return '${date.year}-W${week.toString().padLeft(2, '0')}';
+}

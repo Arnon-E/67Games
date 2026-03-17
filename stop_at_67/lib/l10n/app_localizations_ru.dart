@@ -281,7 +281,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get profilePerfects => 'Идеальных';
 
   @override
-  String get profileTotalXp => 'Всего опыта';
+  String get profileTotalXp => 'Всего очков';
 
   @override
   String get profileBestScores => 'Лучшие результаты';
@@ -541,4 +541,119 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get resultsLivesHeartEmoji => '❤️';
+
+  @override
+  String get weeklyMissionsTitle => 'ЕЖЕНЕДЕЛЬНЫЕ ЗАДАНИЯ';
+
+  @override
+  String get weeklyMissionPlay10Label => 'Игроман';
+
+  @override
+  String get weeklyMissionPlay10Desc => 'Сыграйте 10 игр в любом режиме';
+
+  @override
+  String get weeklyMissionPerfect3Label => 'Перфекционист';
+
+  @override
+  String get weeklyMissionPerfect3Desc =>
+      'Получите 3 идеальных остановки (0ms)';
+
+  @override
+  String get weeklyMissionModes3Label => 'Исследователь';
+
+  @override
+  String get weeklyMissionModes3Desc => 'Сыграйте в 3 разных режима';
+
+  @override
+  String get weeklyMissionScore900Label => 'Снайпер';
+
+  @override
+  String get weeklyMissionScore900Desc => 'Наберите 900+ в одной игре';
+
+  @override
+  String get weeklyMissionStreak5Label => 'В огне';
+
+  @override
+  String get weeklyMissionStreak5Desc => 'Достигните серии 5 за одну сессию';
+
+  @override
+  String get leaderboardAllTime => 'ВСЕ ВРЕМЯ';
+
+  @override
+  String get leaderboardThisWeek => '🏆 ЭТА НЕДЕЛЯ';
+
+  @override
+  String get leaderboardWeeklyTournament => '🏆  Недельный турнир';
+
+  @override
+  String leaderboardResetsIn(String time) {
+    return 'Сброс через $time';
+  }
+
+  @override
+  String weeklyMissionsProgress(int completed, int total) {
+    return '$completed / $total выполнено';
+  }
+
+  @override
+  String get weeklyMissionsClaim => 'ЗАБРАТЬ!';
+
+  @override
+  String get weeklyMissionsClaimButton => 'ЗАБРАТЬ';
+
+  @override
+  String get settingsHowToPlay => 'Как играть';
+
+  @override
+  String get settingsHowToPlayIntro =>
+      'Нажмите на экран, чтобы остановить таймер точно на целевом времени. Чем ближе — тем выше счёт (до 1000). Идеальная остановка (0ms) даёт бонус серии.';
+
+  @override
+  String get settingsRulesClassicTitle => 'Классика';
+
+  @override
+  String get settingsRulesClassicBody =>
+      'Остановите таймер ровно на 6.700 секундах. Игра, с которой всё началось.';
+
+  @override
+  String get settingsRulesBlindTitle => 'Слепой';
+
+  @override
+  String get settingsRulesBlindBody =>
+      'Таймер виден 3 секунды, затем скрывается. Остановите его на 6.700 секундах, не видя цифр.';
+
+  @override
+  String get settingsRulesSurgeTitle => 'Ускорение';
+
+  @override
+  String get settingsRulesSurgeBody =>
+      'Та же цель 6.700с, но таймер немного ускоряется после каждой игры. Сколько раундов вы продержитесь?';
+
+  @override
+  String get settingsRulesDoubleTapTitle => 'Двойное касание';
+
+  @override
+  String get settingsRulesDoubleTapBody =>
+      'Нажмите первый раз на 3.350с, затем снова — чтобы остановиться на 6.700с. Оба нажатия учитываются.';
+
+  @override
+  String get settingsRulesMovingTargetTitle => 'Движущаяся цель';
+
+  @override
+  String get settingsRulesMovingTargetBody =>
+      'Целевое время меняется каждый раунд. Будьте гибкими — точная цель неизвестна до начала раунда.';
+
+  @override
+  String get settingsRulesCalibrationTitle => 'Калибровка';
+
+  @override
+  String get settingsRulesCalibrationBody =>
+      'Сделайте 5 попыток подряд. Счёт основан на среднем отклонении за все 5 — главное стабильность.';
+
+  @override
+  String get settingsRulesPressureTitle => 'Давление';
+
+  @override
+  String get settingsRulesPressureBody =>
+      'Остановитесь в пределах допуска. Каждый успех сужает окно. Выживите как можно больше раундов.';
 }

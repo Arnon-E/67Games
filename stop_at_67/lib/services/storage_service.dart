@@ -11,6 +11,7 @@ class StorageService {
   static const _languageKey = 'stop_at_67_language';
   static const _ownedCosmeticsKey = 'stop_at_67_owned_cosmetics';
   static const _streakKey = 'stop_at_67_streak';
+  static const _weeklyMissionsKey = 'stop_at_67_weekly_missions';
 
   Future<SharedPreferences> get _prefs => SharedPreferences.getInstance();
 
@@ -124,6 +125,22 @@ class StorageService {
       _streakKey,
       jsonEncode({'currentStreak': currentStreak, 'bestStreak': bestStreak}),
     );
+  }
+
+  Future<WeeklyMissionsState?> loadWeeklyMissions() async {
+    final prefs = await _prefs;
+    final json = prefs.getString(_weeklyMissionsKey);
+    if (json == null) return null;
+    try {
+      return WeeklyMissionsState.fromJson(jsonDecode(json) as Map<String, dynamic>);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  Future<void> saveWeeklyMissions(WeeklyMissionsState state) async {
+    final prefs = await _prefs;
+    await prefs.setString(_weeklyMissionsKey, jsonEncode(state.toJson()));
   }
 
   PlayerStats _defaultStats() => const PlayerStats(

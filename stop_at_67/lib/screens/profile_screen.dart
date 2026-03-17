@@ -115,7 +115,7 @@ class ProfileScreen extends StatelessWidget {
                         _statTile(l10n.profileGames, '${stats.totalGames}'),
                         _statTile(l10n.profileBestStreak, '${stats.bestStreak}'),
                         _statTile(l10n.profilePerfects, '${stats.perfectCount}'),
-                        _statTile(l10n.profileTotalXp, '${stats.totalXp}'),
+                        _statTile(l10n.profileTotalXp, '${stats.totalScore}'),
                       ],
                     ),
                     const SizedBox(height: 24),
@@ -128,30 +128,6 @@ class ProfileScreen extends StatelessWidget {
                       final modeName = _modeLocalName(mode.id, l10n);
                       return _scoreRow(modeName, best != null ? formatScore(best) : '—');
                     }),
-                    const SizedBox(height: 24),
-                    _label(l10n.profileAchievements),
-                    const SizedBox(height: 12),
-                    Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                          color: AppColors.darkCard,
-                          borderRadius: BorderRadius.circular(12)),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            l10n.profileAchievementsUnlocked(
-                                gs.achievements.length, kAchievements.length),
-                            style: const TextStyle(color: AppColors.textSecondary, fontSize: 15),
-                          ),
-                          Text(
-                            '${(gs.achievements.length / kAchievements.length * 100).round()}%',
-                            style: const TextStyle(
-                                color: AppColors.orange, fontSize: 15, fontWeight: FontWeight.w600),
-                          ),
-                        ],
-                      ),
-                    ),
                     const SizedBox(height: 32),
                     if (auth.isSignedIn)
                       GestureDetector(
@@ -194,6 +170,10 @@ class ProfileScreen extends StatelessWidget {
       'reverse100' => l10n.modeReverse100Name,
       'daily' => l10n.modeDailyName,
       'surge' => l10n.modeSurgeName,
+      'doubletap' => l10n.modeDoubleTapName,
+      'movingtarget' => l10n.modeMovingTargetName,
+      'calibration' => l10n.modeCalibrationName,
+      'pressure' => l10n.modePressureName,
       _ => modeId,
     };
   }
