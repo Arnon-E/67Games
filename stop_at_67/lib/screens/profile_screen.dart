@@ -124,9 +124,9 @@ class ProfileScreen extends StatelessWidget {
                     ...kGameModes.values
                         .where((mode) => !const {'extended', 'reverse', 'reverse100'}.contains(mode.id))
                         .map((mode) {
-                      final best = stats.bestScores[mode.id];
+                      final cumulative = stats.modeScores[mode.id];
                       final modeName = _modeLocalName(mode.id, l10n);
-                      return _scoreRow(modeName, best != null ? formatScore(best) : '—');
+                      return _scoreRow(modeName, cumulative != null ? formatScore(cumulative) : '—');
                     }),
                     const SizedBox(height: 24),
                     _label(l10n.profileAchievements),

@@ -175,6 +175,10 @@ PlayerStats updateStats(
     newBestScores[modeId] = result.finalScore;
   }
 
+  // Cumulative mode scores: add every round's points
+  final newModeScores = Map<String, int>.from(stats.modeScores);
+  newModeScores[modeId] = (newModeScores[modeId] ?? 0) + result.finalScore;
+
   final newModeGamesPlayed = Map<String, int>.from(stats.modeGamesPlayed);
   newModeGamesPlayed[modeId] = (newModeGamesPlayed[modeId] ?? 0) + 1;
 
@@ -189,6 +193,7 @@ PlayerStats updateStats(
     totalGames: newTotalGames,
     totalScore: newTotalScore,
     bestScores: newBestScores,
+    modeScores: newModeScores,
     perfectCount: newPerfectCount,
     currentStreak: newStreak,
     bestStreak: newBestStreak,

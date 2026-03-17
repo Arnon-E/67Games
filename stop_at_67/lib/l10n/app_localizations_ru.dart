@@ -284,7 +284,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get profileTotalXp => 'Всего опыта';
 
   @override
-  String get profileBestScores => 'Лучшие результаты';
+  String get profileBestScores => 'Общие результаты';
 
   @override
   String get profileAchievements => 'Достижения';

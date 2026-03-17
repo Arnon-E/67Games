@@ -110,6 +110,8 @@ class PlayerStats {
   final int totalGames;
   final int totalScore;
   final Map<String, int> bestScores;
+  /// Cumulative score per mode – every round's points are added here.
+  final Map<String, int> modeScores;
   final int perfectCount;
   final int currentStreak;
   final int bestStreak;
@@ -122,6 +124,7 @@ class PlayerStats {
     required this.totalGames,
     required this.totalScore,
     required this.bestScores,
+    this.modeScores = const {},
     required this.perfectCount,
     required this.currentStreak,
     required this.bestStreak,
@@ -135,6 +138,7 @@ class PlayerStats {
     int? totalGames,
     int? totalScore,
     Map<String, int>? bestScores,
+    Map<String, int>? modeScores,
     int? perfectCount,
     int? currentStreak,
     int? bestStreak,
@@ -147,6 +151,7 @@ class PlayerStats {
       totalGames: totalGames ?? this.totalGames,
       totalScore: totalScore ?? this.totalScore,
       bestScores: bestScores ?? this.bestScores,
+      modeScores: modeScores ?? this.modeScores,
       perfectCount: perfectCount ?? this.perfectCount,
       currentStreak: currentStreak ?? this.currentStreak,
       bestStreak: bestStreak ?? this.bestStreak,
@@ -161,6 +166,7 @@ class PlayerStats {
     'totalGames': totalGames,
     'totalScore': totalScore,
     'bestScores': bestScores,
+    'modeScores': modeScores,
     'perfectCount': perfectCount,
     'currentStreak': currentStreak,
     'bestStreak': bestStreak,
@@ -174,6 +180,10 @@ class PlayerStats {
     totalGames: (json['totalGames'] as num?)?.toInt() ?? 0,
     totalScore: (json['totalScore'] as num?)?.toInt() ?? 0,
     bestScores: (json['bestScores'] as Map<String, dynamic>?)?.map(
+          (k, v) => MapEntry(k, (v as num).toInt()),
+        ) ??
+        {},
+    modeScores: (json['modeScores'] as Map<String, dynamic>?)?.map(
           (k, v) => MapEntry(k, (v as num).toInt()),
         ) ??
         {},

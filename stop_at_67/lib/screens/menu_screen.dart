@@ -208,9 +208,9 @@ class _MenuScreenState extends State<MenuScreen>
                     _statItem(l10n.menuGames, '${gs.stats.totalGames}'),
                     _statItem(
                       l10n.menuBest,
-                      gs.stats.bestScores.isEmpty
+                      gs.stats.modeScores.isEmpty
                           ? '—'
-                          : '${gs.stats.bestScores.values.reduce((a, b) => a > b ? a : b)}',
+                          : '${gs.stats.modeScores.values.reduce((a, b) => a + b)}',
                     ),
                     _statItem(l10n.menuStreak, '${gs.currentStreakValue}'),
                   ],

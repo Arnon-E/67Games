@@ -64,7 +64,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
     final gs = context.watch<GameState>();
     final auth = context.watch<AuthState>();
     final l10n = AppLocalizations.of(context);
-    final bestScores = gs.stats.bestScores;
+    final modeScores = gs.stats.modeScores;
     final currentUid = auth.user?.uid;
 
     return Scaffold(
@@ -149,8 +149,8 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                                   color: AppColors.textDisabled, fontSize: 12),
                             ),
                             Text(
-                              bestScores[_selectedModeId] != null
-                                  ? formatScore(bestScores[_selectedModeId]!)
+                              modeScores[_selectedModeId] != null
+                                  ? formatScore(modeScores[_selectedModeId]!)
                                   : '—',
                               style: const TextStyle(
                                   color: AppColors.textPrimary,

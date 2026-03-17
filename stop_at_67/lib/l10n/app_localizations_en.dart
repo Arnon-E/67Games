@@ -283,7 +283,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get profileTotalXp => 'Total XP';
 
   @override
-  String get profileBestScores => 'Best Scores';
+  String get profileBestScores => 'Total Scores';
 
   @override
   String get profileAchievements => 'Achievements';

@@ -604,10 +604,11 @@ class _ResultsScreenState extends State<ResultsScreen> {
         const SizedBox(height: 8),
         _detailRow(l10n.resultsDeviation, formatDeviation(result.deviationMs)),
         const SizedBox(height: 8),
-        // Accelerate: show cumulative score and lives instead of streak
+        // Cumulative mode score
+        _detailRow(l10n.resultsTotalScore, '${gs.stats.modeScores[mode.id] ?? 0}'),
+        const SizedBox(height: 8),
+        // Accelerate: show lives instead of streak
         if (isSurge) ...[
-          _detailRow(l10n.resultsTotalScore, '${gs.surgeCumulativeScore}'),
-          const SizedBox(height: 8),
           _detailRow(l10n.resultsLives, '${l10n.resultsLivesHeartEmoji} ${gs.surgeLives}'),
         ] else ...[
           _detailRow(l10n.resultsStreak,

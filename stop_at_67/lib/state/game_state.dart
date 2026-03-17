@@ -573,13 +573,14 @@ class GameState extends ChangeNotifier {
     // Sound feedback
     _playResultFeedback(resultToSave);
 
-    // Submit to online leaderboard if signed in and new personal best
-    if (resultToSave.isNewBest && _authState.isSignedIn) {
+    // Submit cumulative mode score to the online leaderboard after every game
+    if (persistStats && _authState.isSignedIn) {
       final uid = _authState.user!.uid;
+      final cumulativeScore = _stats.modeScores[mode.id] ?? 0;
       _leaderboard.submitScore(
         uid: uid,
         modeId: mode.id,
-        score: resultToSave.finalScore,
+        score: cumulativeScore,
         displayName: _authState.userName,
       );
     }

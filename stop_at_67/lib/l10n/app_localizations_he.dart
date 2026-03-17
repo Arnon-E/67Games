@@ -283,7 +283,7 @@ class AppLocalizationsHe extends AppLocalizations {
   String get profileTotalXp => 'סה\"כ נק\' ניסיון';
 
   @override
-  String get profileBestScores => 'ניקודים מקסימליים';
+  String get profileBestScores => 'סה\"כ ניקוד';
 
   @override
   String get profileAchievements => 'הישגים';
