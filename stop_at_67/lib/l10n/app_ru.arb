@@ -218,6 +218,16 @@
   "surgeResetBody": "Жизни закончились!\nСкорость сбрасывается до 1×.",
   "surgeResetWatchAd": "СМОТРЕТЬ РЕКЛАМУ — ПОЛУЧИТЬ 1 ЖИЗНЬ",
   "surgeResetAccept": "ОК, СБРОСИТЬ ДО 1×",
+  "surgeResetTotalScore": "Total score: {score}",
+  "@surgeResetTotalScore": {
+    "placeholders": {
+      "score": { "type": "int" }
+    }
+  },
+  "surgeFailLabel": "GAME OVER",
+  "resultsTotalScore": "Total Score",
+  "resultsLives": "Lives",
+  "resultsLivesHeartEmoji": "❤️",
 
   "weeklyMissionsTitle": "ЕЖЕНЕДЕЛЬНЫЕ ЗАДАНИЯ",
   "weeklyMissionPlay10Label": "Игроман",

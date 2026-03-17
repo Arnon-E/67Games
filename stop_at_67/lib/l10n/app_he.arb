@@ -219,6 +219,16 @@
   "surgeResetBody": "נגמרו החיים!\nהמהירות מתאפסת ל-1×.",
   "surgeResetWatchAd": "צפה בפרסומת — קבל חיים 1",
   "surgeResetAccept": "אישור, אפס ל-1×",
+  "surgeResetTotalScore": "Total score: {score}",
+  "@surgeResetTotalScore": {
+    "placeholders": {
+      "score": { "type": "int" }
+    }
+  },
+  "surgeFailLabel": "GAME OVER",
+  "resultsTotalScore": "Total Score",
+  "resultsLives": "Lives",
+  "resultsLivesHeartEmoji": "❤️",
 
   "weeklyMissionsTitle": "משימות שבועיות",
   "weeklyMissionPlay10Label": "התמדה",
