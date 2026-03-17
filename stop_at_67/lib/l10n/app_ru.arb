@@ -110,7 +110,7 @@
   "profileGames": "Игры",
   "profileBestStreak": "Лучшая серия",
   "profilePerfects": "Идеальных",
-  "profileTotalXp": "Всего опыта",
+  "profileTotalXp": "Всего очков",
   "profileBestScores": "Лучшие результаты",
   "profileAchievements": "Достижения",
   "profileGuest": "Гость",
@@ -217,5 +217,36 @@
   "surgeResetTitle": "СБРОС УСКОРЕНИЯ",
   "surgeResetBody": "Жизни закончились!\nСкорость сбрасывается до 1×.",
   "surgeResetWatchAd": "СМОТРЕТЬ РЕКЛАМУ — ПОЛУЧИТЬ 1 ЖИЗНЬ",
-  "surgeResetAccept": "ОК, СБРОСИТЬ ДО 1×"
+  "surgeResetAccept": "ОК, СБРОСИТЬ ДО 1×",
+
+  "weeklyMissionsTitle": "ЕЖЕНЕДЕЛЬНЫЕ ЗАДАНИЯ",
+  "weeklyMissionPlay10Label": "Игроман",
+  "weeklyMissionPlay10Desc": "Сыграйте 10 игр в любом режиме",
+  "weeklyMissionPerfect3Label": "Перфекционист",
+  "weeklyMissionPerfect3Desc": "Получите 3 идеальных остановки (0ms)",
+  "weeklyMissionModes3Label": "Исследователь",
+  "weeklyMissionModes3Desc": "Сыграйте в 3 разных режима",
+  "weeklyMissionScore900Label": "Снайпер",
+  "weeklyMissionScore900Desc": "Наберите 900+ в одной игре",
+  "weeklyMissionStreak5Label": "В огне",
+  "weeklyMissionStreak5Desc": "Достигните серии 5 за одну сессию",
+
+  "leaderboardAllTime": "ВСЕ ВРЕМЯ",
+  "leaderboardThisWeek": "🏆 ЭТА НЕДЕЛЯ",
+  "leaderboardWeeklyTournament": "🏆  Недельный турнир",
+  "leaderboardResetsIn": "Сброс через {time}",
+  "@leaderboardResetsIn": {
+    "placeholders": {
+      "time": { "type": "String" }
+    }
+  },
+  "weeklyMissionsProgress": "{completed} / {total} выполнено",
+  "@weeklyMissionsProgress": {
+    "placeholders": {
+      "completed": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
+  "weeklyMissionsClaim": "ЗАБРАТЬ!",
+  "weeklyMissionsClaimButton": "ЗАБРАТЬ"
 }

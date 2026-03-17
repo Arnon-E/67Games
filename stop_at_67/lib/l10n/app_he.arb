@@ -111,7 +111,7 @@
   "profileGames": "משחקים",
   "profileBestStreak": "רצף מקסימלי",
   "profilePerfects": "מושלמים",
-  "profileTotalXp": "סה\"כ נק' ניסיון",
+  "profileTotalXp": "סה\"כ ניקוד",
   "profileBestScores": "ניקודים מקסימליים",
   "profileAchievements": "הישגים",
   "profileGuest": "אורח",
@@ -218,5 +218,36 @@
   "surgeResetTitle": "איפוס האצה",
   "surgeResetBody": "נגמרו החיים!\nהמהירות מתאפסת ל-1×.",
   "surgeResetWatchAd": "צפה בפרסומת — קבל חיים 1",
-  "surgeResetAccept": "אישור, אפס ל-1×"
+  "surgeResetAccept": "אישור, אפס ל-1×",
+
+  "weeklyMissionsTitle": "משימות שבועיות",
+  "weeklyMissionPlay10Label": "התמדה",
+  "weeklyMissionPlay10Desc": "שחק 10 משחקים בכל מצב",
+  "weeklyMissionPerfect3Label": "שלמות",
+  "weeklyMissionPerfect3Desc": "קבל 3 עצירות מושלמות (0ms)",
+  "weeklyMissionModes3Label": "חוקר",
+  "weeklyMissionModes3Desc": "שחק 3 מצבי משחק שונים",
+  "weeklyMissionScore900Label": "הדייקן",
+  "weeklyMissionScore900Desc": "קבל 900+ במשחק בודד",
+  "weeklyMissionStreak5Label": "לוהט",
+  "weeklyMissionStreak5Desc": "הגע לרצף של 5 בסשן אחד",
+
+  "leaderboardAllTime": "כל הזמן",
+  "leaderboardThisWeek": "🏆 השבוע",
+  "leaderboardWeeklyTournament": "🏆  טורניר שבועי",
+  "leaderboardResetsIn": "מתאפס בעוד {time}",
+  "@leaderboardResetsIn": {
+    "placeholders": {
+      "time": { "type": "String" }
+    }
+  },
+  "weeklyMissionsProgress": "{completed} / {total} הושלמו",
+  "@weeklyMissionsProgress": {
+    "placeholders": {
+      "completed": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
+  "weeklyMissionsClaim": "קח!",
+  "weeklyMissionsClaimButton": "קח"
 }

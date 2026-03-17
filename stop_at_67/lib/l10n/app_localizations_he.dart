@@ -280,7 +280,7 @@ class AppLocalizationsHe extends AppLocalizations {
   String get profilePerfects => 'מושלמים';
 
   @override
-  String get profileTotalXp => 'סה\"כ נק\' ניסיון';
+  String get profileTotalXp => 'סה\"כ ניקוד';
 
   @override
   String get profileBestScores => 'ניקודים מקסימליים';
@@ -533,4 +533,62 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get resultsLivesHeartEmoji => '❤️';
+
+  @override
+  String get weeklyMissionsTitle => 'משימות שבועיות';
+
+  @override
+  String get weeklyMissionPlay10Label => 'התמדה';
+
+  @override
+  String get weeklyMissionPlay10Desc => 'שחק 10 משחקים בכל מצב';
+
+  @override
+  String get weeklyMissionPerfect3Label => 'שלמות';
+
+  @override
+  String get weeklyMissionPerfect3Desc => 'קבל 3 עצירות מושלמות (0ms)';
+
+  @override
+  String get weeklyMissionModes3Label => 'חוקר';
+
+  @override
+  String get weeklyMissionModes3Desc => 'שחק 3 מצבי משחק שונים';
+
+  @override
+  String get weeklyMissionScore900Label => 'הדייקן';
+
+  @override
+  String get weeklyMissionScore900Desc => 'קבל 900+ במשחק בודד';
+
+  @override
+  String get weeklyMissionStreak5Label => 'לוהט';
+
+  @override
+  String get weeklyMissionStreak5Desc => 'הגע לרצף של 5 בסשן אחד';
+
+  @override
+  String get leaderboardAllTime => 'כל הזמן';
+
+  @override
+  String get leaderboardThisWeek => '🏆 השבוע';
+
+  @override
+  String get leaderboardWeeklyTournament => '🏆  טורניר שבועי';
+
+  @override
+  String leaderboardResetsIn(String time) {
+    return 'מתאפס בעוד $time';
+  }
+
+  @override
+  String weeklyMissionsProgress(int completed, int total) {
+    return '$completed / $total הושלמו';
+  }
+
+  @override
+  String get weeklyMissionsClaim => 'קח!';
+
+  @override
+  String get weeklyMissionsClaimButton => 'קח';
 }

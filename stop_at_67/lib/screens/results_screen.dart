@@ -400,6 +400,28 @@ class _BouncyScoreState extends State<_BouncyScore>
   }
 }
 
+// ── Pressure eliminated background ───────────────────────────
+
+class _PressureEliminatedBackground extends StatelessWidget {
+  final Widget child;
+  const _PressureEliminatedBackground({required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [Color(0xFF2a0000), Color(0xFF1a0000), Color(0xFF0f0000)],
+          stops: [0.0, 0.5, 1.0],
+        ),
+      ),
+      child: child,
+    );
+  }
+}
+
 // ── Results screen ───────────────────────────────────────────
 
 class ResultsScreen extends StatefulWidget {
@@ -469,26 +491,23 @@ class _ResultsScreenState extends State<ResultsScreen> {
     final isPerfect = deviation == 0;
     final showFireworks = _isExcellent(result.rating.tier);
 
-    // Use celebration background for excellent+, regular background otherwise
-    final Widget background = showFireworks
-        ? _CelebrationBackground(
-            child: SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24),
-                child: _buildResultContent(context, gs, l10n, result, isPerfect,
-                    isPersonalBest, isNearMiss, showFireworks),
-              ),
-            ),
-          )
-        : AppGradientBackground(
-            child: SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24),
-                child: _buildResultContent(context, gs, l10n, result, isPerfect,
-                    isPersonalBest, isNearMiss, showFireworks),
-              ),
-            ),
-          );
+    // Pressure eliminated: show red background
+    final bool isPressureEliminated = mode.isPressure && !gs.pressureLastRoundSuccess;
+
+    final Widget safeContent = SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 24),
+        child: _buildResultContent(context, gs, l10n, result, isPerfect,
+            isPersonalBest, isNearMiss, showFireworks),
+      ),
+    );
+
+    // Use celebration background for excellent+, red for pressure eliminated, regular otherwise
+    final Widget background = isPressureEliminated
+        ? _PressureEliminatedBackground(child: safeContent)
+        : showFireworks
+            ? _CelebrationBackground(child: safeContent)
+            : AppGradientBackground(child: safeContent);
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -617,6 +636,41 @@ class _ResultsScreenState extends State<ResultsScreen> {
         const SizedBox(height: 8),
         _detailRow(l10n.resultsXp, '+${result.xpEarned} XP'),
 
+        // Session score (only for non-surge, non-pressure normal modes)
+        if (gs.sessionScore > 0) ...[
+          const SizedBox(height: 16),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            decoration: BoxDecoration(
+              color: AppColors.orange.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: AppColors.orange.withValues(alpha: 0.3)),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  'SESSION',
+                  style: TextStyle(
+                    color: AppColors.textDisabled,
+                    fontSize: 12,
+                    letterSpacing: 1.5,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                Text(
+                  '${gs.sessionScore}',
+                  style: const TextStyle(
+                    color: AppColors.orange,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+
         const Spacer(),
 
         // Action buttons
@@ -635,14 +689,16 @@ class _ResultsScreenState extends State<ResultsScreen> {
                 primary: false,
               ),
             ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: GameButton(
-                label: l10n.commonShare,
-                onPressed: () => _share(context, result, gs.currentMode!.name, l10n),
-                primary: false,
+            if (_isExcellent(result.rating.tier)) ...[
+              const SizedBox(width: 12),
+              Expanded(
+                child: GameButton(
+                  label: l10n.commonShare,
+                  onPressed: () => _share(context, result, gs.currentMode!.name, l10n),
+                  primary: false,
+                ),
               ),
-            ),
+            ],
           ],
         ),
         const SizedBox(height: 24),
@@ -827,7 +883,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
         _badge(l10n.resultsPressureEliminated, Colors.redAccent),
         const SizedBox(height: 16),
         const Spacer(),
-        ScoreDisplay(result: result),
+        ScoreDisplay(result: result, labelOverride: 'ELIMINATED', labelColorOverride: Colors.redAccent),
         const SizedBox(height: 40),
         _detailRow(l10n.resultsPressureRounds, '${gs.pressureRoundsSucceeded}'),
         const SizedBox(height: 8),
@@ -894,9 +950,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
         ),
         const SizedBox(height: 16),
         const Spacer(),
-        showFireworks
-            ? _BouncyScore(child: ScoreDisplay(result: result))
-            : ScoreDisplay(result: result),
+        ScoreDisplay(result: result, labelOverride: 'ELIMINATED', labelColorOverride: Colors.redAccent),
         const SizedBox(height: 40),
         _detailRow(
           l10n.resultsPressureRounds,
@@ -1013,7 +1067,7 @@ class _PressureAdRetryContentState extends State<_PressureAdRetryContent> {
         widget.buildBadge(l10n.resultsPressureEliminated, Colors.redAccent),
         const SizedBox(height: 16),
         const Spacer(),
-        ScoreDisplay(result: result),
+        ScoreDisplay(result: result, labelOverride: 'ELIMINATED', labelColorOverride: Colors.redAccent),
         const SizedBox(height: 40),
         widget.buildDetailRow(l10n.resultsPressureRounds, '${gs.pressureRoundsSucceeded}'),
         const SizedBox(height: 8),
@@ -1134,8 +1188,9 @@ class _SurgeResetDialogState extends State<_SurgeResetDialog> {
                       ? null
                       : () async {
                           setState(() => _isLoading = true);
+                          final navigator = Navigator.of(context);
                           await widget.onWatchAd();
-                          if (mounted) Navigator.of(context).pop();
+                          if (mounted) navigator.pop();
                         },
                   style: TextButton.styleFrom(
                     backgroundColor: AppColors.cyan.withValues(alpha: 0.15),

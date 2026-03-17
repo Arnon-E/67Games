@@ -318,9 +318,9 @@ class _ShareCard extends StatelessWidget {
 
           const SizedBox(height: 4),
 
-          Text(
+          const Text(
             'pts',
-            style: const TextStyle(
+            style: TextStyle(
               color: AppColors.textDisabled,
               fontSize: 14,
               letterSpacing: 1,

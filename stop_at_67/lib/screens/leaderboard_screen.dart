@@ -28,11 +28,42 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
   @override
   void initState() {
     super.initState();
-    _loadScores();
+    _syncLocalBests(); // uploads missing bests, then loads list when done
   }
 
-  void _loadScores() {
+  /// Upload any local best scores that were never submitted to Firestore
+  /// (e.g. due to the previous isNewBest comparison bug).
+  Future<void> _syncLocalBests() async {
+    final auth = context.read<AuthState>();
+    if (!auth.isSignedIn) {
+      _loadScores(forceRefresh: true);
+      return;
+    }
+    final gs = context.read<GameState>();
     final leaderboard = context.read<LeaderboardService>();
+    final uid = auth.user!.uid;
+    final displayName = auth.userName;
+    final futures = <Future<void>>[];
+    for (final entry in gs.stats.bestScores.entries) {
+      if (entry.value > 0) {
+        futures.add(leaderboard.submitScore(
+          uid: uid,
+          modeId: entry.key,
+          score: entry.value,
+          displayName: displayName,
+        ));
+      }
+    }
+    await Future.wait(futures);
+    if (mounted) _loadScores(forceRefresh: true);
+  }
+
+  void _loadScores({bool forceRefresh = false}) {
+    final leaderboard = context.read<LeaderboardService>();
+    if (forceRefresh) {
+      leaderboard.invalidate(_selectedModeId);
+      leaderboard.invalidate('tournament:${weekIdForDate(DateTime.now())}');
+    }
     setState(() {
       _scoresFuture = _showTournament
           ? leaderboard.getTournamentTopScores()
@@ -103,7 +134,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                           ),
                           alignment: Alignment.center,
                           child: Text(
-                            'ALL TIME',
+                            l10n.leaderboardAllTime,
                             style: TextStyle(
                               color: !_showTournament ? AppColors.textPrimary : AppColors.textDisabled,
                               fontSize: 12,
@@ -128,7 +159,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text(
-                                '🏆 THIS WEEK',
+                                l10n.leaderboardThisWeek,
                                 style: TextStyle(
                                   color: _showTournament ? AppColors.textPrimary : AppColors.textDisabled,
                                   fontSize: 12,
@@ -351,6 +382,7 @@ class _TournamentCountdown extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 4),
       child: Container(
@@ -363,9 +395,9 @@ class _TournamentCountdown extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text(
-              '🏆  Weekly Tournament',
-              style: TextStyle(
+            Text(
+              l10n.leaderboardWeeklyTournament,
+              style: const TextStyle(
                 color: AppColors.gold,
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
@@ -376,7 +408,7 @@ class _TournamentCountdown extends StatelessWidget {
                 const Icon(Icons.timer_outlined, color: AppColors.textHint, size: 14),
                 const SizedBox(width: 4),
                 Text(
-                  'Resets in ${_timeUntilReset()}',
+                  l10n.leaderboardResetsIn(_timeUntilReset()),
                   style: const TextStyle(color: AppColors.textHint, fontSize: 12),
                 ),
               ],

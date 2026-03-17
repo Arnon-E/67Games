@@ -637,7 +637,7 @@ abstract class AppLocalizations {
   /// No description provided for @profileTotalXp.
   ///
   /// In en, this message translates to:
-  /// **'Total XP'**
+  /// **'Total Score'**
   String get profileTotalXp;
 
   /// No description provided for @profileBestScores.
@@ -1113,6 +1113,114 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'❤️'**
   String get resultsLivesHeartEmoji;
+
+  /// No description provided for @weeklyMissionsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'WEEKLY MISSIONS'**
+  String get weeklyMissionsTitle;
+
+  /// No description provided for @weeklyMissionPlay10Label.
+  ///
+  /// In en, this message translates to:
+  /// **'Game Grinder'**
+  String get weeklyMissionPlay10Label;
+
+  /// No description provided for @weeklyMissionPlay10Desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Play 10 games in any mode'**
+  String get weeklyMissionPlay10Desc;
+
+  /// No description provided for @weeklyMissionPerfect3Label.
+  ///
+  /// In en, this message translates to:
+  /// **'Perfectionist'**
+  String get weeklyMissionPerfect3Label;
+
+  /// No description provided for @weeklyMissionPerfect3Desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Get 3 Perfect stops (0ms off)'**
+  String get weeklyMissionPerfect3Desc;
+
+  /// No description provided for @weeklyMissionModes3Label.
+  ///
+  /// In en, this message translates to:
+  /// **'Explorer'**
+  String get weeklyMissionModes3Label;
+
+  /// No description provided for @weeklyMissionModes3Desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Play 3 different game modes'**
+  String get weeklyMissionModes3Desc;
+
+  /// No description provided for @weeklyMissionScore900Label.
+  ///
+  /// In en, this message translates to:
+  /// **'Sharpshooter'**
+  String get weeklyMissionScore900Label;
+
+  /// No description provided for @weeklyMissionScore900Desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Score 900+ in a single game'**
+  String get weeklyMissionScore900Desc;
+
+  /// No description provided for @weeklyMissionStreak5Label.
+  ///
+  /// In en, this message translates to:
+  /// **'On Fire'**
+  String get weeklyMissionStreak5Label;
+
+  /// No description provided for @weeklyMissionStreak5Desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Reach a streak of 5 in one session'**
+  String get weeklyMissionStreak5Desc;
+
+  /// No description provided for @leaderboardAllTime.
+  ///
+  /// In en, this message translates to:
+  /// **'ALL TIME'**
+  String get leaderboardAllTime;
+
+  /// No description provided for @leaderboardThisWeek.
+  ///
+  /// In en, this message translates to:
+  /// **'🏆 THIS WEEK'**
+  String get leaderboardThisWeek;
+
+  /// No description provided for @leaderboardWeeklyTournament.
+  ///
+  /// In en, this message translates to:
+  /// **'🏆  Weekly Tournament'**
+  String get leaderboardWeeklyTournament;
+
+  /// No description provided for @leaderboardResetsIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Resets in {time}'**
+  String leaderboardResetsIn(String time);
+
+  /// No description provided for @weeklyMissionsProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'{completed} / {total} complete'**
+  String weeklyMissionsProgress(int completed, int total);
+
+  /// No description provided for @weeklyMissionsClaim.
+  ///
+  /// In en, this message translates to:
+  /// **'CLAIM!'**
+  String get weeklyMissionsClaim;
+
+  /// No description provided for @weeklyMissionsClaimButton.
+  ///
+  /// In en, this message translates to:
+  /// **'CLAIM'**
+  String get weeklyMissionsClaimButton;
 }
 
 class _AppLocalizationsDelegate

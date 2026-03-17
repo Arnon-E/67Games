@@ -280,7 +280,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get profilePerfects => 'Perfects';
 
   @override
-  String get profileTotalXp => 'Total XP';
+  String get profileTotalXp => 'Total Score';
 
   @override
   String get profileBestScores => 'Best Scores';
@@ -537,4 +537,62 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get resultsLivesHeartEmoji => '❤️';
+
+  @override
+  String get weeklyMissionsTitle => 'WEEKLY MISSIONS';
+
+  @override
+  String get weeklyMissionPlay10Label => 'Game Grinder';
+
+  @override
+  String get weeklyMissionPlay10Desc => 'Play 10 games in any mode';
+
+  @override
+  String get weeklyMissionPerfect3Label => 'Perfectionist';
+
+  @override
+  String get weeklyMissionPerfect3Desc => 'Get 3 Perfect stops (0ms off)';
+
+  @override
+  String get weeklyMissionModes3Label => 'Explorer';
+
+  @override
+  String get weeklyMissionModes3Desc => 'Play 3 different game modes';
+
+  @override
+  String get weeklyMissionScore900Label => 'Sharpshooter';
+
+  @override
+  String get weeklyMissionScore900Desc => 'Score 900+ in a single game';
+
+  @override
+  String get weeklyMissionStreak5Label => 'On Fire';
+
+  @override
+  String get weeklyMissionStreak5Desc => 'Reach a streak of 5 in one session';
+
+  @override
+  String get leaderboardAllTime => 'ALL TIME';
+
+  @override
+  String get leaderboardThisWeek => '🏆 THIS WEEK';
+
+  @override
+  String get leaderboardWeeklyTournament => '🏆  Weekly Tournament';
+
+  @override
+  String leaderboardResetsIn(String time) {
+    return 'Resets in $time';
+  }
+
+  @override
+  String weeklyMissionsProgress(int completed, int total) {
+    return '$completed / $total complete';
+  }
+
+  @override
+  String get weeklyMissionsClaim => 'CLAIM!';
+
+  @override
+  String get weeklyMissionsClaimButton => 'CLAIM';
 }

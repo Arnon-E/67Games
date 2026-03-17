@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../l10n/app_localizations.dart';
@@ -72,8 +73,16 @@ class _MenuScreenState extends State<MenuScreen>
       backgroundColor: Colors.transparent,
       body: AppGradientBackground(
         child: SafeArea(
-          child: Column(
-            children: [
+          child: SingleChildScrollView(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                minHeight: MediaQuery.of(context).size.height -
+                    MediaQuery.of(context).padding.top -
+                    MediaQuery.of(context).padding.bottom,
+              ),
+              child: IntrinsicHeight(
+                child: Column(
+                  children: [
               // Top bar
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
@@ -200,23 +209,8 @@ class _MenuScreenState extends State<MenuScreen>
 
               const SizedBox(height: 48),
 
-              // Stats row
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 48),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    _statItem(l10n.menuGames, '${gs.stats.totalGames}'),
-                    _statItem(
-                      l10n.menuBest,
-                      gs.stats.bestScores.isEmpty
-                          ? '—'
-                          : '${gs.stats.bestScores.values.reduce((a, b) => a > b ? a : b)}',
-                    ),
-                    _statItem(l10n.menuStreak, '${gs.currentStreakValue}'),
-                  ],
-                ),
-              ),
+              // Rotating per-mode stats
+              const _RotatingModeStats(),
 
               const SizedBox(height: 48),
 
@@ -354,28 +348,12 @@ class _MenuScreenState extends State<MenuScreen>
                   ),
                 ),
             ],
+                ),
+              ),
+            ),
           ),
         ),
       ),
-    );
-  }
-
-  Widget _statItem(String label, String value) {
-    return Column(
-      children: [
-        Text(
-          value,
-          style: const TextStyle(
-            fontSize: 28,
-            fontWeight: FontWeight.w200,
-            color: AppColors.textPrimary,
-          ),
-        ),
-        Text(
-          label,
-          style: const TextStyle(fontSize: 12, color: AppColors.textDisabled),
-        ),
-      ],
     );
   }
 
@@ -401,6 +379,160 @@ class _MenuScreenState extends State<MenuScreen>
   }
 }
 
+// ── Rotating per-mode stats ──────────────────────────────────
+
+class _RotatingModeStats extends StatefulWidget {
+  const _RotatingModeStats();
+
+  @override
+  State<_RotatingModeStats> createState() => _RotatingModeStatsState();
+}
+
+class _RotatingModeStatsState extends State<_RotatingModeStats> {
+  int _modeIndex = 0;
+  Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    _timer = Timer.periodic(const Duration(seconds: 3), (_) {
+      final gs = context.read<GameState>();
+      final playedModes = _getPlayedModes(gs);
+      if (playedModes.length > 1) {
+        setState(() => _modeIndex = (_modeIndex + 1) % playedModes.length);
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  String _modeNameL10n(String modeId, AppLocalizations l10n) => switch (modeId) {
+    'classic'      => l10n.modeClassicName,
+    'extended'     => l10n.modeExtendedName,
+    'blind'        => l10n.modeBlindName,
+    'reverse'      => l10n.modeReverseName,
+    'reverse100'   => l10n.modeReverse100Name,
+    'daily'        => l10n.modeDailyName,
+    'surge'        => l10n.modeSurgeName,
+    'doubletap'    => l10n.modeDoubleTapName,
+    'movingtarget' => l10n.modeMovingTargetName,
+    'calibration'  => l10n.modeCalibrationName,
+    'pressure'     => l10n.modePressureName,
+    _              => modeId,
+  };
+
+  List<String> _getPlayedModes(GameState gs) {
+    final played = gs.stats.modeGamesPlayed.entries
+        .where((e) => e.value > 0)
+        .map((e) => e.key)
+        .toList();
+    return played.isEmpty ? ['classic'] : played;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final gs = context.watch<GameState>();
+    final l10n = AppLocalizations.of(context);
+    final playedModes = _getPlayedModes(gs);
+
+    // Clamp index in case modes list shrinks
+    final safeIndex = _modeIndex.clamp(0, playedModes.length - 1);
+    final modeId = playedModes[safeIndex];
+    final modeName = _modeNameL10n(modeId, l10n);
+    final best = gs.stats.bestScores[modeId] ?? 0;
+    final streak = gs.currentStreakValue;
+    final hasPlayed = gs.stats.modeGamesPlayed.values.any((v) => v > 0);
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 48),
+      child: AnimatedSwitcher(
+        duration: const Duration(milliseconds: 400),
+        child: hasPlayed
+            ? Column(
+                key: ValueKey('$modeId-$safeIndex'),
+                children: [
+                  Text(
+                    modeName.toUpperCase(),
+                    style: const TextStyle(
+                      color: AppColors.textHint,
+                      fontSize: 10,
+                      letterSpacing: 2,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      _statItem(l10n.menuGames, '${gs.stats.modeGamesPlayed[modeId] ?? 0}'),
+                      _statItem(l10n.menuBest, best > 0 ? '$best' : '—'),
+                      _statItem(l10n.menuStreak, '$streak'),
+                    ],
+                  ),
+                ],
+              )
+            : Row(
+                key: const ValueKey('global'),
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  _statItem(l10n.menuGames, '${gs.stats.totalGames}'),
+                  _statItem(
+                    l10n.menuBest,
+                    gs.stats.bestScores.isEmpty
+                        ? '—'
+                        : '${gs.stats.bestScores.values.reduce((a, b) => a > b ? a : b)}',
+                  ),
+                  _statItem(l10n.menuStreak, '$streak'),
+                ],
+              ),
+      ),
+    );
+  }
+
+  Widget _statItem(String label, String value) {
+    return Column(
+      children: [
+        Text(
+          value,
+          style: const TextStyle(
+            fontSize: 28,
+            fontWeight: FontWeight.w200,
+            color: AppColors.textPrimary,
+          ),
+        ),
+        Text(
+          label,
+          style: const TextStyle(fontSize: 12, color: AppColors.textDisabled),
+        ),
+      ],
+    );
+  }
+}
+
+// ── Mission l10n helpers ─────────────────────────────────────
+
+String _missionLabel(String id, AppLocalizations l10n) => switch (id) {
+  'play_10'   => l10n.weeklyMissionPlay10Label,
+  'perfect_3' => l10n.weeklyMissionPerfect3Label,
+  'modes_3'   => l10n.weeklyMissionModes3Label,
+  'score_900' => l10n.weeklyMissionScore900Label,
+  'streak_5'  => l10n.weeklyMissionStreak5Label,
+  _           => id,
+};
+
+String _missionDesc(String id, AppLocalizations l10n) => switch (id) {
+  'play_10'   => l10n.weeklyMissionPlay10Desc,
+  'perfect_3' => l10n.weeklyMissionPerfect3Desc,
+  'modes_3'   => l10n.weeklyMissionModes3Desc,
+  'score_900' => l10n.weeklyMissionScore900Desc,
+  'streak_5'  => l10n.weeklyMissionStreak5Desc,
+  _           => id,
+};
+
 // ── Weekly Missions Card ─────────────────────────────────────
 
 class _WeeklyMissionsCard extends StatefulWidget {
@@ -416,6 +548,7 @@ class _WeeklyMissionsCardState extends State<_WeeklyMissionsCard> {
   @override
   Widget build(BuildContext context) {
     final gs = context.watch<GameState>();
+    final l10n = AppLocalizations.of(context);
     final missionsState = gs.weeklyMissions;
     final missions = missionsState.missions;
     if (missions.isEmpty) return const SizedBox.shrink();
@@ -464,9 +597,9 @@ class _WeeklyMissionsCardState extends State<_WeeklyMissionsCard> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
-                            'WEEKLY MISSIONS',
-                            style: TextStyle(
+                          Text(
+                            l10n.weeklyMissionsTitle,
+                            style: const TextStyle(
                               color: AppColors.textSecondary,
                               fontSize: 12,
                               fontWeight: FontWeight.w700,
@@ -474,11 +607,12 @@ class _WeeklyMissionsCardState extends State<_WeeklyMissionsCard> {
                             ),
                           ),
                           Text(
-                            '$completed / $total complete',
+                            l10n.weeklyMissionsProgress(completed, total),
                             style: TextStyle(
                               color: hasUnclaimed ? AppColors.gold : AppColors.textHint,
                               fontSize: 11,
                             ),
+                            textDirection: TextDirection.ltr,
                           ),
                         ],
                       ),
@@ -492,7 +626,7 @@ class _WeeklyMissionsCardState extends State<_WeeklyMissionsCard> {
                           border: Border.all(color: AppColors.gold.withValues(alpha: 0.4)),
                         ),
                         child: Text(
-                          'CLAIM!',
+                          l10n.weeklyMissionsClaim,
                           style: const TextStyle(
                             color: AppColors.gold,
                             fontSize: 10,
@@ -566,6 +700,7 @@ class _MissionRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final isDone = progress.progress >= def.target;
     final isClaimed = progress.claimed;
     final pct = (progress.progress / def.target).clamp(0.0, 1.0);
@@ -597,9 +732,9 @@ class _MissionRow extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  def.label,
+                  _missionLabel(def.id, l10n),
                   style: TextStyle(
-                    color: isClaimed ? AppColors.textHint : AppColors.textSecondary,
+                    color: isClaimed ? AppColors.textHint : AppColors.textPrimary,
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
                     decoration: isClaimed ? TextDecoration.lineThrough : null,
@@ -607,8 +742,8 @@ class _MissionRow extends StatelessWidget {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  def.description,
-                  style: const TextStyle(color: AppColors.textHint, fontSize: 11),
+                  _missionDesc(def.id, l10n),
+                  style: const TextStyle(color: AppColors.textDisabled, fontSize: 11),
                 ),
                 const SizedBox(height: 6),
                 Row(
@@ -663,9 +798,9 @@ class _MissionRow extends StatelessWidget {
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(color: AppColors.gold.withValues(alpha: 0.5)),
                     ),
-                    child: const Text(
-                      'CLAIM',
-                      style: TextStyle(
+                    child: Text(
+                      l10n.weeklyMissionsClaimButton,
+                      style: const TextStyle(
                         color: AppColors.gold,
                         fontSize: 10,
                         fontWeight: FontWeight.w700,

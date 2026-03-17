@@ -403,7 +403,7 @@ const List<WeeklyMissionDef> kWeeklyMissions = [
     description: 'Get 3 Perfect stops (0ms off)',
     target: 3,
     type: 'perfects',
-    rewardCoins: 500,
+    rewardCoins: 5000,
   ),
   WeeklyMissionDef(
     id: 'modes_3',

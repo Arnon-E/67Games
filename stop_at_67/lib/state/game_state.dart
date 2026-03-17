@@ -107,6 +107,11 @@ class GameState extends ChangeNotifier {
   int get surgeCumulativeScore => _surgeCumulativeScore;
   int get surgeLives => _surgeLives;
 
+  // ── Session score ────────────────────────────────────────────
+  int _sessionScore = 0;
+  String? _sessionModeId; // which mode the session belongs to
+  int get sessionScore => _sessionScore;
+
   // ── Double Tap mode ─────────────────────────────────────────
   // Phase: 0=not active, 1=running (waiting for mid-tap), 2=mid-done (waiting for stop)
   static const int _doubleTapMidpointMs = 3350;
@@ -151,7 +156,7 @@ class GameState extends ChangeNotifier {
   bool get pressureGameOver => _pressureGameOver;
 
   // ── Weekly missions ─────────────────────────────────────────
-  WeeklyMissionsState _weeklyMissions = WeeklyMissionsState(
+  WeeklyMissionsState _weeklyMissions = const WeeklyMissionsState(
     weekId: '',
     missions: [],
   );
@@ -249,6 +254,11 @@ class GameState extends ChangeNotifier {
       _surgeCumulativeScore = 0;
       _surgeGamesInSession = 0;
     }
+    // Reset session score when switching to a different mode
+    if (modeId != _sessionModeId) {
+      _sessionScore = 0;
+      _sessionModeId = modeId;
+    }
     _screen = AppScreen.modeSelect;
     notifyListeners();
   }
@@ -313,7 +323,7 @@ class GameState extends ChangeNotifier {
   /// Returns a random moving-target value within [_movingTargetMinMs, _movingTargetMaxMs],
   /// rounded to the nearest [_movingTargetStepMs], and different from the current target.
   int _randomMovingTarget() {
-    final numSteps =
+    const numSteps =
         (_movingTargetMaxMs - _movingTargetMinMs) ~/ _movingTargetStepMs;
     int target;
     do {
@@ -476,10 +486,16 @@ class GameState extends ChangeNotifier {
     );
 
     // ── Update stats ─────────────────────────────────────────
-    // For calibration, only persist stats after the final attempt.
-    // For pressure success rounds, persist each round normally.
-    final bool persistStats = !mode.isCalibration ||
-        _calibrationResults.length >= mode.calibrationRounds;
+    // For calibration: only persist after the final attempt.
+    // For surge: only persist at game-over (when _surgePendingReset triggers).
+    // For pressure: only persist at game-over (when _pressureGameOver triggers).
+    final bool persistStats = switch (true) {
+      _ when mode.isCalibration =>
+        _calibrationResults.length >= mode.calibrationRounds,
+      _ when mode.id == 'surge' => _surgePendingReset,
+      _ when mode.isPressure => _pressureGameOver,
+      _ => true,
+    };
 
     // Use averaged result for calibration final persistence
     ScoreResult resultToSave = result;
@@ -505,7 +521,7 @@ class GameState extends ChangeNotifier {
       );
     }
 
-    final newStats = persistStats
+    var newStats = persistStats
         ? updateStats(_stats, resultToSave, mode.id, streakResult.newStreak)
         : _stats;
 
@@ -538,6 +554,25 @@ class GameState extends ChangeNotifier {
     }
 
     // Moving Target: next target is randomized on _startPrecisionTimer; nothing to track here.
+
+    // ── Session score ────────────────────────────────────────────
+    // Only update session score for non-pressure, non-calibration, non-surge normal rounds
+    if (!mode.isPressure && !mode.isCalibration && mode.id != 'surge') {
+      final tier = result.rating.tier;
+      if (tier == 'great' || tier == 'excellent' || tier == 'incredible' || tier == 'perfect') {
+        _sessionScore += result.finalScore;
+      } else if (tier == 'miss') {
+        _sessionScore = (_sessionScore - 200).clamp(0, 999999);
+      }
+      // good / ok: no change
+
+      // If the session total now beats the stored best, patch newStats so it
+      // gets persisted and submitted to the leaderboard.
+      if (persistStats && _sessionScore > (newStats.bestScores[mode.id] ?? 0)) {
+        final patchedBest = Map<String, int>.from(newStats.bestScores)..[mode.id] = _sessionScore;
+        newStats = newStats.copyWith(bestScores: patchedBest);
+      }
+    }
 
     // Session
     final newSession = SessionStats(
@@ -600,21 +635,28 @@ class GameState extends ChangeNotifier {
     // Sound feedback
     _playResultFeedback(resultToSave);
 
-    // Submit to online leaderboard if signed in and new personal best
-    if (resultToSave.isNewBest && _authState.isSignedIn) {
+    // Submit to online leaderboard if signed in.
+    // For normal modes: submit the session cumulative score when it beats the stored best.
+    // For surge/pressure/calibration: submit the single-round score as before.
+    if (_authState.isSignedIn) {
       final uid = _authState.user!.uid;
-      _leaderboard.submitScore(
-        uid: uid,
-        modeId: mode.id,
-        score: resultToSave.finalScore,
-        displayName: _authState.userName,
-      );
-      // Also submit to this week's tournament
-      _leaderboard.submitTournamentScore(
-        uid: uid,
-        displayName: _authState.userName,
-        score: resultToSave.finalScore,
-      );
+      final bool isSessionMode = !mode.isPressure && !mode.isCalibration && mode.id != 'surge';
+      final int scoreToSubmit = isSessionMode ? _sessionScore : resultToSave.finalScore;
+      final bool isNewBest = scoreToSubmit > bestScore;
+
+      if (isNewBest) {
+        _leaderboard.submitScore(
+          uid: uid,
+          modeId: mode.id,
+          score: scoreToSubmit,
+          displayName: _authState.userName,
+        );
+        _leaderboard.submitTournamentScore(
+          uid: uid,
+          displayName: _authState.userName,
+          score: scoreToSubmit,
+        );
+      }
     }
   }
 
@@ -658,9 +700,6 @@ class GameState extends ChangeNotifier {
         _calibrationResults.isNotEmpty &&
         _calibrationResults.length < mode.calibrationRounds;
 
-    // Determine if we are continuing a pressure run (last round was a success)
-    final bool pressureContinue = mode.isPressure && _pressureLastRoundSuccess;
-
     // Reset completed calibration run so next "Play Again" starts fresh
     if (mode.isCalibration && !calibrationContinue) {
       _calibrationResults = [];
@@ -702,6 +741,8 @@ class GameState extends ChangeNotifier {
     _pressureFailAttempts = 0;
     _pressurePendingAdRetry = false;
     _pressureGameOver = false;
+    _sessionScore = 0;
+    _sessionModeId = null;
     _screen = AppScreen.menu;
     WakelockPlus.disable().catchError((_) {}); 
     notifyListeners();
