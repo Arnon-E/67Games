@@ -591,4 +591,60 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get weeklyMissionsClaimButton => 'קח';
+
+  @override
+  String get settingsHowToPlay => 'איך משחקים';
+
+  @override
+  String get settingsHowToPlayIntro =>
+      'הקש על המסך כדי לעצור את הטיימר בדיוק בזמן היעד. ככל שתהיה קרוב יותר, כך הניקוד גבוה יותר (עד 1000). עצירה מושלמת (0ms) מעניקה בונוס רצף.';
+
+  @override
+  String get settingsRulesClassicTitle => 'קלאסי';
+
+  @override
+  String get settingsRulesClassicBody =>
+      'עצור את הטיימר בדיוק על 6.700 שניות. המשחק שממנו הכל התחיל.';
+
+  @override
+  String get settingsRulesBlindTitle => 'עיוור';
+
+  @override
+  String get settingsRulesBlindBody =>
+      'הטיימר מוצג 3 שניות ואז נעלם. עצור אותו על 6.700 שניות בלי לראות את השעון.';
+
+  @override
+  String get settingsRulesSurgeTitle => 'האצה';
+
+  @override
+  String get settingsRulesSurgeBody =>
+      'אותו יעד של 6.700 שנ׳, אבל הטיימר מאיץ קצת אחרי כל משחק. כמה סיבובים תוכל להחזיק?';
+
+  @override
+  String get settingsRulesDoubleTapTitle => 'הקשה כפולה';
+
+  @override
+  String get settingsRulesDoubleTapBody =>
+      'הקש פעם ראשונה על 3.350 שנ׳, ואז הקש שוב לעצור על 6.700 שנ׳. שתי ההקשות נספרות.';
+
+  @override
+  String get settingsRulesMovingTargetTitle => 'מטרה נעה';
+
+  @override
+  String get settingsRulesMovingTargetBody =>
+      'זמן היעד משתנה בכל סיבוב. הישאר גמיש — לא תדע בדיוק היכן לעצור עד שהסיבוב יתחיל.';
+
+  @override
+  String get settingsRulesCalibrationTitle => 'כיול';
+
+  @override
+  String get settingsRulesCalibrationBody =>
+      'בצע 5 ניסיונות ברצף. הניקוד מבוסס על הסטייה הממוצעת בכל 5 הניסיונות — עקביות היא הכל.';
+
+  @override
+  String get settingsRulesPressureTitle => 'לחץ';
+
+  @override
+  String get settingsRulesPressureBody =>
+      'עצור בתוך חלון הטווח המותר. כל הצלחה מצמצמת את החלון. שרוד כמה שיותר סיבובים.';
 }

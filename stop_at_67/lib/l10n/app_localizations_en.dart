@@ -595,4 +595,60 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get weeklyMissionsClaimButton => 'CLAIM';
+
+  @override
+  String get settingsHowToPlay => 'How to Play';
+
+  @override
+  String get settingsHowToPlayIntro =>
+      'Tap the screen to stop the timer at exactly the target time. The closer you are, the higher your score (up to 1000). A perfect stop (0ms off) earns a streak bonus.';
+
+  @override
+  String get settingsRulesClassicTitle => 'Classic';
+
+  @override
+  String get settingsRulesClassicBody =>
+      'Stop the timer at exactly 6.700 seconds. The game that started it all.';
+
+  @override
+  String get settingsRulesBlindTitle => 'Blind';
+
+  @override
+  String get settingsRulesBlindBody =>
+      'The timer displays for 3 seconds, then hides. Stop it at 6.700 seconds without being able to see the clock.';
+
+  @override
+  String get settingsRulesSurgeTitle => 'Accelerate';
+
+  @override
+  String get settingsRulesSurgeBody =>
+      'Same 6.700s target, but the timer speeds up a little after each game. See how many rounds you can keep up.';
+
+  @override
+  String get settingsRulesDoubleTapTitle => 'Double Tap';
+
+  @override
+  String get settingsRulesDoubleTapBody =>
+      'Tap once at 3.350 seconds, then tap again to stop at 6.700 seconds. Both taps count toward your score.';
+
+  @override
+  String get settingsRulesMovingTargetTitle => 'Moving Target';
+
+  @override
+  String get settingsRulesMovingTargetBody =>
+      'The target time shifts every round. Stay adaptable — you won\'t know exactly where to stop until the round begins.';
+
+  @override
+  String get settingsRulesCalibrationTitle => 'Calibration';
+
+  @override
+  String get settingsRulesCalibrationBody =>
+      'Make 5 attempts in a row. Your score is based on the average deviation across all 5 — consistency is everything.';
+
+  @override
+  String get settingsRulesPressureTitle => 'Pressure';
+
+  @override
+  String get settingsRulesPressureBody =>
+      'Stop within the allowed tolerance window. Each success tightens the window. Survive as many rounds as you can.';
 }

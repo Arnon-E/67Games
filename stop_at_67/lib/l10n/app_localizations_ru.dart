@@ -600,4 +600,60 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get weeklyMissionsClaimButton => 'ЗАБРАТЬ';
+
+  @override
+  String get settingsHowToPlay => 'Как играть';
+
+  @override
+  String get settingsHowToPlayIntro =>
+      'Нажмите на экран, чтобы остановить таймер точно на целевом времени. Чем ближе — тем выше счёт (до 1000). Идеальная остановка (0ms) даёт бонус серии.';
+
+  @override
+  String get settingsRulesClassicTitle => 'Классика';
+
+  @override
+  String get settingsRulesClassicBody =>
+      'Остановите таймер ровно на 6.700 секундах. Игра, с которой всё началось.';
+
+  @override
+  String get settingsRulesBlindTitle => 'Слепой';
+
+  @override
+  String get settingsRulesBlindBody =>
+      'Таймер виден 3 секунды, затем скрывается. Остановите его на 6.700 секундах, не видя цифр.';
+
+  @override
+  String get settingsRulesSurgeTitle => 'Ускорение';
+
+  @override
+  String get settingsRulesSurgeBody =>
+      'Та же цель 6.700с, но таймер немного ускоряется после каждой игры. Сколько раундов вы продержитесь?';
+
+  @override
+  String get settingsRulesDoubleTapTitle => 'Двойное касание';
+
+  @override
+  String get settingsRulesDoubleTapBody =>
+      'Нажмите первый раз на 3.350с, затем снова — чтобы остановиться на 6.700с. Оба нажатия учитываются.';
+
+  @override
+  String get settingsRulesMovingTargetTitle => 'Движущаяся цель';
+
+  @override
+  String get settingsRulesMovingTargetBody =>
+      'Целевое время меняется каждый раунд. Будьте гибкими — точная цель неизвестна до начала раунда.';
+
+  @override
+  String get settingsRulesCalibrationTitle => 'Калибровка';
+
+  @override
+  String get settingsRulesCalibrationBody =>
+      'Сделайте 5 попыток подряд. Счёт основан на среднем отклонении за все 5 — главное стабильность.';
+
+  @override
+  String get settingsRulesPressureTitle => 'Давление';
+
+  @override
+  String get settingsRulesPressureBody =>
+      'Остановитесь в пределах допуска. Каждый успех сужает окно. Выживите как можно больше раундов.';
 }

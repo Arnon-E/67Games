@@ -248,5 +248,29 @@
     }
   },
   "weeklyMissionsClaim": "ЗАБРАТЬ!",
-  "weeklyMissionsClaimButton": "ЗАБРАТЬ"
+  "weeklyMissionsClaimButton": "ЗАБРАТЬ",
+
+  "settingsHowToPlay": "Как играть",
+  "settingsHowToPlayIntro": "Нажмите на экран, чтобы остановить таймер точно на целевом времени. Чем ближе — тем выше счёт (до 1000). Идеальная остановка (0ms) даёт бонус серии.",
+
+  "settingsRulesClassicTitle": "Классика",
+  "settingsRulesClassicBody": "Остановите таймер ровно на 6.700 секундах. Игра, с которой всё началось.",
+
+  "settingsRulesBlindTitle": "Слепой",
+  "settingsRulesBlindBody": "Таймер виден 3 секунды, затем скрывается. Остановите его на 6.700 секундах, не видя цифр.",
+
+  "settingsRulesSurgeTitle": "Ускорение",
+  "settingsRulesSurgeBody": "Та же цель 6.700с, но таймер немного ускоряется после каждой игры. Сколько раундов вы продержитесь?",
+
+  "settingsRulesDoubleTapTitle": "Двойное касание",
+  "settingsRulesDoubleTapBody": "Нажмите первый раз на 3.350с, затем снова — чтобы остановиться на 6.700с. Оба нажатия учитываются.",
+
+  "settingsRulesMovingTargetTitle": "Движущаяся цель",
+  "settingsRulesMovingTargetBody": "Целевое время меняется каждый раунд. Будьте гибкими — точная цель неизвестна до начала раунда.",
+
+  "settingsRulesCalibrationTitle": "Калибровка",
+  "settingsRulesCalibrationBody": "Сделайте 5 попыток подряд. Счёт основан на среднем отклонении за все 5 — главное стабильность.",
+
+  "settingsRulesPressureTitle": "Давление",
+  "settingsRulesPressureBody": "Остановитесь в пределах допуска. Каждый успех сужает окно. Выживите как можно больше раундов."
 }

@@ -249,5 +249,29 @@
     }
   },
   "weeklyMissionsClaim": "קח!",
-  "weeklyMissionsClaimButton": "קח"
+  "weeklyMissionsClaimButton": "קח",
+
+  "settingsHowToPlay": "איך משחקים",
+  "settingsHowToPlayIntro": "הקש על המסך כדי לעצור את הטיימר בדיוק בזמן היעד. ככל שתהיה קרוב יותר, כך הניקוד גבוה יותר (עד 1000). עצירה מושלמת (0ms) מעניקה בונוס רצף.",
+
+  "settingsRulesClassicTitle": "קלאסי",
+  "settingsRulesClassicBody": "עצור את הטיימר בדיוק על 6.700 שניות. המשחק שממנו הכל התחיל.",
+
+  "settingsRulesBlindTitle": "עיוור",
+  "settingsRulesBlindBody": "הטיימר מוצג 3 שניות ואז נעלם. עצור אותו על 6.700 שניות בלי לראות את השעון.",
+
+  "settingsRulesSurgeTitle": "האצה",
+  "settingsRulesSurgeBody": "אותו יעד של 6.700 שנ׳, אבל הטיימר מאיץ קצת אחרי כל משחק. כמה סיבובים תוכל להחזיק?",
+
+  "settingsRulesDoubleTapTitle": "הקשה כפולה",
+  "settingsRulesDoubleTapBody": "הקש פעם ראשונה על 3.350 שנ׳, ואז הקש שוב לעצור על 6.700 שנ׳. שתי ההקשות נספרות.",
+
+  "settingsRulesMovingTargetTitle": "מטרה נעה",
+  "settingsRulesMovingTargetBody": "זמן היעד משתנה בכל סיבוב. הישאר גמיש — לא תדע בדיוק היכן לעצור עד שהסיבוב יתחיל.",
+
+  "settingsRulesCalibrationTitle": "כיול",
+  "settingsRulesCalibrationBody": "בצע 5 ניסיונות ברצף. הניקוד מבוסס על הסטייה הממוצעת בכל 5 הניסיונות — עקביות היא הכל.",
+
+  "settingsRulesPressureTitle": "לחץ",
+  "settingsRulesPressureBody": "עצור בתוך חלון הטווח המותר. כל הצלחה מצמצמת את החלון. שרוד כמה שיותר סיבובים."
 }

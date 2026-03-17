@@ -258,5 +258,29 @@
     }
   },
   "weeklyMissionsClaim": "CLAIM!",
-  "weeklyMissionsClaimButton": "CLAIM"
+  "weeklyMissionsClaimButton": "CLAIM",
+
+  "settingsHowToPlay": "How to Play",
+  "settingsHowToPlayIntro": "Tap the screen to stop the timer at exactly the target time. The closer you are, the higher your score (up to 1000). A perfect stop (0ms off) earns a streak bonus.",
+
+  "settingsRulesClassicTitle": "Classic",
+  "settingsRulesClassicBody": "Stop the timer at exactly 6.700 seconds. The game that started it all.",
+
+  "settingsRulesBlindTitle": "Blind",
+  "settingsRulesBlindBody": "The timer displays for 3 seconds, then hides. Stop it at 6.700 seconds without being able to see the clock.",
+
+  "settingsRulesSurgeTitle": "Accelerate",
+  "settingsRulesSurgeBody": "Same 6.700s target, but the timer speeds up a little after each game. See how many rounds you can keep up.",
+
+  "settingsRulesDoubleTapTitle": "Double Tap",
+  "settingsRulesDoubleTapBody": "Tap once at 3.350 seconds, then tap again to stop at 6.700 seconds. Both taps count toward your score.",
+
+  "settingsRulesMovingTargetTitle": "Moving Target",
+  "settingsRulesMovingTargetBody": "The target time shifts every round. Stay adaptable — you won't know exactly where to stop until the round begins.",
+
+  "settingsRulesCalibrationTitle": "Calibration",
+  "settingsRulesCalibrationBody": "Make 5 attempts in a row. Your score is based on the average deviation across all 5 — consistency is everything.",
+
+  "settingsRulesPressureTitle": "Pressure",
+  "settingsRulesPressureBody": "Stop within the allowed tolerance window. Each success tightens the window. Survive as many rounds as you can."
 }

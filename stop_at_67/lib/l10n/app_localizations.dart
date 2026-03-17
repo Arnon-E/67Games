@@ -1221,6 +1221,102 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'CLAIM'**
   String get weeklyMissionsClaimButton;
+
+  /// No description provided for @settingsHowToPlay.
+  ///
+  /// In en, this message translates to:
+  /// **'How to Play'**
+  String get settingsHowToPlay;
+
+  /// No description provided for @settingsHowToPlayIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap the screen to stop the timer at exactly the target time. The closer you are, the higher your score (up to 1000). A perfect stop (0ms off) earns a streak bonus.'**
+  String get settingsHowToPlayIntro;
+
+  /// No description provided for @settingsRulesClassicTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Classic'**
+  String get settingsRulesClassicTitle;
+
+  /// No description provided for @settingsRulesClassicBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop the timer at exactly 6.700 seconds. The game that started it all.'**
+  String get settingsRulesClassicBody;
+
+  /// No description provided for @settingsRulesBlindTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Blind'**
+  String get settingsRulesBlindTitle;
+
+  /// No description provided for @settingsRulesBlindBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The timer displays for 3 seconds, then hides. Stop it at 6.700 seconds without being able to see the clock.'**
+  String get settingsRulesBlindBody;
+
+  /// No description provided for @settingsRulesSurgeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Accelerate'**
+  String get settingsRulesSurgeTitle;
+
+  /// No description provided for @settingsRulesSurgeBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Same 6.700s target, but the timer speeds up a little after each game. See how many rounds you can keep up.'**
+  String get settingsRulesSurgeBody;
+
+  /// No description provided for @settingsRulesDoubleTapTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Double Tap'**
+  String get settingsRulesDoubleTapTitle;
+
+  /// No description provided for @settingsRulesDoubleTapBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap once at 3.350 seconds, then tap again to stop at 6.700 seconds. Both taps count toward your score.'**
+  String get settingsRulesDoubleTapBody;
+
+  /// No description provided for @settingsRulesMovingTargetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Moving Target'**
+  String get settingsRulesMovingTargetTitle;
+
+  /// No description provided for @settingsRulesMovingTargetBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The target time shifts every round. Stay adaptable — you won\'t know exactly where to stop until the round begins.'**
+  String get settingsRulesMovingTargetBody;
+
+  /// No description provided for @settingsRulesCalibrationTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Calibration'**
+  String get settingsRulesCalibrationTitle;
+
+  /// No description provided for @settingsRulesCalibrationBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Make 5 attempts in a row. Your score is based on the average deviation across all 5 — consistency is everything.'**
+  String get settingsRulesCalibrationBody;
+
+  /// No description provided for @settingsRulesPressureTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Pressure'**
+  String get settingsRulesPressureTitle;
+
+  /// No description provided for @settingsRulesPressureBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop within the allowed tolerance window. Each success tightens the window. Survive as many rounds as you can.'**
+  String get settingsRulesPressureBody;
 }
 
 class _AppLocalizationsDelegate
