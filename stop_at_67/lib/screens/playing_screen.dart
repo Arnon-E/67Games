@@ -109,6 +109,8 @@ class _PlayingScreenState extends State<PlayingScreen> {
                           // Left spacer mirrors badge width so title stays centred
                           if (mode != null && mode.isPressure)
                             const SizedBox(width: 72),
+                          if (mode?.id == 'surge')
+                            const SizedBox(width: 72),
                           Flexible(
                             child: RichText(
                               textAlign: TextAlign.center,
@@ -154,6 +156,13 @@ class _PlayingScreenState extends State<PlayingScreen> {
                               roundsSucceeded: gs.pressureRoundsSucceeded,
                             ),
                           ],
+                          if (mode?.id == 'surge') ...[
+                            const SizedBox(width: 8),
+                            _SurgeSpeedBadge(
+                              multiplier: timerState.speedMultiplier,
+                              lives: gs.surgeLives,
+                            ),
+                          ],
                         ],
                       ),
                     ),
@@ -197,16 +206,7 @@ class _PlayingScreenState extends State<PlayingScreen> {
                   ),
                 ),
 
-                // Surge / Accelerate badge (top-right overlay)
-                if (mode?.id == 'surge')
-                  Positioned(
-                    top: 16,
-                    right: 20,
-                    child: _SurgeSpeedBadge(
-                      multiplier: timerState.speedMultiplier,
-                      lives: gs.surgeLives,
-                    ),
-                  ),
+
 
                 // Calibration badge (top-right overlay)
                 if (mode != null && mode.isCalibration)
