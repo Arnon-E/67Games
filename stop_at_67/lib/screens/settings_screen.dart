@@ -48,6 +48,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 child: ListView(
                   padding: const EdgeInsets.symmetric(horizontal: 24),
                   children: [
+                    // Sound
+                    _section(l10n.settingsSound),
+                    _soundToggle(context, gs, l10n),
+
+                    const SizedBox(height: 24),
+
                     // Language
                     _section(l10n.settingsLanguage),
                     _languageSelector(context, langState, l10n),
@@ -169,6 +175,28 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
+
+  Widget _soundToggle(BuildContext context, GameState gs, AppLocalizations l10n) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      decoration: BoxDecoration(
+        color: AppColors.darkCard,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: SwitchListTile(
+        title: Text(
+          gs.isSoundEnabled ? '🔊 On' : '🔇 Off',
+          style: TextStyle(
+            color: gs.isSoundEnabled ? AppColors.textPrimary : AppColors.textDisabled,
+            fontSize: 14,
+          ),
+        ),
+        value: gs.isSoundEnabled,
+        activeColor: AppColors.orange,
+        onChanged: (val) => gs.setSoundEnabled(val),
+      ),
+    );
+  }
 
   Widget _languageSelector(
       BuildContext context, LanguageState langState, AppLocalizations l10n) {

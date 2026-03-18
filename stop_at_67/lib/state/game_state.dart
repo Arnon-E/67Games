@@ -196,6 +196,7 @@ class GameState extends ChangeNotifier {
     _achievements = await _storage.loadAchievements();
     _coins = await _storage.loadCoins();
     _loadout = await _storage.loadLoadout();
+    _sound.setEnabled(await _storage.loadSoundEnabled());
     _ownedCosmetics = await _storage.loadOwnedCosmetics();
     _dailyRewards = await _storage.loadDailyRewards();
 
@@ -667,6 +668,24 @@ class GameState extends ChangeNotifier {
       _sound.play('miss');
       return;
     }
+    // Surge fail round (below excellent loses a life): play failure sound
+    final mode = _currentMode;
+    // Pressure failure (any round, including game-over): play failure sound
+    if (mode != null && mode.isPressure && !_pressureLastRoundSuccess) {
+      Haptics.vibrate(HapticsType.error).catchError((_) {});
+      _sound.play('miss');
+      return;
+    }
+    if (mode != null && mode.id == 'surge') {
+      final tier = result.rating.tier;
+      final isExcellentOrBetter =
+          tier == 'perfect' || tier == 'incredible' || tier == 'excellent';
+      if (!isExcellentOrBetter) {
+        Haptics.vibrate(HapticsType.error).catchError((_) {});
+        _sound.play('miss');
+        return;
+      }
+    }
     final tier = result.rating.tier;
     switch (tier) {
       case 'perfect':
@@ -905,8 +924,12 @@ class GameState extends ChangeNotifier {
     notifyListeners();
   }
 
+  bool get isSoundEnabled => _sound.isEnabled;
+
   void setSoundEnabled(bool enabled) {
     _sound.setEnabled(enabled);
+    _storage.saveSoundEnabled(enabled);
+    notifyListeners();
   }
 
   // ═══════════════════════════════════════════════════════════

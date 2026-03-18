@@ -436,6 +436,12 @@ abstract class AppLocalizations {
   /// **'Logout'**
   String get settingsLogout;
 
+  /// No description provided for @settingsSound.
+  ///
+  /// In en, this message translates to:
+  /// **'Sound'**
+  String get settingsSound;
+
   /// No description provided for @settingsLanguage.
   ///
   /// In en, this message translates to:
