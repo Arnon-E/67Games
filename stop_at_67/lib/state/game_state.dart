@@ -667,6 +667,24 @@ class GameState extends ChangeNotifier {
       _sound.play('miss');
       return;
     }
+    // Pressure game-over: play failure sound regardless of score tier
+    if (_pressureGameOver) {
+      Haptics.vibrate(HapticsType.error).catchError((_) {});
+      _sound.play('miss');
+      return;
+    }
+    // Surge fail round (below excellent loses a life): play failure sound
+    final mode = _currentMode;
+    if (mode != null && mode.id == 'surge') {
+      final tier = result.rating.tier;
+      final isExcellentOrBetter =
+          tier == 'perfect' || tier == 'incredible' || tier == 'excellent';
+      if (!isExcellentOrBetter) {
+        Haptics.vibrate(HapticsType.error).catchError((_) {});
+        _sound.play('miss');
+        return;
+      }
+    }
     final tier = result.rating.tier;
     switch (tier) {
       case 'perfect':
