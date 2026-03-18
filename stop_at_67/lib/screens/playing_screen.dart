@@ -99,44 +99,62 @@ class _PlayingScreenState extends State<PlayingScreen> {
                   child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    // Title bar: "Stop at X.XXXs"
+                    // Title bar: "Stop at X.XXXs" + inline pressure badge
                     Padding(
-                      padding: const EdgeInsets.only(top: 20),
-                      child: RichText(
-                        textAlign: TextAlign.center,
-                        text: TextSpan(
-                          children: [
-                            TextSpan(
-                              text: l10n.playingStopAt,
-                              style: const TextStyle(
-                                fontSize: 30,
-                                fontWeight: FontWeight.w800,
-                                fontStyle: FontStyle.italic,
-                                color: AppColors.textPrimary,
-                                letterSpacing: 0.5,
-                              ),
-                            ),
-                            TextSpan(
-                              text: targetDisplay,
-                              style: const TextStyle(
-                                fontSize: 30,
-                                fontWeight: FontWeight.w900,
-                                color: AppColors.gold,
-                                letterSpacing: 0.5,
-                                shadows: [
-                                  Shadow(
-                                    color: AppColors.gold,
-                                    blurRadius: 16,
+                      padding: const EdgeInsets.only(top: 20, left: 16, right: 16),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          // Left spacer mirrors badge width so title stays centred
+                          if (mode != null && mode.isPressure)
+                            const SizedBox(width: 72),
+                          Flexible(
+                            child: RichText(
+                              textAlign: TextAlign.center,
+                              text: TextSpan(
+                                children: [
+                                  TextSpan(
+                                    text: l10n.playingStopAt,
+                                    style: const TextStyle(
+                                      fontSize: 30,
+                                      fontWeight: FontWeight.w800,
+                                      fontStyle: FontStyle.italic,
+                                      color: AppColors.textPrimary,
+                                      letterSpacing: 0.5,
+                                    ),
                                   ),
-                                  Shadow(
-                                    color: AppColors.goldWarm,
-                                    blurRadius: 32,
+                                  TextSpan(
+                                    text: targetDisplay,
+                                    style: const TextStyle(
+                                      fontSize: 30,
+                                      fontWeight: FontWeight.w900,
+                                      color: AppColors.gold,
+                                      letterSpacing: 0.5,
+                                      shadows: [
+                                        Shadow(
+                                          color: AppColors.gold,
+                                          blurRadius: 16,
+                                        ),
+                                        Shadow(
+                                          color: AppColors.goldWarm,
+                                          blurRadius: 32,
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ],
                               ),
                             ),
+                          ),
+                          if (mode != null && mode.isPressure) ...[
+                            const SizedBox(width: 8),
+                            _PressureBadge(
+                              toleranceMs: gs.pressureTolerance,
+                              roundsSucceeded: gs.pressureRoundsSucceeded,
+                            ),
                           ],
-                        ),
+                        ],
                       ),
                     ),
 
@@ -201,16 +219,6 @@ class _PlayingScreenState extends State<PlayingScreen> {
                     ),
                   ),
 
-                // Pressure badge (top-right overlay)
-                if (mode != null && mode.isPressure)
-                  Positioned(
-                    top: 16,
-                    right: 20,
-                    child: _PressureBadge(
-                      toleranceMs: gs.pressureTolerance,
-                      roundsSucceeded: gs.pressureRoundsSucceeded,
-                    ),
-                  ),
               ],
             ),
           ),
@@ -448,18 +456,18 @@ class _PressureBadge extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
           decoration: BoxDecoration(
-            color: Colors.redAccent.withValues(alpha: 0.1),
+            color: AppColors.orange.withValues(alpha: 0.15),
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: Colors.redAccent.withValues(alpha: 0.5), width: 1),
+            border: Border.all(color: AppColors.orange.withValues(alpha: 0.7), width: 1.5),
           ),
           child: Text(
             '±${toleranceMs}ms',
             style: const TextStyle(
               fontSize: 13,
-              color: Colors.redAccent,
-              fontWeight: FontWeight.w600,
+              color: AppColors.orangeLight,
+              fontWeight: FontWeight.w700,
               letterSpacing: 1,
             ),
           ),
