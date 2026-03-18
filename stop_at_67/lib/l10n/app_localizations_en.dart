@@ -179,7 +179,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsLogout => 'Logout';
 
   @override
-  @override
   String get settingsSound => 'Sound';
 
   @override
