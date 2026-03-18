@@ -485,7 +485,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
     }
 
     final deviation = result.deviationMs;
-    final isNearMiss = deviation > 0 && deviation <= 50;
+    final isNearMiss = deviation > 50 && deviation <= 65;
     final bestScore = gs.stats.bestScores[mode.id] ?? 0;
     final isPersonalBest = result.finalScore > 0 && result.finalScore == bestScore;
     final isPerfect = deviation == 0;
