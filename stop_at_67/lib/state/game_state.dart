@@ -196,6 +196,7 @@ class GameState extends ChangeNotifier {
     _achievements = await _storage.loadAchievements();
     _coins = await _storage.loadCoins();
     _loadout = await _storage.loadLoadout();
+    _sound.setEnabled(await _storage.loadSoundEnabled());
     _ownedCosmetics = await _storage.loadOwnedCosmetics();
     _dailyRewards = await _storage.loadDailyRewards();
 
@@ -905,8 +906,12 @@ class GameState extends ChangeNotifier {
     notifyListeners();
   }
 
+  bool get isSoundEnabled => _sound.isEnabled;
+
   void setSoundEnabled(bool enabled) {
     _sound.setEnabled(enabled);
+    _storage.saveSoundEnabled(enabled);
+    notifyListeners();
   }
 
   // ═══════════════════════════════════════════════════════════

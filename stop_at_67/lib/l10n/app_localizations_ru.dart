@@ -179,6 +179,10 @@ class AppLocalizationsRu extends AppLocalizations {
   String get settingsLogout => 'Выйти';
 
   @override
+  @override
+  String get settingsSound => 'Звук';
+
+  @override
   String get settingsLanguage => 'Язык';
 
   @override

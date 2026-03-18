@@ -12,6 +12,7 @@ class StorageService {
   static const _ownedCosmeticsKey = 'stop_at_67_owned_cosmetics';
   static const _streakKey = 'stop_at_67_streak';
   static const _weeklyMissionsKey = 'stop_at_67_weekly_missions';
+  static const _soundEnabledKey = 'stop_at_67_sound_enabled';
 
   Future<SharedPreferences> get _prefs => SharedPreferences.getInstance();
 
@@ -125,6 +126,16 @@ class StorageService {
       _streakKey,
       jsonEncode({'currentStreak': currentStreak, 'bestStreak': bestStreak}),
     );
+  }
+
+  Future<bool> loadSoundEnabled() async {
+    final prefs = await _prefs;
+    return prefs.getBool(_soundEnabledKey) ?? true;
+  }
+
+  Future<void> saveSoundEnabled(bool enabled) async {
+    final prefs = await _prefs;
+    await prefs.setBool(_soundEnabledKey, enabled);
   }
 
   Future<WeeklyMissionsState?> loadWeeklyMissions() async {
