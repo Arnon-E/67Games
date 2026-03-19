@@ -9,6 +9,8 @@ import '../engine/types.dart';
 import '../theme/app_colors.dart';
 import '../widgets/app_gradient_background.dart';
 import '../widgets/daily_reward_modal.dart';
+import '../widgets/update_dialog.dart';
+import '../services/update_service.dart';
 
 class MenuScreen extends StatefulWidget {
   const MenuScreen({super.key});
@@ -44,6 +46,7 @@ class _MenuScreenState extends State<MenuScreen>
       if (gs.dailyRewards.canClaim) {
         _showDailyReward();
       }
+      _checkForUpdate();
     });
   }
 
@@ -59,6 +62,17 @@ class _MenuScreenState extends State<MenuScreen>
       backgroundColor: Colors.transparent,
       builder: (_) => const DailyRewardModal(),
     );
+  }
+
+  Future<void> _checkForUpdate() async {
+    final required = await UpdateService.isUpdateRequired();
+    if (required && mounted) {
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (_) => const UpdateDialog(),
+      );
+    }
   }
 
   @override
