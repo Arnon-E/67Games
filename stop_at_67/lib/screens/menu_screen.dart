@@ -8,6 +8,7 @@ import '../engine/constants.dart';
 import '../engine/types.dart';
 import '../theme/app_colors.dart';
 import '../widgets/app_gradient_background.dart';
+import '../widgets/coin_fly_animation.dart';
 import '../widgets/daily_reward_modal.dart';
 import '../widgets/update_dialog.dart';
 import '../services/update_service.dart';
@@ -20,10 +21,16 @@ class MenuScreen extends StatefulWidget {
 }
 
 class _MenuScreenState extends State<MenuScreen>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   late AnimationController _pulseController;
   late Animation<double> _pulseAnimation;
   late Animation<double> _glowAnimation;
+
+  // Coin animation state
+  final GlobalKey _coinKey = GlobalKey();
+  int _prevCoins = -1;
+  late AnimationController _coinBounceController;
+  late Animation<double> _coinBounceAnimation;
 
   @override
   void initState() {
@@ -41,8 +48,19 @@ class _MenuScreenState extends State<MenuScreen>
       CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
     );
 
+    _coinBounceController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 400),
+    );
+    _coinBounceAnimation = TweenSequence<double>([
+      TweenSequenceItem(tween: Tween(begin: 1.0, end: 1.45), weight: 40),
+      TweenSequenceItem(tween: Tween(begin: 1.45, end: 0.88), weight: 25),
+      TweenSequenceItem(tween: Tween(begin: 0.88, end: 1.0), weight: 35),
+    ]).animate(CurvedAnimation(parent: _coinBounceController, curve: Curves.easeOut));
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final gs = context.read<GameState>();
+      _prevCoins = gs.coins;
       if (gs.dailyRewards.canClaim) {
         _showDailyReward();
       }
@@ -53,6 +71,7 @@ class _MenuScreenState extends State<MenuScreen>
   @override
   void dispose() {
     _pulseController.dispose();
+    _coinBounceController.dispose();
     super.dispose();
   }
 
@@ -75,6 +94,35 @@ class _MenuScreenState extends State<MenuScreen>
     }
   }
 
+  void _triggerCoinAnimation(int delta, {Offset? sourceOffset}) {
+    if (MediaQuery.of(context).disableAnimations) {
+      _coinBounceController.forward(from: 0);
+      return;
+    }
+
+    final RenderBox? box =
+        _coinKey.currentContext?.findRenderObject() as RenderBox?;
+    if (box == null) {
+      _coinBounceController.forward(from: 0);
+      return;
+    }
+
+    final coinPos = box.localToGlobal(box.size.center(Offset.zero));
+    final screenSize = MediaQuery.of(context).size;
+    final from = sourceOffset ??
+        Offset(screenSize.width / 2, screenSize.height * 0.82);
+
+    CoinFlyAnimation.show(
+      context: context,
+      fromOffset: from,
+      toOffset: coinPos,
+      coinAmount: delta,
+      onComplete: () {
+        if (mounted) _coinBounceController.forward(from: 0);
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final gs = context.watch<GameState>();
@@ -82,6 +130,15 @@ class _MenuScreenState extends State<MenuScreen>
     final levelInfo = levelFromXp(gs.stats.totalXp);
 
     final disableAnimations = MediaQuery.of(context).disableAnimations;
+
+    // Detect coin increase and trigger fly animation
+    if (_prevCoins >= 0 && gs.coins > _prevCoins) {
+      final delta = gs.coins - _prevCoins;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _triggerCoinAnimation(delta);
+      });
+    }
+    _prevCoins = gs.coins;
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -115,16 +172,36 @@ class _MenuScreenState extends State<MenuScreen>
                         style: const TextStyle(color: AppColors.textSecondary, fontSize: 13),
                       ),
                     ),
-                    // Coins
-                    Row(
-                      children: [
-                        const Icon(Icons.circle, color: AppColors.gold, size: 14),
-                        const SizedBox(width: 4),
-                        Text(
-                          '${gs.coins}',
-                          style: const TextStyle(color: AppColors.textSecondary, fontSize: 14),
-                        ),
-                      ],
+                    // Coins with bounce animation on increase
+                    AnimatedBuilder(
+                      animation: _coinBounceAnimation,
+                      builder: (context, child) => Transform.scale(
+                        scale: _coinBounceAnimation.value,
+                        child: child,
+                      ),
+                      child: Row(
+                        key: _coinKey,
+                        children: [
+                          const Icon(Icons.circle, color: AppColors.gold, size: 14),
+                          const SizedBox(width: 4),
+                          AnimatedSwitcher(
+                            duration: const Duration(milliseconds: 300),
+                            transitionBuilder: (child, anim) => ScaleTransition(
+                              scale: anim,
+                              child: child,
+                            ),
+                            child: Text(
+                              '${gs.coins}',
+                              key: ValueKey(gs.coins),
+                              style: const TextStyle(
+                                color: AppColors.gold,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                     // Settings
                     GestureDetector(
