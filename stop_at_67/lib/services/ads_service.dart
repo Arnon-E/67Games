@@ -1,18 +1,16 @@
 import 'dart:async';
-import 'package:applovin_max/applovin_max.dart';
 import 'package:flutter/foundation.dart';
+import 'package:unity_ads_plugin/unity_ads_plugin.dart';
 
 class AdsService {
-  // Replace these with your AppLovin MAX SDK key and ad unit IDs.
-  // Get them from: applovin.com → MAX → Mediation → Ad Units
-  static const _sdkKey = 'YOUR_APPLOVIN_SDK_KEY';
+  static const _gameId = '6070462';
 
-  static const _interstitialAdUnitId = kDebugMode
-      ? 'YOUR_TEST_INTERSTITIAL_AD_UNIT_ID'
-      : 'YOUR_PRODUCTION_INTERSTITIAL_AD_UNIT_ID';
-  static const _rewardedAdUnitId = kDebugMode
-      ? 'YOUR_TEST_REWARDED_AD_UNIT_ID'
-      : 'YOUR_PRODUCTION_REWARDED_AD_UNIT_ID';
+  static const _interstitialPlacementId = kDebugMode
+      ? 'Interstitial_Android' // Unity uses same IDs in test mode
+      : 'Interstitial_Android';
+  static const _rewardedPlacementId = kDebugMode
+      ? 'Rewarded_Android'
+      : 'Rewarded_Android';
 
   bool _interstitialReady = false;
   bool _rewardedReady = false;
@@ -20,80 +18,44 @@ class AdsService {
 
   Completer<bool>? _interstitialCompleter;
   Completer<bool>? _rewardedCompleter;
-  void Function(MaxReward)? _onRewarded;
+  void Function()? _onRewarded;
 
   Future<void> initialize() async {
     if (_initialized) return;
-    await AppLovinMAX.initialize(_sdkKey);
-
-    AppLovinMAX.setInterstitialListener(InterstitialListener(
-      onAdLoadedCallback: (ad) {
-        _interstitialReady = true;
-      },
-      onAdLoadFailedCallback: (adUnitId, error) {
-        _interstitialReady = false;
-        Future.delayed(const Duration(seconds: 5), _preloadInterstitial);
-      },
-      onAdDisplayedCallback: (ad) {},
-      onAdDisplayFailedCallback: (ad, error) {
-        _interstitialReady = false;
+    await UnityAds.init(
+      gameId: _gameId,
+      testMode: kDebugMode,
+      onComplete: () {
+        _initialized = true;
         _preloadInterstitial();
-        _interstitialCompleter?.complete(false);
-        _interstitialCompleter = null;
-      },
-      onAdHiddenCallback: (ad) {
-        _interstitialReady = false;
-        _preloadInterstitial();
-        _interstitialCompleter?.complete(true);
-        _interstitialCompleter = null;
-      },
-      onAdClickedCallback: (ad) {},
-    ));
-
-    AppLovinMAX.setRewardedAdListener(RewardedAdListener(
-      onAdLoadedCallback: (ad) {
-        _rewardedReady = true;
-      },
-      onAdLoadFailedCallback: (adUnitId, error) {
-        _rewardedReady = false;
-        Future.delayed(const Duration(seconds: 5), _preloadRewarded);
-      },
-      onAdDisplayedCallback: (ad) {},
-      onAdDisplayFailedCallback: (ad, error) {
-        _rewardedReady = false;
         _preloadRewarded();
-        _rewardedCompleter?.complete(false);
-        _rewardedCompleter = null;
-        _onRewarded = null;
       },
-      onAdHiddenCallback: (ad) {
-        _rewardedReady = false;
-        _preloadRewarded();
-        // Only fires if reward was not already granted
-        _rewardedCompleter?.complete(false);
-        _rewardedCompleter = null;
-        _onRewarded = null;
+      onFailed: (error, message) {
+        debugPrint('Unity Ads init failed: $error - $message');
       },
-      onAdClickedCallback: (ad) {},
-      onAdReceivedRewardCallback: (ad, reward) {
-        _onRewarded?.call(reward);
-        _onRewarded = null;
-        _rewardedCompleter?.complete(true);
-        _rewardedCompleter = null;
-      },
-    ));
-
-    _initialized = true;
-    _preloadInterstitial();
-    _preloadRewarded();
+    );
   }
 
   void _preloadInterstitial() {
-    AppLovinMAX.loadInterstitial(_interstitialAdUnitId);
+    UnityAds.load(
+      placementId: _interstitialPlacementId,
+      onComplete: (_) => _interstitialReady = true,
+      onFailed: (_, error, message) {
+        _interstitialReady = false;
+        Future.delayed(const Duration(seconds: 5), _preloadInterstitial);
+      },
+    );
   }
 
   void _preloadRewarded() {
-    AppLovinMAX.loadRewardedAd(_rewardedAdUnitId);
+    UnityAds.load(
+      placementId: _rewardedPlacementId,
+      onComplete: (_) => _rewardedReady = true,
+      onFailed: (_, error, message) {
+        _rewardedReady = false;
+        Future.delayed(const Duration(seconds: 5), _preloadRewarded);
+      },
+    );
   }
 
   Future<bool> showInterstitial() async {
@@ -104,20 +66,60 @@ class AdsService {
     }
     _interstitialCompleter = Completer<bool>();
     _interstitialReady = false;
-    AppLovinMAX.showInterstitial(_interstitialAdUnitId);
+    UnityAds.showVideoAd(
+      placementId: _interstitialPlacementId,
+      onComplete: (_) {
+        _preloadInterstitial();
+        _interstitialCompleter?.complete(true);
+        _interstitialCompleter = null;
+      },
+      onFailed: (_, error, message) {
+        _preloadInterstitial();
+        _interstitialCompleter?.complete(false);
+        _interstitialCompleter = null;
+      },
+      onSkipped: (_) {
+        _preloadInterstitial();
+        _interstitialCompleter?.complete(true);
+        _interstitialCompleter = null;
+      },
+      onStart: (_) {},
+    );
     return _interstitialCompleter!.future;
   }
 
-  Future<bool> showRewarded(void Function(MaxReward reward) onRewarded) async {
+  Future<bool> showRewarded(void Function(dynamic reward) onRewarded) async {
     if (!_initialized) await initialize();
     if (!_rewardedReady) {
       _preloadRewarded();
       return false;
     }
     _rewardedCompleter = Completer<bool>();
-    _onRewarded = onRewarded;
+    _onRewarded = () => onRewarded(null);
     _rewardedReady = false;
-    AppLovinMAX.showRewardedAd(_rewardedAdUnitId);
+    UnityAds.showVideoAd(
+      placementId: _rewardedPlacementId,
+      onComplete: (_) {
+        _onRewarded?.call();
+        _onRewarded = null;
+        _preloadRewarded();
+        _rewardedCompleter?.complete(true);
+        _rewardedCompleter = null;
+      },
+      onFailed: (_, error, message) {
+        _onRewarded = null;
+        _preloadRewarded();
+        _rewardedCompleter?.complete(false);
+        _rewardedCompleter = null;
+      },
+      onSkipped: (_) {
+        _onRewarded = null;
+        _preloadRewarded();
+        _rewardedCompleter?.complete(false);
+        _rewardedCompleter = null;
+      },
+      onStart: (_) {},
+    );
     return _rewardedCompleter!.future;
   }
 
