@@ -2,6 +2,9 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<!-- AppLovin MAX SDK Key — replace with your key from applovin.com → Account → Keys -->
+	<key>AppLovinSdkKey</key>
+	<string>YOUR_APPLOVIN_SDK_KEY</string>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>CFBundleDevelopmentRegion</key>
