@@ -5,12 +5,8 @@ import 'package:unity_ads_plugin/unity_ads_plugin.dart';
 class AdsService {
   static const _gameId = '6070462';
 
-  static const _interstitialPlacementId = kDebugMode
-      ? 'Interstitial_Android' // Unity uses same IDs in test mode
-      : 'Interstitial_Android';
-  static const _rewardedPlacementId = kDebugMode
-      ? 'Rewarded_Android'
-      : 'Rewarded_Android';
+  static const _interstitialPlacementId = 'Interstitial_Android';
+  static const _rewardedPlacementId = 'Rewarded_Android';
 
   bool _interstitialReady = false;
   bool _rewardedReady = false;
