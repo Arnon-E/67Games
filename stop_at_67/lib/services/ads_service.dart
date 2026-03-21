@@ -1,130 +1,122 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:unity_ads_plugin/unity_ads_plugin.dart';
 
 class AdsService {
-  // kDebugMode is a Flutter compile-time const: true in debug, false in release.
-  // This guarantees real ad IDs are always used in release builds without
-  // requiring any --dart-define flag.
-  static const _interstitialAdUnitId = kDebugMode
-      ? 'ca-app-pub-3940256099942544/1033173712' // Google test interstitial
-      : 'ca-app-pub-6676728509237934/8213370504';
-  static const _rewardedAdUnitId = kDebugMode
-      ? 'ca-app-pub-3940256099942544/5224354917' // Google test rewarded
-      : 'ca-app-pub-6676728509237934/8993875800';
+  static const _gameId = '6070462';
 
-  InterstitialAd? _interstitial;
-  RewardedAd? _rewarded;
+  static const _interstitialPlacementId = 'Interstitial_Android';
+  static const _rewardedPlacementId = 'Rewarded_Android';
+
   bool _interstitialReady = false;
   bool _rewardedReady = false;
   bool _initialized = false;
 
+  Completer<bool>? _interstitialCompleter;
+  Completer<bool>? _rewardedCompleter;
+  void Function()? _onRewarded;
+
   Future<void> initialize() async {
     if (_initialized) return;
-    await MobileAds.instance.initialize();
-    await MobileAds.instance.updateRequestConfiguration(
-      RequestConfiguration(
-        maxAdContentRating: MaxAdContentRating.pg,
-        tagForChildDirectedTreatment: TagForChildDirectedTreatment.unspecified,
-        tagForUnderAgeOfConsent: TagForUnderAgeOfConsent.unspecified,
-        testDeviceIds: kDebugMode ? ['5922B42B9D123D00A7A94867C6E5E6A0'] : [],
-      ),
+    await UnityAds.init(
+      gameId: _gameId,
+      testMode: kDebugMode,
+      onComplete: () {
+        _initialized = true;
+        _preloadInterstitial();
+        _preloadRewarded();
+      },
+      onFailed: (error, message) {
+        debugPrint('Unity Ads init failed: $error - $message');
+      },
     );
-    _initialized = true;
-    _preloadInterstitial();
-    _preloadRewarded();
   }
 
   void _preloadInterstitial() {
-    InterstitialAd.load(
-      adUnitId: _interstitialAdUnitId,
-      request: const AdRequest(),
-      adLoadCallback: InterstitialAdLoadCallback(
-        onAdLoaded: (ad) {
-          _interstitial = ad;
-          _interstitialReady = true;
-        },
-        onAdFailedToLoad: (_) {
-          _interstitialReady = false;
-          Future.delayed(const Duration(seconds: 5), _preloadInterstitial);
-        },
-      ),
+    UnityAds.load(
+      placementId: _interstitialPlacementId,
+      onComplete: (_) => _interstitialReady = true,
+      onFailed: (_, error, message) {
+        _interstitialReady = false;
+        Future.delayed(const Duration(seconds: 5), _preloadInterstitial);
+      },
     );
   }
 
   void _preloadRewarded() {
-    RewardedAd.load(
-      adUnitId: _rewardedAdUnitId,
-      request: const AdRequest(),
-      rewardedAdLoadCallback: RewardedAdLoadCallback(
-        onAdLoaded: (ad) {
-          _rewarded = ad;
-          _rewardedReady = true;
-        },
-        onAdFailedToLoad: (_) {
-          _rewardedReady = false;
-          Future.delayed(const Duration(seconds: 5), _preloadRewarded);
-        },
-      ),
+    UnityAds.load(
+      placementId: _rewardedPlacementId,
+      onComplete: (_) => _rewardedReady = true,
+      onFailed: (_, error, message) {
+        _rewardedReady = false;
+        Future.delayed(const Duration(seconds: 5), _preloadRewarded);
+      },
     );
   }
 
   Future<bool> showInterstitial() async {
     if (!_initialized) await initialize();
-    if (!_interstitialReady || _interstitial == null) {
+    if (!_interstitialReady) {
       _preloadInterstitial();
       return false;
     }
-    final completer = Completer<bool>();
-    _interstitial!.fullScreenContentCallback = FullScreenContentCallback(
-      onAdDismissedFullScreenContent: (ad) {
-        ad.dispose();
-        _interstitial = null;
-        _interstitialReady = false;
+    _interstitialCompleter = Completer<bool>();
+    _interstitialReady = false;
+    UnityAds.showVideoAd(
+      placementId: _interstitialPlacementId,
+      onComplete: (_) {
         _preloadInterstitial();
-        completer.complete(true);
+        _interstitialCompleter?.complete(true);
+        _interstitialCompleter = null;
       },
-      onAdFailedToShowFullScreenContent: (ad, _) {
-        ad.dispose();
-        _interstitial = null;
-        _interstitialReady = false;
+      onFailed: (_, error, message) {
         _preloadInterstitial();
-        completer.complete(false);
+        _interstitialCompleter?.complete(false);
+        _interstitialCompleter = null;
       },
+      onSkipped: (_) {
+        _preloadInterstitial();
+        _interstitialCompleter?.complete(true);
+        _interstitialCompleter = null;
+      },
+      onStart: (_) {},
     );
-    await _interstitial!.show();
-    return completer.future;
+    return _interstitialCompleter!.future;
   }
 
-  Future<bool> showRewarded(void Function(RewardItem reward) onRewarded) async {
+  Future<bool> showRewarded(void Function(dynamic reward) onRewarded) async {
     if (!_initialized) await initialize();
-    if (!_rewardedReady || _rewarded == null) {
+    if (!_rewardedReady) {
       _preloadRewarded();
       return false;
     }
-    final completer = Completer<bool>();
-    bool earned = false;
-    _rewarded!.fullScreenContentCallback = FullScreenContentCallback(
-      onAdDismissedFullScreenContent: (ad) {
-        ad.dispose();
-        _rewarded = null;
-        _rewardedReady = false;
+    _rewardedCompleter = Completer<bool>();
+    _onRewarded = () => onRewarded(null);
+    _rewardedReady = false;
+    UnityAds.showVideoAd(
+      placementId: _rewardedPlacementId,
+      onComplete: (_) {
+        _onRewarded?.call();
+        _onRewarded = null;
         _preloadRewarded();
-        if (!completer.isCompleted) completer.complete(earned);
+        _rewardedCompleter?.complete(true);
+        _rewardedCompleter = null;
       },
-      onAdFailedToShowFullScreenContent: (ad, _) {
-        ad.dispose();
-        _rewarded = null;
-        _rewardedReady = false;
+      onFailed: (_, error, message) {
+        _onRewarded = null;
         _preloadRewarded();
-        if (!completer.isCompleted) completer.complete(false);
+        _rewardedCompleter?.complete(false);
+        _rewardedCompleter = null;
       },
+      onSkipped: (_) {
+        _onRewarded = null;
+        _preloadRewarded();
+        _rewardedCompleter?.complete(false);
+        _rewardedCompleter = null;
+      },
+      onStart: (_) {},
     );
-    await _rewarded!.show(onUserEarnedReward: (_, reward) {
-      earned = true;
-      onRewarded(reward);
-    });
-    return completer.future;
+    return _rewardedCompleter!.future;
   }
 
   bool get isInterstitialReady => _interstitialReady;

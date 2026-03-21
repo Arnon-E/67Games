@@ -104,7 +104,9 @@ jobs:
 
       - name: Build release AAB
         working-directory: stop_at_67
-        run: flutter build appbundle --release
+        env:
+          BUILD_NUMBER: ${{ github.run_number }}
+        run: flutter build appbundle --release --build-number=$((BUILD_NUMBER + 100))
 
       # ── Publish ──────────────────────────────────────────────────────────
       - name: Upload AAB to GitHub Release
