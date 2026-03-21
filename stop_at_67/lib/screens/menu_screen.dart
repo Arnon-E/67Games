@@ -384,18 +384,26 @@ class _MenuScreenState extends State<MenuScreen>
               const SizedBox(height: 24),
 
               // Secondary nav row
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  _navButton(l10n.menuLeaderboard, Icons.leaderboard_outlined,
-                      () => gs.setScreen(AppScreen.leaderboard)),
-                  const SizedBox(width: 16),
-                  _navButton(l10n.menuProfile, Icons.person_outline,
-                      () => gs.setScreen(AppScreen.profile)),
-                  const SizedBox(width: 16),
-                  _navButton(l10n.menuShop, Icons.store_outlined,
-                      () => gs.setScreen(AppScreen.shop)),
-                ],
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: _navButton(l10n.menuLeaderboard, Icons.leaderboard_outlined,
+                          () => gs.setScreen(AppScreen.leaderboard)),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: _navButton(l10n.menuProfile, Icons.person_outline,
+                          () => gs.setScreen(AppScreen.profile)),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: _navButton(l10n.menuShop, Icons.store_outlined,
+                          () => gs.setScreen(AppScreen.shop)),
+                    ),
+                  ],
+                ),
               ),
 
               const SizedBox(height: 8),
@@ -452,17 +460,23 @@ class _MenuScreenState extends State<MenuScreen>
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
         decoration: BoxDecoration(
           color: AppColors.darkElevated,
           borderRadius: BorderRadius.circular(20),
         ),
         child: Row(
-          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(icon, color: AppColors.textDisabled, size: 16),
             const SizedBox(width: 6),
-            Text(label, style: const TextStyle(color: AppColors.textDisabled, fontSize: 12)),
+            Flexible(
+              child: Text(
+                label,
+                style: const TextStyle(color: AppColors.textDisabled, fontSize: 12),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
           ],
         ),
       ),
