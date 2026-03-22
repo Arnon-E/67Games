@@ -182,6 +182,8 @@
   "modeCalibrationDesc": "5 attempts averaged — track your consistency",
   "modePressureName": "Pressure",
   "modePressureDesc": "Hit within tolerance — it tightens each success",
+  "modeFortuneName": "Fortune",
+  "modeFortuneDesc": "Spin the wheel — fate picks your mode and multiplier",
 
   "playingDoubleTapMidHint": "TAP AT 3.35s",
   "playingDoubleTapStopHint": "STOP AT 6.7s",

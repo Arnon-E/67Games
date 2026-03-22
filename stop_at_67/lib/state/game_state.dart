@@ -18,6 +18,7 @@ import 'auth_state.dart';
 enum AppScreen {
   menu,
   modeSelect,
+  fortuneWheel,
   countdown,
   playing,
   results,
@@ -111,6 +112,10 @@ class GameState extends ChangeNotifier {
   int _sessionScore = 0;
   String? _sessionModeId; // which mode the session belongs to
   int get sessionScore => _sessionScore;
+
+  // ── Fortune mode ─────────────────────────────────────────────
+  double _fortuneMultiplier = 1.0;
+  double get fortuneMultiplier => _fortuneMultiplier;
 
   // ── Double Tap mode ─────────────────────────────────────────
   // Phase: 0=not active, 1=running (waiting for mid-tap), 2=mid-done (waiting for stop)
@@ -262,6 +267,26 @@ class GameState extends ChangeNotifier {
     }
     _screen = AppScreen.modeSelect;
     notifyListeners();
+  }
+
+  /// Deducts coins and navigates to the Fortune wheel screen.
+  /// Returns false if the player cannot afford it.
+  bool startFortuneSpin() {
+    if (_coins < kFortuneCost) return false;
+    _coins -= kFortuneCost;
+    _storage.saveCoins(_coins);
+    _fortuneMultiplier = 1.0;
+    _screen = AppScreen.fortuneWheel;
+    notifyListeners();
+    return true;
+  }
+
+  /// Called from FortuneWheelScreen once the wheel lands.
+  /// Selects the given mode, stores the multiplier, and starts the countdown.
+  void applyFortuneResult(String modeId, double multiplier) {
+    _fortuneMultiplier = multiplier;
+    selectMode(modeId);
+    startCountdown();
   }
 
   Future<void> startCountdown() async {
@@ -470,6 +495,22 @@ class GameState extends ChangeNotifier {
         streakResult.streakForScoring,
         bestScore,
         overrideTargetMs: mode.movingTarget ? effectiveTargetMs : null,
+      );
+    }
+
+    // ── Apply Fortune multiplier ──────────────────────────────
+    if (_fortuneMultiplier > 1.0) {
+      final boosted = (result.finalScore * _fortuneMultiplier).round();
+      result = ScoreResult(
+        stoppedAtMs: result.stoppedAtMs,
+        targetMs: result.targetMs,
+        deviationMs: result.deviationMs,
+        rawScore: result.rawScore,
+        streakMultiplier: result.streakMultiplier,
+        finalScore: boosted,
+        rating: result.rating,
+        xpEarned: (boosted / kScoringConfig.xpDivisor).round(),
+        isNewBest: boosted > bestScore,
       );
     }
 
@@ -762,6 +803,7 @@ class GameState extends ChangeNotifier {
     _pressureGameOver = false;
     _sessionScore = 0;
     _sessionModeId = null;
+    _fortuneMultiplier = 1.0;
     _screen = AppScreen.menu;
     WakelockPlus.disable().catchError((_) {}); 
     notifyListeners();

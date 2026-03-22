@@ -441,6 +441,13 @@ class AppLocalizationsEn extends AppLocalizations {
       'Hit within tolerance — it tightens each success';
 
   @override
+  String get modeFortuneName => 'Fortune';
+
+  @override
+  String get modeFortuneDesc =>
+      'Spin the wheel — fate picks your mode and multiplier';
+
+  @override
   String get playingDoubleTapMidHint => 'TAP AT 3.35s';
 
   @override

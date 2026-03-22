@@ -183,6 +183,8 @@
   "modeCalibrationDesc": "5 ניסיונות ממוצעים — בדוק את היציבות שלך",
   "modePressureName": "לחץ",
   "modePressureDesc": "פגע בתוך הטווח - זה  מתהדק בכל הצלחה",
+  "modeFortuneName": "מזל",
+  "modeFortuneDesc": "סובב את הגלגל — הגורל בוחר מצב ומכפיל",
 
   "playingDoubleTapMidHint": "הקש ב-3.35 שנ׳",
   "playingDoubleTapStopHint": "עצור ב-6.7 שנ׳",

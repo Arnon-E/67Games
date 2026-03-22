@@ -437,6 +437,12 @@ class AppLocalizationsHe extends AppLocalizations {
   String get modePressureDesc => 'פגע בתוך הטווח - זה  מתהדק בכל הצלחה';
 
   @override
+  String get modeFortuneName => 'מזל';
+
+  @override
+  String get modeFortuneDesc => 'סובב את הגלגל — הגורל בוחר מצב ומכפיל';
+
+  @override
   String get playingDoubleTapMidHint => 'הקש ב-3.35 שנ׳';
 
   @override

@@ -444,6 +444,13 @@ class AppLocalizationsRu extends AppLocalizations {
       'Попадите в допуск — он сужается с каждым успехом';
 
   @override
+  String get modeFortuneName => 'Фортуна';
+
+  @override
+  String get modeFortuneDesc =>
+      'Крутите колесо — судьба выбирает режим и множитель';
+
+  @override
   String get playingDoubleTapMidHint => 'НАЖМИТЕ НА 3.35с';
 
   @override

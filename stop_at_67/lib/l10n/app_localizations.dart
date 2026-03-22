@@ -928,6 +928,18 @@ abstract class AppLocalizations {
   /// **'Hit within tolerance — it tightens each success'**
   String get modePressureDesc;
 
+  /// No description provided for @modeFortuneName.
+  ///
+  /// In en, this message translates to:
+  /// **'Fortune'**
+  String get modeFortuneName;
+
+  /// No description provided for @modeFortuneDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Spin the wheel — fate picks your mode and multiplier'**
+  String get modeFortuneDesc;
+
   /// No description provided for @playingDoubleTapMidHint.
   ///
   /// In en, this message translates to:

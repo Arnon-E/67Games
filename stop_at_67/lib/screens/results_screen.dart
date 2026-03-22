@@ -636,6 +636,41 @@ class _ResultsScreenState extends State<ResultsScreen> {
         const SizedBox(height: 8),
         _detailRow(l10n.resultsXp, '+${result.xpEarned} XP'),
 
+        // Fortune multiplier badge
+        if (gs.fortuneMultiplier > 1.0) ...[
+          const SizedBox(height: 12),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            decoration: BoxDecoration(
+              color: AppColors.gold.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: AppColors.gold.withValues(alpha: 0.35)),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  '🎰  FORTUNE BOOST',
+                  style: TextStyle(
+                    color: AppColors.gold,
+                    fontSize: 12,
+                    letterSpacing: 1.2,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                Text(
+                  '${gs.fortuneMultiplier == gs.fortuneMultiplier.truncateToDouble() ? gs.fortuneMultiplier.toInt() : gs.fortuneMultiplier}×',
+                  style: const TextStyle(
+                    color: AppColors.gold,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+
         // Session score (only for non-surge, non-pressure normal modes)
         if (gs.sessionScore > 0) ...[
           const SizedBox(height: 16),

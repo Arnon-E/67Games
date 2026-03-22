@@ -31,6 +31,7 @@ class ModeCard extends StatelessWidget {
       'movingtarget' => l10n.modeMovingTargetName,
       'calibration' => l10n.modeCalibrationName,
       'pressure' => l10n.modePressureName,
+      'fortune' => l10n.modeFortuneName,
       _ => mode.name,
     };
   }
@@ -48,6 +49,7 @@ class ModeCard extends StatelessWidget {
       'movingtarget' => l10n.modeMovingTargetDesc,
       'calibration' => l10n.modeCalibrationDesc,
       'pressure' => l10n.modePressureDesc,
+      'fortune' => l10n.modeFortuneDesc,
       _ => mode.description,
     };
   }
@@ -134,10 +136,16 @@ class ModeCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    l10n.modeCardTarget(mode.displayTarget),
+                    mode.id == 'fortune'
+                        ? '🎰  Spin to reveal'
+                        : l10n.modeCardTarget(mode.displayTarget),
                     style: TextStyle(
                       fontSize: 12,
-                      color: isLocked ? AppColors.textHint : AppColors.orange,
+                      color: isLocked
+                          ? AppColors.textHint
+                          : mode.id == 'fortune'
+                              ? AppColors.gold
+                              : AppColors.orange,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -173,6 +181,30 @@ class ModeCard extends StatelessWidget {
             const SizedBox(width: 8),
             if (isLocked)
               const Icon(Icons.lock_outline, color: AppColors.textDisabled, size: 24)
+            else if (mode.costCoins > 0)
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: AppColors.gold.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: AppColors.gold.withValues(alpha: 0.35)),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Text('🪙', style: TextStyle(fontSize: 12)),
+                    const SizedBox(width: 3),
+                    Text(
+                      '${mode.costCoins}',
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.gold,
+                      ),
+                    ),
+                  ],
+                ),
+              )
             else
               const Icon(Icons.chevron_right, color: AppColors.textDisabled, size: 24),
           ],

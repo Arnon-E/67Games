@@ -17,6 +17,7 @@ import 'screens/leaderboard_screen.dart';
 import 'screens/profile_screen.dart';
 import 'screens/shop_screen.dart';
 import 'screens/auth_screen.dart';
+import 'screens/fortune_wheel_screen.dart';
 
 class StopAt67App extends StatelessWidget {
   const StopAt67App({super.key});
@@ -49,6 +50,7 @@ class _ScreenSwitcher extends StatelessWidget {
   AppScreen? _backTarget(AppScreen screen) => switch (screen) {
     AppScreen.menu        => null, // exit app
     AppScreen.modeSelect  => AppScreen.menu,
+    AppScreen.fortuneWheel => AppScreen.modeSelect,
     AppScreen.countdown   => AppScreen.modeSelect,
     AppScreen.playing     => null, // handled by PlayingScreen's own PopScope
     AppScreen.results     => AppScreen.menu,
@@ -98,6 +100,7 @@ class _ScreenSwitcher extends StatelessWidget {
     return switch (screen) {
       AppScreen.menu        => const MenuScreen(),
       AppScreen.modeSelect  => const ModeSelectScreen(),
+      AppScreen.fortuneWheel => const FortuneWheelScreen(),
       AppScreen.countdown   => const CountdownScreen(),
       AppScreen.playing     => const PlayingScreen(),
       AppScreen.results     => const ResultsScreen(),
