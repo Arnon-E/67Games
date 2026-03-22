@@ -37,6 +37,9 @@ class GameMode {
   // Pressure mode: tolerance tightens with each success
   final bool isPressure;
 
+  // Fortune mode: costs coins to play; wheel picks mode + multiplier
+  final int costCoins;
+
   const GameMode({
     required this.id,
     required this.name,
@@ -53,6 +56,7 @@ class GameMode {
     this.isCalibration = false,
     this.calibrationRounds = 5,
     this.isPressure = false,
+    this.costCoins = 0,
   });
 }
 

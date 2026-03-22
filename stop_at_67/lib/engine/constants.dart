@@ -67,6 +67,15 @@ const Map<String, GameMode> kGameModes = {
     description: 'Timer speeds up every game — how long can you keep up?',
     unlockCondition: UnlockCondition(type: 'mode_games_played', modeId: 'blind', value: 3),
   ),
+  'fortune': GameMode(
+    id: 'fortune',
+    name: 'Fortune',
+    targetMs: 6700,
+    displayTarget: '?',
+    description: 'Spin the wheel — fate picks your mode and multiplier',
+    costCoins: 500,
+    unlockCondition: UnlockCondition(type: 'games_played', value: 3),
+  ),
   'doubletap': GameMode(
     id: 'doubletap',
     name: 'Double Tap',
@@ -106,6 +115,41 @@ const Map<String, GameMode> kGameModes = {
     unlockCondition: UnlockCondition(type: 'score', modeId: 'classic', value: 800),
   ),
 };
+
+// ============================================================
+// FORTUNE WHEEL
+// ============================================================
+
+/// Cost in coins to spin the Fortune wheel.
+const int kFortuneCost = 500;
+
+/// Cost in coins to re-spin the Fortune wheel after seeing a result.
+const int kFortuneRespinCost = 100;
+
+/// Segment definition for the Fortune wheel.
+typedef FortuneSegment = ({
+  String modeId,
+  double multiplier,
+  String shortLabel,
+  String emoji,
+  Color color,
+  Color textColor,
+});
+
+const List<FortuneSegment> kFortuneSegments = [
+  (modeId: 'classic',      multiplier: 2.0, shortLabel: 'Classic',   emoji: '⏱️',  color: Color(0xFF1565C0), textColor: Color(0xFFFFFFFF)),
+  (modeId: 'blind',        multiplier: 2.0, shortLabel: 'Blind',     emoji: '👁',  color: Color(0xFF6A1B9A), textColor: Color(0xFFFFFFFF)),
+  (modeId: 'surge',        multiplier: 1.5, shortLabel: 'Surge',     emoji: '⚡',  color: Color(0xFFE65100), textColor: Color(0xFFFFFFFF)),
+  (modeId: 'pressure',     multiplier: 3.0, shortLabel: 'Pressure',  emoji: '💀',  color: Color(0xFFC62828), textColor: Color(0xFFFFFFFF)),
+  (modeId: 'movingtarget', multiplier: 2.0, shortLabel: 'Moving',    emoji: '🎯',  color: Color(0xFF00838F), textColor: Color(0xFFFFFFFF)),
+  (modeId: 'classic',      multiplier: 1.5, shortLabel: 'Classic',   emoji: '⏱️',  color: Color(0xFF283593), textColor: Color(0xFFFFD700)),
+  (modeId: 'doubletap',    multiplier: 2.5, shortLabel: 'D.Tap',     emoji: '👆',  color: Color(0xFF2E7D32), textColor: Color(0xFFFFFFFF)),
+  (modeId: 'blind',        multiplier: 3.0, shortLabel: 'Blind',     emoji: '🙈',  color: Color(0xFF4A148C), textColor: Color(0xFFFFD700)),
+  (modeId: 'calibration',  multiplier: 1.5, shortLabel: 'Calibrate', emoji: '📊',  color: Color(0xFF00695C), textColor: Color(0xFFFFFFFF)),
+  (modeId: 'surge',        multiplier: 2.0, shortLabel: 'Surge',     emoji: '⚡',  color: Color(0xFFBF360C), textColor: Color(0xFFFFFFFF)),
+  (modeId: 'classic',      multiplier: 1.5, shortLabel: 'Classic',   emoji: '⏱️',  color: Color(0xFF1A237E), textColor: Color(0xFFFFFFFF)),
+  (modeId: 'pressure',     multiplier: 5.0, shortLabel: 'Pressure',  emoji: '☠️',  color: Color(0xFFB71C1C), textColor: Color(0xFFFFD700)),
+];
 
 // ============================================================
 // RATING TIERS

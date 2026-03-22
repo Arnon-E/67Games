@@ -28,34 +28,40 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
   @override
   void initState() {
     super.initState();
-    _syncLocalBests(); // uploads missing bests, then loads list when done
+    // Load scores immediately so the list appears right away,
+    // then sync local bests in the background.
+    _loadScores();
+    _syncLocalBests();
   }
 
-  /// Upload any local best scores that were never submitted to Firestore
-  /// (e.g. due to the previous isNewBest comparison bug).
+  /// Upload any local best scores that were never submitted to Firestore.
+  /// Runs in the background — does not block the initial list load.
+  /// Only refreshes the visible list if the current mode's score was updated.
   Future<void> _syncLocalBests() async {
     final auth = context.read<AuthState>();
-    if (!auth.isSignedIn) {
-      _loadScores(forceRefresh: true);
-      return;
-    }
+    if (!auth.isSignedIn) return;
     final gs = context.read<GameState>();
     final leaderboard = context.read<LeaderboardService>();
     final uid = auth.user!.uid;
     final displayName = auth.userName;
-    final futures = <Future<void>>[];
-    for (final entry in gs.stats.bestScores.entries) {
-      if (entry.value > 0) {
-        futures.add(leaderboard.submitScore(
-          uid: uid,
-          modeId: entry.key,
-          score: entry.value,
-          displayName: displayName,
-        ));
-      }
-    }
+
+    bool currentModeUpdated = false;
+    final futures = gs.stats.bestScores.entries
+        .where((e) => e.value > 0)
+        .map((e) async {
+          final improved = await leaderboard.submitScore(
+            uid: uid,
+            modeId: e.key,
+            score: e.value,
+            displayName: displayName,
+          );
+          if (improved && e.key == _selectedModeId) currentModeUpdated = true;
+        })
+        .toList();
+
     await Future.wait(futures);
-    if (mounted) _loadScores(forceRefresh: true);
+    // Only re-render if the currently visible mode actually had a new best
+    if (mounted && currentModeUpdated) _loadScores(forceRefresh: true);
   }
 
   void _loadScores({bool forceRefresh = false}) {

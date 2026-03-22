@@ -437,6 +437,53 @@ class AppLocalizationsHe extends AppLocalizations {
   String get modePressureDesc => 'פגע בתוך הטווח - זה  מתהדק בכל הצלחה';
 
   @override
+  String get modeFortuneName => 'רולטה';
+
+  @override
+  String get modeFortuneDesc => 'סובב את הגלגל — הגורל בוחר מצב ומכפיל';
+
+  @override
+  String get modeFortuneSpinToReveal => '🎰  סובב לגילוי';
+
+  @override
+  String get fortuneTitle => 'רולטה';
+
+  @override
+  String fortuneCostPerSpin(int cost) {
+    return 'עולה $cost מטבעות לסיבוב';
+  }
+
+  @override
+  String get fortuneSpinButton => '🎰  סובב';
+
+  @override
+  String get fortuneSpinningButton => 'מסתובב...';
+
+  @override
+  String get fortuneSpinHint => 'לחץ סובב לגילוי המשחק והמכפיל';
+
+  @override
+  String fortuneMultiplierBadge(String mult) {
+    return '$mult מכפיל ניקוד וניסיון';
+  }
+
+  @override
+  String fortunePlayButton(String mult) {
+    return 'שחק  $mult';
+  }
+
+  @override
+  String get fortuneBoostLabel => '🎰  בוסט מזל';
+
+  @override
+  String fortuneRespinButton(int cost) {
+    return '🔄  סובב שוב — $cost מטבעות';
+  }
+
+  @override
+  String get fortuneRespinCantAfford => 'אין מספיק מטבעות לסיבוב נוסף';
+
+  @override
   String get playingDoubleTapMidHint => 'הקש ב-3.35 שנ׳';
 
   @override

@@ -441,6 +441,54 @@ class AppLocalizationsEn extends AppLocalizations {
       'Hit within tolerance — it tightens each success';
 
   @override
+  String get modeFortuneName => 'Fortune';
+
+  @override
+  String get modeFortuneDesc =>
+      'Spin the wheel — fate picks your mode and multiplier';
+
+  @override
+  String get modeFortuneSpinToReveal => '🎰  Spin to reveal';
+
+  @override
+  String get fortuneTitle => 'Fortune';
+
+  @override
+  String fortuneCostPerSpin(int cost) {
+    return 'Costs $cost coins per spin';
+  }
+
+  @override
+  String get fortuneSpinButton => '🎰  SPIN';
+
+  @override
+  String get fortuneSpinningButton => 'SPINNING...';
+
+  @override
+  String get fortuneSpinHint => 'Tap SPIN to reveal your mode and multiplier';
+
+  @override
+  String fortuneMultiplierBadge(String mult) {
+    return '$mult Score & XP Multiplier';
+  }
+
+  @override
+  String fortunePlayButton(String mult) {
+    return 'PLAY  $mult';
+  }
+
+  @override
+  String get fortuneBoostLabel => '🎰  FORTUNE BOOST';
+
+  @override
+  String fortuneRespinButton(int cost) {
+    return '🔄  Spin Again — $cost coins';
+  }
+
+  @override
+  String get fortuneRespinCantAfford => 'Not enough coins to spin again';
+
+  @override
   String get playingDoubleTapMidHint => 'TAP AT 3.35s';
 
   @override

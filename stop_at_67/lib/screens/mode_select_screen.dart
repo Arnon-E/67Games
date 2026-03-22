@@ -5,6 +5,7 @@ import '../l10n/app_localizations.dart';
 import '../state/game_state.dart';
 import '../engine/constants.dart';
 import '../engine/progression.dart';
+import '../theme/app_colors.dart';
 import '../widgets/app_gradient_background.dart';
 import '../widgets/mode_card.dart';
 import '../widgets/screen_header.dart';
@@ -35,13 +36,31 @@ class ModeSelectScreen extends StatelessWidget {
                       .where((mode) => !const {'extended', 'reverse', 'reverse100', 'daily'}.contains(mode.id))
                       .map((mode) {
                     final locked = !isModeUnlocked(mode.id, gs.stats);
+                    final cannotAfford = mode.costCoins > 0 && gs.coins < mode.costCoins;
                     return ModeCard(
                       mode: mode,
                       isLocked: locked,
+                      cannotAfford: cannotAfford,
+                      isHot: mode.id == 'fortune',
                       stats: gs.stats,
                       onTap: () {
-                        gs.selectMode(mode.id);
-                        gs.startCountdown();
+                        if (mode.id == 'fortune') {
+                          final success = gs.startFortuneSpin();
+                          if (!success) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  'Need ${kFortuneCost} coins to spin  (you have ${gs.coins})',
+                                ),
+                                backgroundColor: AppColors.darkCard,
+                                behavior: SnackBarBehavior.floating,
+                              ),
+                            );
+                          }
+                        } else {
+                          gs.selectMode(mode.id);
+                          gs.startCountdown();
+                        }
                       },
                     );
                   }).toList(),

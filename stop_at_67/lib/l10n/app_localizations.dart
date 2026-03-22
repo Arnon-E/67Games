@@ -928,6 +928,84 @@ abstract class AppLocalizations {
   /// **'Hit within tolerance — it tightens each success'**
   String get modePressureDesc;
 
+  /// No description provided for @modeFortuneName.
+  ///
+  /// In en, this message translates to:
+  /// **'Fortune'**
+  String get modeFortuneName;
+
+  /// No description provided for @modeFortuneDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Spin the wheel — fate picks your mode and multiplier'**
+  String get modeFortuneDesc;
+
+  /// No description provided for @modeFortuneSpinToReveal.
+  ///
+  /// In en, this message translates to:
+  /// **'🎰  Spin to reveal'**
+  String get modeFortuneSpinToReveal;
+
+  /// No description provided for @fortuneTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Fortune'**
+  String get fortuneTitle;
+
+  /// No description provided for @fortuneCostPerSpin.
+  ///
+  /// In en, this message translates to:
+  /// **'Costs {cost} coins per spin'**
+  String fortuneCostPerSpin(int cost);
+
+  /// No description provided for @fortuneSpinButton.
+  ///
+  /// In en, this message translates to:
+  /// **'🎰  SPIN'**
+  String get fortuneSpinButton;
+
+  /// No description provided for @fortuneSpinningButton.
+  ///
+  /// In en, this message translates to:
+  /// **'SPINNING...'**
+  String get fortuneSpinningButton;
+
+  /// No description provided for @fortuneSpinHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap SPIN to reveal your mode and multiplier'**
+  String get fortuneSpinHint;
+
+  /// No description provided for @fortuneMultiplierBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'{mult} Score & XP Multiplier'**
+  String fortuneMultiplierBadge(String mult);
+
+  /// No description provided for @fortunePlayButton.
+  ///
+  /// In en, this message translates to:
+  /// **'PLAY  {mult}'**
+  String fortunePlayButton(String mult);
+
+  /// No description provided for @fortuneBoostLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'🎰  FORTUNE BOOST'**
+  String get fortuneBoostLabel;
+
+  /// No description provided for @fortuneRespinButton.
+  ///
+  /// In en, this message translates to:
+  /// **'🔄  Spin Again — {cost} coins'**
+  String fortuneRespinButton(int cost);
+
+  /// No description provided for @fortuneRespinCantAfford.
+  ///
+  /// In en, this message translates to:
+  /// **'Not enough coins to spin again'**
+  String get fortuneRespinCantAfford;
+
   /// No description provided for @playingDoubleTapMidHint.
   ///
   /// In en, this message translates to:

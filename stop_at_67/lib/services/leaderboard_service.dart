@@ -101,7 +101,8 @@ class LeaderboardService {
   /// Submit a score for the current user. Only updates if the new score
   /// is strictly greater than the existing one.
   /// Also maintains the aggregated top-10 document.
-  Future<void> submitScore({
+  /// Returns true if the score was actually improved (and cache invalidated).
+  Future<bool> submitScore({
     required String uid,
     required String modeId,
     required int score,
@@ -111,6 +112,7 @@ class LeaderboardService {
     final top10Ref = _db.collection('leaderboard').doc(modeId).collection('meta').doc('top10');
 
     try {
+      bool improved = false;
       await _db.runTransaction((tx) async {
         final snap = await tx.get(scoresRef);
         final top10Snap = await tx.get(top10Ref);
@@ -118,6 +120,7 @@ class LeaderboardService {
         final existingScore = (snap.data()?['score'] as num? ?? 0).toInt();
         if (snap.exists && existingScore >= score) return; // no improvement
 
+        improved = true;
         final newEntry = {
           'uid': uid,
           'displayName': displayName,
@@ -126,7 +129,6 @@ class LeaderboardService {
         };
         tx.set(scoresRef, newEntry);
 
-        // Rebuild top-10
         final currentList = top10Snap.exists
             ? ((top10Snap.data()?['entries'] as List<dynamic>?) ?? [])
                 .map((e) => Map<String, dynamic>.from(e as Map))
@@ -140,11 +142,13 @@ class LeaderboardService {
         });
       });
 
-      // Invalidate cache so the next read reflects the new score
-      invalidate(modeId);
+      // Only invalidate cache if the score actually improved
+      if (improved) invalidate(modeId);
+      return improved;
     } catch (e, st) {
       // ignore: avoid_print
       print('[LB] submitScore ERROR: $e\n$st');
+      return false;
     }
   }
 

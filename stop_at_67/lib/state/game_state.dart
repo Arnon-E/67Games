@@ -18,6 +18,7 @@ import 'auth_state.dart';
 enum AppScreen {
   menu,
   modeSelect,
+  fortuneWheel,
   countdown,
   playing,
   results,
@@ -111,6 +112,10 @@ class GameState extends ChangeNotifier {
   int _sessionScore = 0;
   String? _sessionModeId; // which mode the session belongs to
   int get sessionScore => _sessionScore;
+
+  // ── Fortune mode ─────────────────────────────────────────────
+  double _fortuneMultiplier = 1.0;
+  double get fortuneMultiplier => _fortuneMultiplier;
 
   // ── Double Tap mode ─────────────────────────────────────────
   // Phase: 0=not active, 1=running (waiting for mid-tap), 2=mid-done (waiting for stop)
@@ -262,6 +267,47 @@ class GameState extends ChangeNotifier {
     }
     _screen = AppScreen.modeSelect;
     notifyListeners();
+  }
+
+  /// Navigates to the Fortune wheel screen. Does NOT deduct coins yet.
+  bool startFortuneSpin() {
+    if (_coins < kFortuneCost) return false;
+    _fortuneMultiplier = 1.0;
+    _screen = AppScreen.fortuneWheel;
+    notifyListeners();
+    return true;
+  }
+
+  /// Deducts the spin cost when the user actually taps SPIN on the wheel.
+  /// Returns false if they can no longer afford it.
+  bool chargeForSpin() {
+    if (_coins < kFortuneCost) return false;
+    _coins -= kFortuneCost;
+    _storage.saveCoins(_coins);
+    notifyListeners();
+    return true;
+  }
+
+  /// Deducts an arbitrary coin amount. Returns false if insufficient funds.
+  bool chargeCoins(int amount) {
+    if (_coins < amount) return false;
+    _coins -= amount;
+    _storage.saveCoins(_coins);
+    notifyListeners();
+    return true;
+  }
+
+  /// Called from FortuneWheelScreen once the wheel lands.
+  /// Selects the given mode, stores the multiplier, and starts the countdown.
+  void applyFortuneResult(String modeId, double multiplier) {
+    _fortuneMultiplier = multiplier;
+    selectMode(modeId); // resets _surgeGamesInSession to 0 for surge
+    if (modeId == 'surge' && multiplier > 1.0) {
+      // Pre-offset surge speed so the timer starts at the fortune multiplier level.
+      // Formula inverse of _computeSurgeMultiplier: games = (mult - 1.0) / 0.067
+      _surgeGamesInSession = ((multiplier - 1.0) / 0.067).round();
+    }
+    startCountdown();
   }
 
   Future<void> startCountdown() async {
@@ -470,6 +516,22 @@ class GameState extends ChangeNotifier {
         streakResult.streakForScoring,
         bestScore,
         overrideTargetMs: mode.movingTarget ? effectiveTargetMs : null,
+      );
+    }
+
+    // ── Apply Fortune multiplier ──────────────────────────────
+    if (_fortuneMultiplier > 1.0) {
+      final boosted = (result.finalScore * _fortuneMultiplier).round();
+      result = ScoreResult(
+        stoppedAtMs: result.stoppedAtMs,
+        targetMs: result.targetMs,
+        deviationMs: result.deviationMs,
+        rawScore: result.rawScore,
+        streakMultiplier: result.streakMultiplier,
+        finalScore: boosted,
+        rating: result.rating,
+        xpEarned: (boosted / kScoringConfig.xpDivisor).round(),
+        isNewBest: boosted > bestScore,
       );
     }
 
@@ -714,6 +776,17 @@ class GameState extends ChangeNotifier {
     final mode = _currentMode;
     if (mode == null) return;
 
+    // Fortune boost is single-use: after one round, return to mode select.
+    // Surge and Pressure are exempt — they run until the user manually exits.
+    if (_fortuneMultiplier > 1.0 && !mode.isPressure && mode.id != 'surge') {
+      _fortuneMultiplier = 1.0;
+      _lastResult = null;
+      _currentMode = null;
+      _screen = AppScreen.modeSelect;
+      notifyListeners();
+      return;
+    }
+
     // Determine if we are continuing a calibration run (not yet complete)
     final bool calibrationContinue = mode.isCalibration &&
         _calibrationResults.isNotEmpty &&
@@ -762,8 +835,9 @@ class GameState extends ChangeNotifier {
     _pressureGameOver = false;
     _sessionScore = 0;
     _sessionModeId = null;
-    _screen = AppScreen.menu;
-    WakelockPlus.disable().catchError((_) {}); 
+    _fortuneMultiplier = 1.0;
+    _screen = AppScreen.modeSelect;
+    WakelockPlus.disable().catchError((_) {});
     notifyListeners();
   }
 
