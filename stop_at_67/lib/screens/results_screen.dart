@@ -580,6 +580,8 @@ class _ResultsScreenState extends State<ResultsScreen> {
         surgeIsFail ? l10n.surgeFailLabel : null;
     final Color? surgeColorOverride =
         surgeIsFail ? const Color(0xFFFF4444) : null;
+    final bool fortuneOneRound =
+        gs.fortuneMultiplier > 1.0 && !isSurge && !mode.isPressure;
 
     return Column(
       children: [
@@ -649,9 +651,9 @@ class _ResultsScreenState extends State<ResultsScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
-                  '🎰  FORTUNE BOOST',
-                  style: TextStyle(
+                Text(
+                  l10n.fortuneBoostLabel,
+                  style: const TextStyle(
                     color: AppColors.gold,
                     fontSize: 12,
                     letterSpacing: 1.2,
@@ -709,12 +711,13 @@ class _ResultsScreenState extends State<ResultsScreen> {
         const Spacer(),
 
         // Action buttons
-        GameButton(
-          label: l10n.commonPlayAgain,
-          onPressed: () => gs.playAgain(),
-          width: double.infinity,
-        ),
-        const SizedBox(height: 12),
+        if (!fortuneOneRound)
+          GameButton(
+            label: l10n.commonPlayAgain,
+            onPressed: () => gs.playAgain(),
+            width: double.infinity,
+          ),
+        if (!fortuneOneRound) const SizedBox(height: 12),
         Row(
           children: [
             Expanded(

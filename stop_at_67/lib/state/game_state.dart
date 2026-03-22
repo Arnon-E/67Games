@@ -269,14 +269,30 @@ class GameState extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Deducts coins and navigates to the Fortune wheel screen.
-  /// Returns false if the player cannot afford it.
+  /// Navigates to the Fortune wheel screen. Does NOT deduct coins yet.
   bool startFortuneSpin() {
+    if (_coins < kFortuneCost) return false;
+    _fortuneMultiplier = 1.0;
+    _screen = AppScreen.fortuneWheel;
+    notifyListeners();
+    return true;
+  }
+
+  /// Deducts the spin cost when the user actually taps SPIN on the wheel.
+  /// Returns false if they can no longer afford it.
+  bool chargeForSpin() {
     if (_coins < kFortuneCost) return false;
     _coins -= kFortuneCost;
     _storage.saveCoins(_coins);
-    _fortuneMultiplier = 1.0;
-    _screen = AppScreen.fortuneWheel;
+    notifyListeners();
+    return true;
+  }
+
+  /// Deducts an arbitrary coin amount. Returns false if insufficient funds.
+  bool chargeCoins(int amount) {
+    if (_coins < amount) return false;
+    _coins -= amount;
+    _storage.saveCoins(_coins);
     notifyListeners();
     return true;
   }
@@ -285,7 +301,12 @@ class GameState extends ChangeNotifier {
   /// Selects the given mode, stores the multiplier, and starts the countdown.
   void applyFortuneResult(String modeId, double multiplier) {
     _fortuneMultiplier = multiplier;
-    selectMode(modeId);
+    selectMode(modeId); // resets _surgeGamesInSession to 0 for surge
+    if (modeId == 'surge' && multiplier > 1.0) {
+      // Pre-offset surge speed so the timer starts at the fortune multiplier level.
+      // Formula inverse of _computeSurgeMultiplier: games = (mult - 1.0) / 0.067
+      _surgeGamesInSession = ((multiplier - 1.0) / 0.067).round();
+    }
     startCountdown();
   }
 
@@ -755,6 +776,17 @@ class GameState extends ChangeNotifier {
     final mode = _currentMode;
     if (mode == null) return;
 
+    // Fortune boost is single-use: after one round, return to mode select.
+    // Surge and Pressure are exempt — they run until the user manually exits.
+    if (_fortuneMultiplier > 1.0 && !mode.isPressure && mode.id != 'surge') {
+      _fortuneMultiplier = 1.0;
+      _lastResult = null;
+      _currentMode = null;
+      _screen = AppScreen.modeSelect;
+      notifyListeners();
+      return;
+    }
+
     // Determine if we are continuing a calibration run (not yet complete)
     final bool calibrationContinue = mode.isCalibration &&
         _calibrationResults.isNotEmpty &&
@@ -804,8 +836,8 @@ class GameState extends ChangeNotifier {
     _sessionScore = 0;
     _sessionModeId = null;
     _fortuneMultiplier = 1.0;
-    _screen = AppScreen.menu;
-    WakelockPlus.disable().catchError((_) {}); 
+    _screen = AppScreen.modeSelect;
+    WakelockPlus.disable().catchError((_) {});
     notifyListeners();
   }
 

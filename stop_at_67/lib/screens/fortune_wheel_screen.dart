@@ -1,9 +1,11 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:haptic_feedback/haptic_feedback.dart';
 import 'package:provider/provider.dart';
 
 import '../engine/constants.dart';
+import '../l10n/app_localizations.dart';
 import '../state/game_state.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_text_styles.dart';
@@ -168,13 +170,48 @@ class _WheelPainter extends CustomPainter {
 class _ResultCard extends StatelessWidget {
   final FortuneSegment segment;
   final VoidCallback onPlay;
+  final VoidCallback? onSpinAgain;
+  final bool canSpinAgain;
 
-  const _ResultCard({required this.segment, required this.onPlay});
+  const _ResultCard({
+    super.key,
+    required this.segment,
+    required this.onPlay,
+    this.onSpinAgain,
+    this.canSpinAgain = true,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final modeName = kGameModes[segment.modeId]?.name ?? segment.modeId;
-    final modeDesc = kGameModes[segment.modeId]?.description ?? '';
+    final l10n = AppLocalizations.of(context);
+    final modeName = switch (segment.modeId) {
+      'classic'      => l10n.modeClassicName,
+      'extended'     => l10n.modeExtendedName,
+      'blind'        => l10n.modeBlindName,
+      'reverse'      => l10n.modeReverseName,
+      'reverse100'   => l10n.modeReverse100Name,
+      'daily'        => l10n.modeDailyName,
+      'surge'        => l10n.modeSurgeName,
+      'doubletap'    => l10n.modeDoubleTapName,
+      'movingtarget' => l10n.modeMovingTargetName,
+      'calibration'  => l10n.modeCalibrationName,
+      'pressure'     => l10n.modePressureName,
+      _              => kGameModes[segment.modeId]?.name ?? segment.modeId,
+    };
+    final modeDesc = switch (segment.modeId) {
+      'classic'      => l10n.modeClassicDesc,
+      'extended'     => l10n.modeExtendedDesc,
+      'blind'        => l10n.modeBlindDesc,
+      'reverse'      => l10n.modeReverseDesc,
+      'reverse100'   => l10n.modeReverse100Desc,
+      'daily'        => l10n.modeDailyDesc,
+      'surge'        => l10n.modeSurgeDesc,
+      'doubletap'    => l10n.modeDoubleTapDesc,
+      'movingtarget' => l10n.modeMovingTargetDesc,
+      'calibration'  => l10n.modeCalibrationDesc,
+      'pressure'     => l10n.modePressureDesc,
+      _              => kGameModes[segment.modeId]?.description ?? '',
+    };
     final multStr = segment.multiplier == segment.multiplier.truncateToDouble()
         ? '${segment.multiplier.toInt()}×'
         : '${segment.multiplier}×';
@@ -247,7 +284,7 @@ class _ResultCard extends StatelessWidget {
                 const Text('🎰', style: TextStyle(fontSize: 18)),
                 const SizedBox(width: 8),
                 Text(
-                  '$multStr Score & XP Multiplier',
+                  l10n.fortuneMultiplierBadge(multStr),
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w700,
@@ -281,11 +318,42 @@ class _ResultCard extends StatelessWidget {
                 elevation: 0,
               ),
               child: Text(
-                'PLAY  $multStr',
+                l10n.fortunePlayButton(multStr),
                 style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w800,
                   letterSpacing: 1.5,
+                ),
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 10),
+
+          // Spin again button
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton(
+              onPressed: canSpinAgain ? onSpinAgain : null,
+              style: OutlinedButton.styleFrom(
+                foregroundColor: canSpinAgain ? AppColors.textSecondary : AppColors.textHint,
+                side: BorderSide(
+                  color: canSpinAgain
+                      ? AppColors.textSecondary.withValues(alpha: 0.4)
+                      : AppColors.textHint.withValues(alpha: 0.2),
+                ),
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                ),
+              ),
+              child: Text(
+                canSpinAgain
+                    ? l10n.fortuneRespinButton(kFortuneRespinCost)
+                    : l10n.fortuneRespinCantAfford,
+                style: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
             ),
@@ -349,6 +417,11 @@ class _FortuneWheelScreenState extends State<FortuneWheelScreen>
 
   void _spin() {
     if (_spinning) return;
+    final charged = context.read<GameState>().chargeForSpin();
+    if (!charged) {
+      context.read<GameState>().setScreen(AppScreen.modeSelect);
+      return;
+    }
     setState(() {
       _resultIndex = null;
       _velocity = 0.22 + _rng.nextDouble() * 0.18;
@@ -361,8 +434,11 @@ class _FortuneWheelScreenState extends State<FortuneWheelScreen>
   int _computeSegmentIndex() {
     final n = kFortuneSegments.length;
     final segAngle = (math.pi * 2) / n;
-    // Pointer is at the top: subtract angle to find which segment is at top
-    final norm = ((-_angle - math.pi / 2) % (math.pi * 2) + math.pi * 2) % (math.pi * 2);
+    // The painter draws segment i starting at: angle + i*segAngle - π/2
+    // The pointer is fixed at -π/2, so the segment at the pointer is
+    // the one where: angle + i*segAngle - π/2 <= -π/2 < angle + (i+1)*segAngle - π/2
+    // Simplifies to: i = floor((-angle % 2π) / segAngle)
+    final norm = ((-_angle) % (math.pi * 2) + math.pi * 2) % (math.pi * 2);
     return (norm / segAngle).floor() % n;
   }
 
@@ -372,8 +448,21 @@ class _FortuneWheelScreenState extends State<FortuneWheelScreen>
     context.read<GameState>().applyFortuneResult(seg.modeId, seg.multiplier);
   }
 
+  void _respin() {
+    final gs = context.read<GameState>();
+    if (gs.coins < kFortuneRespinCost) return;
+    gs.chargeCoins(kFortuneRespinCost);
+    setState(() {
+      _resultIndex = null;
+      _velocity = 0.22 + _rng.nextDouble() * 0.18;
+      _spinning = true;
+    });
+    Haptics.vibrate(HapticsType.medium).catchError((_) {});
+  }
+
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final gs = context.watch<GameState>();
     final hasResult = _resultIndex != null;
 
@@ -381,11 +470,13 @@ class _FortuneWheelScreenState extends State<FortuneWheelScreen>
       backgroundColor: Colors.transparent,
       body: AppGradientBackground(
         child: SafeArea(
-          child: Column(
+          child: SingleChildScrollView(
+            child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
               // Header
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
                 child: Row(
                   children: [
                     GestureDetector(
@@ -394,7 +485,7 @@ class _FortuneWheelScreenState extends State<FortuneWheelScreen>
                           color: AppColors.textSecondary, size: 20),
                     ),
                     const SizedBox(width: 12),
-                    Text('Fortune', style: AppTextStyles.screenTitle),
+                    Text(l10n.fortuneTitle, style: AppTextStyles.screenTitle),
                     const Spacer(),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
@@ -426,9 +517,9 @@ class _FortuneWheelScreenState extends State<FortuneWheelScreen>
 
               // Subtitle
               Padding(
-                padding: const EdgeInsets.only(top: 2, bottom: 12),
+                padding: const EdgeInsets.only(top: 0, bottom: 6),
                 child: Text(
-                  'Costs ${kFortuneCost} coins per spin',
+                  l10n.fortuneCostPerSpin(kFortuneCost),
                   style: const TextStyle(
                     fontSize: 13,
                     color: AppColors.textDisabled,
@@ -439,18 +530,16 @@ class _FortuneWheelScreenState extends State<FortuneWheelScreen>
               // Pointer
               const _Pointer(),
 
-              // Wheel
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24),
-                child: AspectRatio(
-                  aspectRatio: 1,
-                  child: CustomPaint(
-                    painter: _WheelPainter(angle: _angle),
-                  ),
+              // Wheel — fixed size so it never crowds the buttons
+              SizedBox(
+                width: 260,
+                height: 260,
+                child: CustomPaint(
+                  painter: _WheelPainter(angle: _angle),
                 ),
               ),
 
-              const SizedBox(height: 16),
+              const SizedBox(height: 12),
 
               // Spin button or result card
               AnimatedSwitcher(
@@ -468,6 +557,8 @@ class _FortuneWheelScreenState extends State<FortuneWheelScreen>
                         key: const ValueKey('result'),
                         segment: kFortuneSegments[_resultIndex!],
                         onPlay: _playResult,
+                        onSpinAgain: _respin,
+                        canSpinAgain: gs.coins >= kFortuneRespinCost,
                       )
                     : Padding(
                         key: const ValueKey('spin'),
@@ -490,7 +581,7 @@ class _FortuneWheelScreenState extends State<FortuneWheelScreen>
                                   elevation: 0,
                                 ),
                                 child: Text(
-                                  _spinning ? 'SPINNING...' : '🎰  SPIN',
+                                  _spinning ? l10n.fortuneSpinningButton : l10n.fortuneSpinButton,
                                   style: const TextStyle(
                                     fontSize: 18,
                                     fontWeight: FontWeight.w800,
@@ -501,7 +592,7 @@ class _FortuneWheelScreenState extends State<FortuneWheelScreen>
                             ),
                             const SizedBox(height: 10),
                             Text(
-                              'Tap SPIN to reveal your mode and multiplier',
+                              l10n.fortuneSpinHint,
                               style: const TextStyle(
                                 fontSize: 12,
                                 color: AppColors.textHint,
@@ -514,6 +605,7 @@ class _FortuneWheelScreenState extends State<FortuneWheelScreen>
               ),
               const SizedBox(height: 16),
             ],
+          ),
           ),
         ),
       ),

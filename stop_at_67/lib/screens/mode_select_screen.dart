@@ -36,9 +36,12 @@ class ModeSelectScreen extends StatelessWidget {
                       .where((mode) => !const {'extended', 'reverse', 'reverse100', 'daily'}.contains(mode.id))
                       .map((mode) {
                     final locked = !isModeUnlocked(mode.id, gs.stats);
+                    final cannotAfford = mode.costCoins > 0 && gs.coins < mode.costCoins;
                     return ModeCard(
                       mode: mode,
                       isLocked: locked,
+                      cannotAfford: cannotAfford,
+                      isHot: mode.id == 'fortune',
                       stats: gs.stats,
                       onTap: () {
                         if (mode.id == 'fortune') {

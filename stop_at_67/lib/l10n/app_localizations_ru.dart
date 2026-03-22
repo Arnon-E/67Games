@@ -451,6 +451,49 @@ class AppLocalizationsRu extends AppLocalizations {
       'Крутите колесо — судьба выбирает режим и множитель';
 
   @override
+  String get modeFortuneSpinToReveal => '🎰  Крутить для открытия';
+
+  @override
+  String get fortuneTitle => 'Фортуна';
+
+  @override
+  String fortuneCostPerSpin(int cost) {
+    return 'Стоит $cost монет за вращение';
+  }
+
+  @override
+  String get fortuneSpinButton => '🎰  КРУТИТЬ';
+
+  @override
+  String get fortuneSpinningButton => 'КРУТИТСЯ...';
+
+  @override
+  String get fortuneSpinHint =>
+      'Нажмите КРУТИТЬ, чтобы узнать режим и множитель';
+
+  @override
+  String fortuneMultiplierBadge(String mult) {
+    return '$mult множитель очков и опыта';
+  }
+
+  @override
+  String fortunePlayButton(String mult) {
+    return 'ИГРАТЬ  $mult';
+  }
+
+  @override
+  String get fortuneBoostLabel => '🎰  БОНУС ФОРТУНЫ';
+
+  @override
+  String fortuneRespinButton(int cost) {
+    return '🔄  Крутить снова — $cost монет';
+  }
+
+  @override
+  String get fortuneRespinCantAfford =>
+      'Недостаточно монет для повторного вращения';
+
+  @override
   String get playingDoubleTapMidHint => 'НАЖМИТЕ НА 3.35с';
 
   @override
