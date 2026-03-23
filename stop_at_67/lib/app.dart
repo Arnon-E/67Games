@@ -79,7 +79,8 @@ class _ScreenSwitcher extends StatelessWidget {
       canPop: backTarget == null, // menu screen: allow exit
       onPopInvokedWithResult: (_, __) {
         if (backTarget != null) {
-          if (backTarget == AppScreen.menu) {
+          // Results screen needs game-state cleanup; all others just navigate.
+          if (screen == AppScreen.results) {
             gs.returnToMenu();
           } else {
             gs.setScreen(backTarget);

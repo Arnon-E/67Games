@@ -836,7 +836,7 @@ class GameState extends ChangeNotifier {
     _sessionScore = 0;
     _sessionModeId = null;
     _fortuneMultiplier = 1.0;
-    _screen = AppScreen.menu;
+    _screen = AppScreen.modeSelect;
     WakelockPlus.disable().catchError((_) {});
     notifyListeners();
   }
