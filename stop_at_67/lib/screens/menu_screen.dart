@@ -22,6 +22,8 @@ class MenuScreen extends StatefulWidget {
 
 class _MenuScreenState extends State<MenuScreen>
     with TickerProviderStateMixin {
+  static bool _updateCheckedThisSession = false;
+
   late AnimationController _pulseController;
   late Animation<double> _pulseAnimation;
   late Animation<double> _glowAnimation;
@@ -84,6 +86,8 @@ class _MenuScreenState extends State<MenuScreen>
   }
 
   Future<void> _checkForUpdate() async {
+    if (_updateCheckedThisSession) return;
+    _updateCheckedThisSession = true;
     final required = await UpdateService.isUpdateRequired();
     if (required && mounted) {
       showDialog(

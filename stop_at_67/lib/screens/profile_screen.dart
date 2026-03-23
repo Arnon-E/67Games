@@ -122,7 +122,7 @@ class ProfileScreen extends StatelessWidget {
                     _label(l10n.profileBestScores),
                     const SizedBox(height: 12),
                     ...kGameModes.values
-                        .where((mode) => !const {'extended', 'reverse', 'reverse100'}.contains(mode.id))
+                        .where((mode) => !const {'extended', 'reverse', 'reverse100', 'fortune'}.contains(mode.id))
                         .map((mode) {
                       final best = stats.bestScores[mode.id];
                       final modeName = _modeLocalName(mode.id, l10n);
