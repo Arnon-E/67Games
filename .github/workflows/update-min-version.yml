@@ -1,0 +1,50 @@
+name: Update min_version (Run AFTER Play Store is live)
+
+# Run this workflow MANUALLY only after you confirm the new version
+# is approved and live on the Play Store. This prevents the update
+# dialog from showing before users can actually download the update.
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to set as min_version (e.g. 1.0.4)'
+        required: true
+
+jobs:
+  update-remote-config:
+    name: Update Firebase Remote Config min_version
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Update Firebase Remote Config min_version
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          MIN_VERSION: ${{ github.event.inputs.version }}
+        run: |
+          echo "Setting min_version to $MIN_VERSION"
+
+          # Write service-account key to a temp file
+          echo "$FIREBASE_SERVICE_ACCOUNT" | base64 --decode > /tmp/sa.json
+
+          # Install Firebase Admin SDK
+          npm install --prefix /tmp/firebase-rc firebase-admin --silent
+
+          # Push new min_version to Remote Config
+          node -e "
+          const admin = require('/tmp/firebase-rc/node_modules/firebase-admin');
+          admin.initializeApp({ credential: admin.credential.cert(require('/tmp/sa.json')) });
+          (async () => {
+            const rc = admin.remoteConfig();
+            const template = await rc.getTemplate();
+            template.parameters['min_version'] = {
+              defaultValue: { value: process.env.MIN_VERSION }
+            };
+            await rc.publishTemplate(template);
+            console.log('Remote Config updated: min_version =', process.env.MIN_VERSION);
+          })().catch(e => { console.error(e.message); process.exit(1); });
+          "

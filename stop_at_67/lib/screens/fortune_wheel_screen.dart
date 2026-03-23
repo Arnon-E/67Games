@@ -10,6 +10,7 @@ import '../state/game_state.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_text_styles.dart';
 import '../widgets/app_gradient_background.dart';
+import '../widgets/coin_fly_animation.dart';
 
 // ── Wheel painter ─────────────────────────────────────────────
 
@@ -385,6 +386,7 @@ class _FortuneWheelScreenState extends State<FortuneWheelScreen>
   static const double _stopThreshold = 0.002;
 
   final math.Random _rng = math.Random();
+  final GlobalKey _coinKey = GlobalKey();
 
   @override
   void initState() {
@@ -415,6 +417,20 @@ class _FortuneWheelScreenState extends State<FortuneWheelScreen>
     });
   }
 
+  void _triggerCoinSpend(int amount) {
+    final RenderBox? box =
+        _coinKey.currentContext?.findRenderObject() as RenderBox?;
+    if (box == null) return;
+    final coinPos = box.localToGlobal(box.size.center(Offset.zero));
+    final screenSize = MediaQuery.of(context).size;
+    CoinFlyAnimation.show(
+      context: context,
+      fromOffset: coinPos,
+      toOffset: Offset(screenSize.width / 2, screenSize.height + 40),
+      coinAmount: amount,
+    );
+  }
+
   void _spin() {
     if (_spinning) return;
     final charged = context.read<GameState>().chargeForSpin();
@@ -422,6 +438,7 @@ class _FortuneWheelScreenState extends State<FortuneWheelScreen>
       context.read<GameState>().setScreen(AppScreen.modeSelect);
       return;
     }
+    _triggerCoinSpend(kFortuneCost);
     setState(() {
       _resultIndex = null;
       _velocity = 0.22 + _rng.nextDouble() * 0.18;
@@ -452,6 +469,7 @@ class _FortuneWheelScreenState extends State<FortuneWheelScreen>
     final gs = context.read<GameState>();
     if (gs.coins < kFortuneRespinCost) return;
     gs.chargeCoins(kFortuneRespinCost);
+    _triggerCoinSpend(kFortuneRespinCost);
     setState(() {
       _resultIndex = null;
       _velocity = 0.22 + _rng.nextDouble() * 0.18;
@@ -488,6 +506,7 @@ class _FortuneWheelScreenState extends State<FortuneWheelScreen>
                     Text(l10n.fortuneTitle, style: AppTextStyles.screenTitle),
                     const Spacer(),
                     Container(
+                      key: _coinKey,
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                       decoration: BoxDecoration(
                         color: AppColors.gold.withValues(alpha: 0.15),
