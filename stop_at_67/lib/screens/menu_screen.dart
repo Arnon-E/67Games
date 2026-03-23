@@ -22,7 +22,7 @@ class MenuScreen extends StatefulWidget {
 
 class _MenuScreenState extends State<MenuScreen>
     with TickerProviderStateMixin {
-  static bool _updateCheckedThisSession = false;
+  static bool _updateCheckedThisSession = false; // guard against repeated checks within one session
 
   late AnimationController _pulseController;
   late Animation<double> _pulseAnimation;
@@ -90,6 +90,10 @@ class _MenuScreenState extends State<MenuScreen>
     _updateCheckedThisSession = true;
     final required = await UpdateService.isUpdateRequired();
     if (required && mounted) {
+      // Persist that we notified for this build before showing the dialog,
+      // so relaunching the app doesn't repeat it until a new build is installed.
+      await UpdateService.markUpdateDialogShown();
+      if (!mounted) return;
       showDialog(
         context: context,
         barrierDismissible: false,
