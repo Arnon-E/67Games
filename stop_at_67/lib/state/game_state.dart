@@ -809,6 +809,7 @@ class GameState extends ChangeNotifier {
 
     _lastResult = null;
     _surgePendingReset = false;
+    await _sound.cleanup();
     await startCountdown();
   }
 
