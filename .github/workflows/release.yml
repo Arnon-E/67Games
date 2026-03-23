@@ -21,16 +21,41 @@ jobs:
       contents: write   # needed to upload assets to the GitHub Release
 
     steps:
-      - name: Checkout
+      - name: Checkout main branch
         uses: actions/checkout@v5
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Determine version
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            TAG="${{ github.event.inputs.tag }}"
+          else
+            TAG="${{ github.ref_name }}"
+          fi
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+          echo "version=${TAG#v}" >> $GITHUB_OUTPUT
+
+      - name: Bump version in pubspec.yaml
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+          BUILD_NUMBER: ${{ github.run_number }}
+        run: |
+          BUILD=$((BUILD_NUMBER + 100))
+          sed -i "s/^version: .*/version: ${VERSION}+${BUILD}/" stop_at_67/pubspec.yaml
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add stop_at_67/pubspec.yaml
+          git diff --cached --quiet || git commit -m "chore: bump version to ${VERSION}+${BUILD}"
+          git push origin main
 
       - name: Create tag (manual trigger only)
         if: github.event_name == 'workflow_dispatch'
         run: |
-          git config user.name "github-actions"
-          git config user.email "github-actions@github.com"
-          git tag ${{ github.event.inputs.tag }}
-          git push origin ${{ github.event.inputs.tag }}
+          git tag ${{ steps.version.outputs.tag }}
+          git push origin ${{ steps.version.outputs.tag }}
 
       # ── Java ─────────────────────────────────────────────────────────────
       - name: Set up Java 17
@@ -104,9 +129,7 @@ jobs:
 
       - name: Build release AAB
         working-directory: stop_at_67
-        env:
-          BUILD_NUMBER: ${{ github.run_number }}
-        run: flutter build appbundle --release --build-number=$((BUILD_NUMBER + 100))
+        run: flutter build appbundle --release
 
       # ── Publish ──────────────────────────────────────────────────────────
       - name: Upload AAB to GitHub Release
