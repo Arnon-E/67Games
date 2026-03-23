@@ -116,41 +116,8 @@ jobs:
           files: stop_at_67/build/app/outputs/bundle/release/app-release.aab
 
       # ── Firebase Remote Config ───────────────────────────────────────────
-      # Sets min_version so existing users are prompted to update.
-      # Requires a service-account JSON key (base64-encoded) stored as the
-      # GitHub secret FIREBASE_SERVICE_ACCOUNT.
-      # The service account needs the "Firebase Remote Config Admin" IAM role.
-      # Encode once with:  base64 -i service-account.json | tr -d '\n'
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
-      - name: Update Firebase Remote Config min_version
-        env:
-          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-          RELEASE_TAG: ${{ github.event.inputs.tag || github.ref_name }}
-        run: |
-          # Strip 'v' prefix: v1.2.3 → 1.2.3
-          VERSION="${RELEASE_TAG#v}"
-
-          # Write service-account key to a temp file
-          echo "$FIREBASE_SERVICE_ACCOUNT" | base64 --decode > /tmp/sa.json
-
-          # Install Firebase Admin SDK
-          npm install --prefix /tmp/firebase-rc firebase-admin --silent
-
-          # Push new min_version to Remote Config
-          MIN_VERSION="$VERSION" node -e "
-          const admin = require('/tmp/firebase-rc/node_modules/firebase-admin');
-          admin.initializeApp({ credential: admin.credential.cert(require('/tmp/sa.json')) });
-          (async () => {
-            const rc = admin.remoteConfig();
-            const template = await rc.getTemplate();
-            template.parameters['min_version'] = {
-              defaultValue: { value: process.env.MIN_VERSION }
-            };
-            await rc.publishTemplate(template);
-            console.log('Remote Config updated: min_version =', process.env.MIN_VERSION);
-          })().catch(e => { console.error(e.message); process.exit(1); });
-          "
+      # NOTE: min_version is NOT updated here.
+      # Run the separate "Update min_version" workflow (update-min-version.yml)
+      # ONLY after the new version is live on the Play Store.
+      # This prevents users from being forced to update before the new version
+      # is actually available to download.
