@@ -376,8 +376,8 @@ const List<Achievement> kAchievements = [
 // ============================================================
 
 const kStreakConfig = (
-  maintainThreshold: 100,
-  breakThreshold: 500,
+  maintainThreshold: 50, // excellent and above only (≤50ms)
+  breakThreshold: 50,   // anything below excellent resets streak
   maxMultiplier: 2.0,
   multiplierStep: 0.1,
 );

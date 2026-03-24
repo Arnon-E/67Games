@@ -634,7 +634,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
           _detailRow(l10n.resultsLives, '${l10n.resultsLivesHeartEmoji} ${gs.surgeLives}'),
         ] else ...[
           _detailRow(l10n.resultsStreak,
-              '${gs.currentStreakValue > 1 ? "🔥 " : ""}${gs.currentStreakValue}'),
+              '${gs.currentStreakValue > 1 ? "🔥 " : ""}${gs.currentStreakValue}  /  ${gs.bestStreakValue}'),
         ],
         const SizedBox(height: 8),
         _detailRow(l10n.resultsXp, '+${result.xpEarned} XP'),
