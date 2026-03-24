@@ -621,13 +621,13 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
-  String get surgeFailLabel => 'GAME OVER';
+  String get surgeFailLabel => 'משחק נגמר';
 
   @override
-  String get resultsTotalScore => 'Total Score';
+  String get resultsTotalScore => 'ניקוד כולל';
 
   @override
-  String get resultsLives => 'Lives';
+  String get resultsLives => 'חיים';
 
   @override
   String get resultsLivesHeartEmoji => '❤️';

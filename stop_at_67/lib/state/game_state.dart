@@ -108,6 +108,10 @@ class GameState extends ChangeNotifier {
   int get surgeCumulativeScore => _surgeCumulativeScore;
   int get surgeLives => _surgeLives;
 
+  // ── Hot streak (excellent+ in a row boosts final score) ──────
+  int _hotStreak = 0;
+  int get hotStreak => _hotStreak;
+
   // ── Session score ────────────────────────────────────────────
   int _sessionScore = 0;
   String? _sessionModeId; // which mode the session belongs to
@@ -456,7 +460,7 @@ class GameState extends ChangeNotifier {
       // Build score directly from combined deviation (exponential curve)
       final rawScore = calculateRawScore(effectiveDeviation);
       final streakMult = calculateStreakMultiplier(streakResult.streakForScoring);
-      final finalScore = (rawScore * streakMult).round();
+      final finalScore = rawScore;
       result = ScoreResult(
         stoppedAtMs: stoppedAtMs,
         targetMs: effectiveTargetMs,
@@ -465,7 +469,7 @@ class GameState extends ChangeNotifier {
         streakMultiplier: streakMult,
         finalScore: finalScore,
         rating: getRating(effectiveDeviation),
-        xpEarned: (finalScore / kScoringConfig.xpDivisor).round(),
+        xpEarned: finalScore ~/ kScoringConfig.xpDivisor,
         isNewBest: finalScore > bestScore,
       );
     } else if (mode.isPressure) {
@@ -504,7 +508,7 @@ class GameState extends ChangeNotifier {
           streakMultiplier: 1.0,
           finalScore: pressureScore,
           rating: getRating(effectiveDeviation),
-          xpEarned: (pressureScore / kScoringConfig.xpDivisor).round(),
+          xpEarned: pressureScore ~/ kScoringConfig.xpDivisor,
           isNewBest: pressureScore > bestScore,
         );
       }
@@ -518,6 +522,25 @@ class GameState extends ChangeNotifier {
       );
     }
 
+    // ── Apply Surge speed multiplier to score ────────────────
+    if (mode.id == 'surge') {
+      final speedMult = _computeSurgeMultiplier();
+      if (speedMult > 1.0) {
+        final boosted = (result.finalScore * speedMult).round();
+        result = ScoreResult(
+          stoppedAtMs: result.stoppedAtMs,
+          targetMs: result.targetMs,
+          deviationMs: result.deviationMs,
+          rawScore: result.rawScore,
+          streakMultiplier: result.streakMultiplier,
+          finalScore: boosted,
+          rating: result.rating,
+          xpEarned: boosted ~/ kScoringConfig.xpDivisor,
+          isNewBest: boosted > bestScore,
+        );
+      }
+    }
+
     // ── Apply Fortune multiplier ──────────────────────────────
     if (_fortuneMultiplier > 1.0) {
       final boosted = (result.finalScore * _fortuneMultiplier).round();
@@ -529,9 +552,34 @@ class GameState extends ChangeNotifier {
         streakMultiplier: result.streakMultiplier,
         finalScore: boosted,
         rating: result.rating,
-        xpEarned: (boosted / kScoringConfig.xpDivisor).round(),
+        xpEarned: boosted ~/ kScoringConfig.xpDivisor,
         isNewBest: boosted > bestScore,
       );
+    }
+
+    // ── Hot streak bonus (excellent+ in a row) ───────────────
+    final tier = result.rating.tier;
+    final isExcellentOrAbove =
+        tier == 'perfect' || tier == 'incredible' || tier == 'excellent';
+    if (isExcellentOrAbove) {
+      _hotStreak++;
+      if (_hotStreak > 1) {
+        final hotBonus = 1.0 + (_hotStreak - 1) * 0.1; // +10% per extra consecutive excellent+
+        final boosted = (result.finalScore * hotBonus).round();
+        result = ScoreResult(
+          stoppedAtMs: result.stoppedAtMs,
+          targetMs: result.targetMs,
+          deviationMs: result.deviationMs,
+          rawScore: result.rawScore,
+          streakMultiplier: result.streakMultiplier,
+          finalScore: boosted,
+          rating: result.rating,
+          xpEarned: boosted ~/ kScoringConfig.xpDivisor,
+          isNewBest: boosted > bestScore,
+        );
+      }
+    } else {
+      _hotStreak = 0;
     }
 
     // ── Calibration: accumulate attempts ─────────────────────
@@ -578,7 +626,7 @@ class GameState extends ChangeNotifier {
         streakMultiplier: 1.0,
         finalScore: avgScore,
         rating: getRating(avgDev),
-        xpEarned: (avgScore / kScoringConfig.xpDivisor).round(),
+        xpEarned: avgScore ~/ kScoringConfig.xpDivisor,
         isNewBest: avgScore > bestScore,
       );
     }
@@ -808,6 +856,7 @@ class GameState extends ChangeNotifier {
 
     _lastResult = null;
     _surgePendingReset = false;
+    _hotStreak = 0;
     await _sound.cleanup();
     await startCountdown();
   }
@@ -837,6 +886,7 @@ class GameState extends ChangeNotifier {
     _sessionScore = 0;
     _sessionModeId = null;
     _fortuneMultiplier = 1.0;
+    _hotStreak = 0;
     _screen = AppScreen.modeSelect;
     WakelockPlus.disable().catchError((_) {});
     notifyListeners();

@@ -258,9 +258,9 @@
       "score": { "type": "int" }
     }
   },
-  "surgeFailLabel": "GAME OVER",
-  "resultsTotalScore": "Total Score",
-  "resultsLives": "Lives",
+  "surgeFailLabel": "ИГРА ОКОНЧЕНА",
+  "resultsTotalScore": "Общий счёт",
+  "resultsLives": "Жизни",
   "resultsLivesHeartEmoji": "❤️",
 
   "weeklyMissionsTitle": "ЕЖЕНЕДЕЛЬНЫЕ ЗАДАНИЯ",

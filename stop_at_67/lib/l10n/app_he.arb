@@ -259,9 +259,9 @@
       "score": { "type": "int" }
     }
   },
-  "surgeFailLabel": "GAME OVER",
-  "resultsTotalScore": "Total Score",
-  "resultsLives": "Lives",
+  "surgeFailLabel": "משחק נגמר",
+  "resultsTotalScore": "ניקוד כולל",
+  "resultsLives": "חיים",
   "resultsLivesHeartEmoji": "❤️",
 
   "weeklyMissionsTitle": "משימות שבועיות",

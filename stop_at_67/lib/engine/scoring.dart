@@ -37,7 +37,8 @@ ScoreResult calculateScore(
   final deviationMs = (stoppedAtMs - targetMs).abs();
   final rawScore = calculateRawScore(deviationMs);
   final streakMultiplier = calculateStreakMultiplier(currentStreak);
-  final finalScore = (rawScore * streakMultiplier).round();
+  final perfectBonus = deviationMs == 0 ? 3.0 : 1.0;
+  final finalScore = (rawScore * perfectBonus).round();
   final rating = getRating(deviationMs);
   final xpEarned = (finalScore / kScoringConfig.xpDivisor).round();
   final isNewBest = finalScore > bestScore;

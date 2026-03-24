@@ -632,13 +632,13 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
-  String get surgeFailLabel => 'GAME OVER';
+  String get surgeFailLabel => 'ИГРА ОКОНЧЕНА';
 
   @override
-  String get resultsTotalScore => 'Total Score';
+  String get resultsTotalScore => 'Общий счёт';
 
   @override
-  String get resultsLives => 'Lives';
+  String get resultsLives => 'Жизни';
 
   @override
   String get resultsLivesHeartEmoji => '❤️';
