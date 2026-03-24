@@ -320,6 +320,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get shopEquip => 'Equip';
 
   @override
+  String get shopUnequip => 'Unequip';
+
+  @override
   String shopPurchased(String name) {
     return '$name purchased!';
   }
@@ -329,6 +332,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get shopCategoryBackgrounds => 'Backgrounds';
+
+  @override
+  String get shopCategorySoundPacks => 'Sound Packs';
 
   @override
   String get shopCategoryCelebrations => 'Celebrations';
@@ -364,49 +370,46 @@ class AppLocalizationsEn extends AppLocalizations {
   String get shopItemFireworksDesc => 'Celebrate with fireworks';
 
   @override
-  String get shopCategorySoundPacks => 'Sound Packs';
-
-  @override
   String get shopItemMatrixTimerName => 'Matrix Timer';
 
   @override
-  String get shopItemMatrixTimerDesc => 'Glowing green code display';
+  String get shopItemMatrixTimerDesc => 'Green digital rain display';
 
   @override
   String get shopItemMidnightTimerName => 'Midnight Timer';
 
   @override
-  String get shopItemMidnightTimerDesc => 'Ice-blue deep midnight style';
+  String get shopItemMidnightTimerDesc => 'Cool blue midnight display';
 
   @override
   String get shopItemEmberNightName => 'Ember Night';
 
   @override
-  String get shopItemEmberNightDesc => 'Dark background lit with embers';
+  String get shopItemEmberNightDesc => 'Fiery orange night theme';
 
   @override
   String get shopItemArcticMistName => 'Arctic Mist';
 
   @override
-  String get shopItemArcticMistDesc => 'Cool icy cyan background';
+  String get shopItemArcticMistDesc => 'Icy cool blue theme';
 
   @override
   String get shopItemCrimsonDuskName => 'Crimson Dusk';
 
   @override
-  String get shopItemCrimsonDuskDesc => 'Deep dark red background';
+  String get shopItemCrimsonDuskDesc => 'Deep crimson twilight theme';
 
   @override
   String get shopItemRetroBeepsName => 'Retro Beeps';
 
   @override
-  String get shopItemRetroBeepsDesc => '8-bit arcade sound effects';
+  String get shopItemRetroBeepsDesc => 'Classic 8-bit sound effects';
 
   @override
   String get shopItemZenClicksName => 'Zen Clicks';
 
   @override
-  String get shopItemZenClicksDesc => 'Soft calming tap sounds';
+  String get shopItemZenClicksDesc => 'Calm minimal tap sounds';
 
   @override
   String modeCardTarget(String target) {

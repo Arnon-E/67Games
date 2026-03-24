@@ -134,6 +134,7 @@
   "shopOwned": "Куплено",
   "shopEquipped": "Надет",
   "shopEquip": "Надеть",
+  "shopUnequip": "Снять",
   "shopPurchased": "{name} куплено!",
   "@shopPurchased": {
     "placeholders": {
@@ -142,6 +143,7 @@
   },
   "shopCategoryTimerSkins": "Облики таймера",
   "shopCategoryBackgrounds": "Фоны",
+  "shopCategorySoundPacks": "Звуковые пакеты",
   "shopCategoryCelebrations": "Празднования",
   "shopItemNeonTimerName": "Неоновый таймер",
   "shopItemNeonTimerDesc": "Светящийся неоновый дисплей",
@@ -153,6 +155,20 @@
   "shopItemOceanDeepDesc": "Тёмная морская тема",
   "shopItemFireworksName": "Фейерверк",
   "shopItemFireworksDesc": "Отпразднуйте с фейерверком",
+  "shopItemMatrixTimerName": "Таймер Матрица",
+  "shopItemMatrixTimerDesc": "Зелёный цифровой дождь",
+  "shopItemMidnightTimerName": "Полночный таймер",
+  "shopItemMidnightTimerDesc": "Прохладный синий полночный дисплей",
+  "shopItemEmberNightName": "Ночь углей",
+  "shopItemEmberNightDesc": "Огненно-оранжевая ночная тема",
+  "shopItemArcticMistName": "Арктический туман",
+  "shopItemArcticMistDesc": "Ледяная голубая тема",
+  "shopItemCrimsonDuskName": "Малиновый закат",
+  "shopItemCrimsonDuskDesc": "Глубокая тёмно-красная тема",
+  "shopItemRetroBeepsName": "Ретро-сигналы",
+  "shopItemRetroBeepsDesc": "Классические 8-битные звуки",
+  "shopItemZenClicksName": "Дзен-клики",
+  "shopItemZenClicksDesc": "Спокойные минимальные звуки касаний",
 
   "modeCardTarget": "Цель: {target}",
   "@modeCardTarget": {

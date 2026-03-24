@@ -112,7 +112,9 @@ class _PlayingScreenState extends State<PlayingScreen> {
                           if (mode?.id == 'surge')
                             const SizedBox(width: 72),
                           Flexible(
-                            child: RichText(
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: RichText(
                               textAlign: TextAlign.center,
                               text: TextSpan(
                                 children: [
@@ -147,6 +149,7 @@ class _PlayingScreenState extends State<PlayingScreen> {
                                   ),
                                 ],
                               ),
+                            ),
                             ),
                           ),
                           if (mode != null && mode.isPressure) ...[

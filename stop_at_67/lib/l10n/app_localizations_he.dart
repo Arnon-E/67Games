@@ -320,6 +320,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get shopEquip => 'צייד';
 
   @override
+  String get shopUnequip => 'הסר';
+
+  @override
   String shopPurchased(String name) {
     return '$name נרכש!';
   }
@@ -329,6 +332,9 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get shopCategoryBackgrounds => 'רקעים';
+
+  @override
+  String get shopCategorySoundPacks => 'חבילות צליל';
 
   @override
   String get shopCategoryCelebrations => 'חגיגות';
@@ -364,49 +370,46 @@ class AppLocalizationsHe extends AppLocalizations {
   String get shopItemFireworksDesc => 'חגוג עם זיקוקים';
 
   @override
-  String get shopCategorySoundPacks => 'חבילות סאונד';
-
-  @override
   String get shopItemMatrixTimerName => 'טיימר מטריקס';
 
   @override
-  String get shopItemMatrixTimerDesc => 'תצוגת קוד ירוק זוהר';
+  String get shopItemMatrixTimerDesc => 'תצוגת גשם דיגיטלי ירוק';
 
   @override
   String get shopItemMidnightTimerName => 'טיימר חצות';
 
   @override
-  String get shopItemMidnightTimerDesc => 'סגנון כחול קרחוני עמוק';
+  String get shopItemMidnightTimerDesc => 'תצוגת חצות כחולה קרירה';
 
   @override
-  String get shopItemEmberNightName => 'ליל גחלים';
+  String get shopItemEmberNightName => 'לילת גחלים';
 
   @override
-  String get shopItemEmberNightDesc => 'רקע כהה עם גחלים';
+  String get shopItemEmberNightDesc => 'ערכת נושא לילה כתומה';
 
   @override
   String get shopItemArcticMistName => 'ערפל ארקטי';
 
   @override
-  String get shopItemArcticMistDesc => 'רקע טורקיז קרחוני';
+  String get shopItemArcticMistDesc => 'ערכת נושא כחולה קרירה';
 
   @override
-  String get shopItemCrimsonDuskName => 'דמדומים ארגמן';
+  String get shopItemCrimsonDuskName => 'דמדומים שנהביים';
 
   @override
-  String get shopItemCrimsonDuskDesc => 'רקע אדום כהה עמוק';
+  String get shopItemCrimsonDuskDesc => 'ערכת נושא שקיעה אדומה עמוקה';
 
   @override
   String get shopItemRetroBeepsName => 'צפצופי רטרו';
 
   @override
-  String get shopItemRetroBeepsDesc => 'צלילי ארקייד 8-ביט';
+  String get shopItemRetroBeepsDesc => 'אפקטי צליל 8-ביט קלאסיים';
 
   @override
   String get shopItemZenClicksName => 'לחיצות זן';
 
   @override
-  String get shopItemZenClicksDesc => 'צלילי הקשה רכים ומרגיעים';
+  String get shopItemZenClicksDesc => 'צלילי הקשה מינימליים שקטים';
 
   @override
   String modeCardTarget(String target) {

@@ -16,7 +16,6 @@ class _Item {
   final String equipType; // matches equipCosmetic() type key
   final int price;
   final Color color;
-  final bool comingSoon;
   const _Item({
     required this.id,
     required this.nameKey,
@@ -25,7 +24,6 @@ class _Item {
     required this.categoryKey,
     required this.equipType,
     required this.color,
-    this.comingSoon = false,
   });
 }
 
@@ -50,15 +48,9 @@ const _items = [
       price: 22000, categoryKey: 'backgrounds', equipType: 'background', color: Color(0xFF80DEEA)),
   _Item(id: 'bg_crimson', nameKey: 'crimsonDusk', descKey: 'crimsonDuskDesc',
       price: 25000, categoryKey: 'backgrounds', equipType: 'background', color: Color(0xFFB71C1C)),
-  // ── Sound Packs ───────────────────────────────────────────
-  _Item(id: 'sound_retro', nameKey: 'retroBeeps', descKey: 'retroBeepsDesc',
-      price: 15000, categoryKey: 'soundPacks', equipType: 'soundPack', color: Color(0xFFFFD54F)),
-  _Item(id: 'sound_zen', nameKey: 'zenClicks', descKey: 'zenClicksDesc',
-      price: 15000, categoryKey: 'soundPacks', equipType: 'soundPack', color: Color(0xFF80CBC4)),
   // ── Celebrations ──────────────────────────────────────────
   _Item(id: 'celebration_fireworks', nameKey: 'fireworks', descKey: 'fireworksDesc',
-      price: 30000, categoryKey: 'celebrations', equipType: 'celebration', color: Color(0xFFFF6B35),
-      comingSoon: true),
+      price: 30000, categoryKey: 'celebrations', equipType: 'celebration', color: Color(0xFFFF6B35)),
 ];
 
 class ShopScreen extends StatelessWidget {
@@ -75,8 +67,6 @@ class ShopScreen extends StatelessWidget {
       'emberNight' => l10n.shopItemEmberNightName,
       'arcticMist' => l10n.shopItemArcticMistName,
       'crimsonDusk' => l10n.shopItemCrimsonDuskName,
-      'retroBeeps' => l10n.shopItemRetroBeepsName,
-      'zenClicks' => l10n.shopItemZenClicksName,
       'fireworks' => l10n.shopItemFireworksName,
       _ => item.nameKey,
     };
@@ -93,8 +83,6 @@ class ShopScreen extends StatelessWidget {
       'emberNightDesc' => l10n.shopItemEmberNightDesc,
       'arcticMistDesc' => l10n.shopItemArcticMistDesc,
       'crimsonDuskDesc' => l10n.shopItemCrimsonDuskDesc,
-      'retroBeepsDesc' => l10n.shopItemRetroBeepsDesc,
-      'zenClicksDesc' => l10n.shopItemZenClicksDesc,
       'fireworksDesc' => l10n.shopItemFireworksDesc,
       _ => item.descKey,
     };
@@ -104,7 +92,6 @@ class ShopScreen extends StatelessWidget {
     return switch (key) {
       'timerSkins' => l10n.shopCategoryTimerSkins,
       'backgrounds' => l10n.shopCategoryBackgrounds,
-      'soundPacks' => l10n.shopCategorySoundPacks,
       'celebrations' => l10n.shopCategoryCelebrations,
       _ => key,
     };
@@ -168,6 +155,7 @@ class ShopScreen extends StatelessWidget {
                               ownedLabel: l10n.shopOwned,
                               equippedLabel: l10n.shopEquipped,
                               equipLabel: l10n.shopEquip,
+                              unequipLabel: l10n.shopUnequip,
                               purchasedMessage: l10n.shopPurchased(_itemName(item, l10n)),
                             )),
                         const SizedBox(height: 20),
@@ -191,6 +179,7 @@ class _ItemCard extends StatelessWidget {
   final String ownedLabel;
   final String equippedLabel;
   final String equipLabel;
+  final String unequipLabel;
   final String purchasedMessage;
 
   const _ItemCard({
@@ -200,6 +189,7 @@ class _ItemCard extends StatelessWidget {
     required this.ownedLabel,
     required this.equippedLabel,
     required this.equipLabel,
+    required this.unequipLabel,
     required this.purchasedMessage,
   });
 
@@ -246,21 +236,18 @@ class _ItemCard extends StatelessWidget {
               ],
             ),
           ),
-          if (item.comingSoon)
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-              decoration: BoxDecoration(
-                  color: AppColors.textHint, borderRadius: BorderRadius.circular(20)),
-              child: const Text('Soon',
-                  style: TextStyle(color: AppColors.textDisabled, fontSize: 12, fontWeight: FontWeight.w600)),
-            )
-          else if (equipped)
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              decoration: BoxDecoration(
-                  color: item.color.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(20)),
-              child: Text(equippedLabel,
-                  style: TextStyle(color: item.color, fontSize: 12, fontWeight: FontWeight.w600)),
+          if (equipped)
+            GestureDetector(
+              onTap: () => gs.unequipCosmetic(item.equipType),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                    color: item.color.withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: item.color.withValues(alpha: 0.5))),
+                child: Text(unequipLabel,
+                    style: TextStyle(color: item.color, fontSize: 12, fontWeight: FontWeight.w600)),
+              ),
             )
           else if (owned)
             GestureDetector(

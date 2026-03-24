@@ -706,6 +706,12 @@ abstract class AppLocalizations {
   /// **'Equip'**
   String get shopEquip;
 
+  /// No description provided for @shopUnequip.
+  ///
+  /// In en, this message translates to:
+  /// **'Unequip'**
+  String get shopUnequip;
+
   /// No description provided for @shopPurchased.
   ///
   /// In en, this message translates to:
@@ -723,6 +729,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Backgrounds'**
   String get shopCategoryBackgrounds;
+
+  /// No description provided for @shopCategorySoundPacks.
+  ///
+  /// In en, this message translates to:
+  /// **'Sound Packs'**
+  String get shopCategorySoundPacks;
 
   /// No description provided for @shopCategoryCelebrations.
   ///
@@ -790,27 +802,88 @@ abstract class AppLocalizations {
   /// **'Celebrate with fireworks'**
   String get shopItemFireworksDesc;
 
-  String get shopCategorySoundPacks;
-
+  /// No description provided for @shopItemMatrixTimerName.
+  ///
+  /// In en, this message translates to:
+  /// **'Matrix Timer'**
   String get shopItemMatrixTimerName;
+
+  /// No description provided for @shopItemMatrixTimerDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Green digital rain display'**
   String get shopItemMatrixTimerDesc;
 
+  /// No description provided for @shopItemMidnightTimerName.
+  ///
+  /// In en, this message translates to:
+  /// **'Midnight Timer'**
   String get shopItemMidnightTimerName;
+
+  /// No description provided for @shopItemMidnightTimerDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Cool blue midnight display'**
   String get shopItemMidnightTimerDesc;
 
+  /// No description provided for @shopItemEmberNightName.
+  ///
+  /// In en, this message translates to:
+  /// **'Ember Night'**
   String get shopItemEmberNightName;
+
+  /// No description provided for @shopItemEmberNightDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Fiery orange night theme'**
   String get shopItemEmberNightDesc;
 
+  /// No description provided for @shopItemArcticMistName.
+  ///
+  /// In en, this message translates to:
+  /// **'Arctic Mist'**
   String get shopItemArcticMistName;
+
+  /// No description provided for @shopItemArcticMistDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Icy cool blue theme'**
   String get shopItemArcticMistDesc;
 
+  /// No description provided for @shopItemCrimsonDuskName.
+  ///
+  /// In en, this message translates to:
+  /// **'Crimson Dusk'**
   String get shopItemCrimsonDuskName;
+
+  /// No description provided for @shopItemCrimsonDuskDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Deep crimson twilight theme'**
   String get shopItemCrimsonDuskDesc;
 
+  /// No description provided for @shopItemRetroBeepsName.
+  ///
+  /// In en, this message translates to:
+  /// **'Retro Beeps'**
   String get shopItemRetroBeepsName;
+
+  /// No description provided for @shopItemRetroBeepsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Classic 8-bit sound effects'**
   String get shopItemRetroBeepsDesc;
 
+  /// No description provided for @shopItemZenClicksName.
+  ///
+  /// In en, this message translates to:
+  /// **'Zen Clicks'**
   String get shopItemZenClicksName;
+
+  /// No description provided for @shopItemZenClicksDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Calm minimal tap sounds'**
   String get shopItemZenClicksDesc;
 
   /// No description provided for @modeCardTarget.

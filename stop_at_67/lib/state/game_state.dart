@@ -998,6 +998,18 @@ class GameState extends ChangeNotifier {
     notifyListeners();
   }
 
+  void unequipCosmetic(String type) {
+    _loadout = switch (type) {
+      'timerSkin' => _loadout.copyWith(timerSkin: 'timer_skin_default'),
+      'background' => _loadout.copyWith(background: 'bg_default'),
+      'soundPack' => _loadout.copyWith(soundPack: 'sound_default'),
+      'celebration' => _loadout.copyWith(celebration: 'celebration_default'),
+      _ => _loadout,
+    };
+    _storage.saveLoadout(_loadout);
+    notifyListeners();
+  }
+
   bool get isSoundEnabled => _sound.isEnabled;
 
   void setSoundEnabled(bool enabled) {
