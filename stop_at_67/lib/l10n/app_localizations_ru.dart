@@ -321,6 +321,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get shopEquip => 'Надеть';
 
   @override
+  String get shopUnequip => 'Снять';
+
+  @override
   String shopPurchased(String name) {
     return '$name куплено!';
   }
@@ -330,6 +333,9 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get shopCategoryBackgrounds => 'Фоны';
+
+  @override
+  String get shopCategorySoundPacks => 'Звуковые пакеты';
 
   @override
   String get shopCategoryCelebrations => 'Празднования';
@@ -363,6 +369,48 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get shopItemFireworksDesc => 'Отпразднуйте с фейерверком';
+
+  @override
+  String get shopItemMatrixTimerName => 'Таймер Матрица';
+
+  @override
+  String get shopItemMatrixTimerDesc => 'Зелёный цифровой дождь';
+
+  @override
+  String get shopItemMidnightTimerName => 'Полночный таймер';
+
+  @override
+  String get shopItemMidnightTimerDesc => 'Прохладный синий полночный дисплей';
+
+  @override
+  String get shopItemEmberNightName => 'Ночь углей';
+
+  @override
+  String get shopItemEmberNightDesc => 'Огненно-оранжевая ночная тема';
+
+  @override
+  String get shopItemArcticMistName => 'Арктический туман';
+
+  @override
+  String get shopItemArcticMistDesc => 'Ледяная голубая тема';
+
+  @override
+  String get shopItemCrimsonDuskName => 'Малиновый закат';
+
+  @override
+  String get shopItemCrimsonDuskDesc => 'Глубокая тёмно-красная тема';
+
+  @override
+  String get shopItemRetroBeepsName => 'Ретро-сигналы';
+
+  @override
+  String get shopItemRetroBeepsDesc => 'Классические 8-битные звуки';
+
+  @override
+  String get shopItemZenClicksName => 'Дзен-клики';
+
+  @override
+  String get shopItemZenClicksDesc => 'Спокойные минимальные звуки касаний';
 
   @override
   String modeCardTarget(String target) {
@@ -584,13 +632,13 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
-  String get surgeFailLabel => 'GAME OVER';
+  String get surgeFailLabel => 'ИГРА ОКОНЧЕНА';
 
   @override
-  String get resultsTotalScore => 'Total Score';
+  String get resultsTotalScore => 'Общий счёт';
 
   @override
-  String get resultsLives => 'Lives';
+  String get resultsLives => 'Жизни';
 
   @override
   String get resultsLivesHeartEmoji => '❤️';

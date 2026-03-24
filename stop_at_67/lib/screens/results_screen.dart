@@ -489,7 +489,8 @@ class _ResultsScreenState extends State<ResultsScreen> {
     final bestScore = gs.stats.bestScores[mode.id] ?? 0;
     final isPersonalBest = result.finalScore > 0 && result.finalScore == bestScore;
     final isPerfect = deviation == 0;
-    final showFireworks = _isExcellent(result.rating.tier);
+    final showFireworks = _isExcellent(result.rating.tier) &&
+        gs.loadout.celebration == 'celebration_fireworks';
 
     // Pressure eliminated: show red background
     final bool isPressureEliminated = mode.isPressure && !gs.pressureLastRoundSuccess;
@@ -633,7 +634,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
           _detailRow(l10n.resultsLives, '${l10n.resultsLivesHeartEmoji} ${gs.surgeLives}'),
         ] else ...[
           _detailRow(l10n.resultsStreak,
-              '${gs.currentStreakValue > 1 ? "🔥 " : ""}${gs.currentStreakValue}'),
+              '${gs.currentStreakValue > 1 ? "🔥 " : ""}${gs.currentStreakValue}  /  ${gs.bestStreakValue}'),
         ],
         const SizedBox(height: 8),
         _detailRow(l10n.resultsXp, '+${result.xpEarned} XP'),

@@ -6,6 +6,8 @@ import '../theme/app_colors.dart';
 Color timerSkinColor(String skinId) => switch (skinId) {
   'timer_skin_neon' => const Color(0xFF00FFCC),
   'timer_skin_gold' => const Color(0xFFFFD700),
+  'timer_skin_matrix' => const Color(0xFF39FF14),
+  'timer_skin_midnight' => const Color(0xFF4FC3F7),
   _ => AppColors.gold, // default
 };
 
@@ -84,8 +86,10 @@ class TimerDisplay extends StatelessWidget {
                             Text(
                               displayTime,
                               textAlign: TextAlign.center,
+                              maxLines: 1,
+                              softWrap: false,
                               style: TextStyle(
-                                fontSize: 80,
+                                fontSize: 64,
                                 fontWeight: FontWeight.w700,
                                 foreground: Paint()
                                   ..maskFilter = const MaskFilter.blur(
@@ -98,8 +102,10 @@ class TimerDisplay extends StatelessWidget {
                           Text(
                             isBlind ? '?.??' : displayTime,
                             textAlign: TextAlign.center,
+                            maxLines: 1,
+                            softWrap: false,
                             style: TextStyle(
-                              fontSize: 80,
+                              fontSize: 64,
                               fontWeight: FontWeight.w700,
                               color: textColor,
                               letterSpacing: -2,

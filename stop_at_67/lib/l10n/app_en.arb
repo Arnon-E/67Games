@@ -134,6 +134,7 @@
   "shopOwned": "Owned",
   "shopEquipped": "Equipped",
   "shopEquip": "Equip",
+  "shopUnequip": "Unequip",
   "shopPurchased": "{name} purchased!",
   "@shopPurchased": {
     "placeholders": {
@@ -142,6 +143,7 @@
   },
   "shopCategoryTimerSkins": "Timer Skins",
   "shopCategoryBackgrounds": "Backgrounds",
+  "shopCategorySoundPacks": "Sound Packs",
   "shopCategoryCelebrations": "Celebrations",
   "shopItemNeonTimerName": "Neon Timer",
   "shopItemNeonTimerDesc": "Glowing neon display",
@@ -153,6 +155,20 @@
   "shopItemOceanDeepDesc": "Dark ocean theme",
   "shopItemFireworksName": "Fireworks",
   "shopItemFireworksDesc": "Celebrate with fireworks",
+  "shopItemMatrixTimerName": "Matrix Timer",
+  "shopItemMatrixTimerDesc": "Green digital rain display",
+  "shopItemMidnightTimerName": "Midnight Timer",
+  "shopItemMidnightTimerDesc": "Cool blue midnight display",
+  "shopItemEmberNightName": "Ember Night",
+  "shopItemEmberNightDesc": "Fiery orange night theme",
+  "shopItemArcticMistName": "Arctic Mist",
+  "shopItemArcticMistDesc": "Icy cool blue theme",
+  "shopItemCrimsonDuskName": "Crimson Dusk",
+  "shopItemCrimsonDuskDesc": "Deep crimson twilight theme",
+  "shopItemRetroBeepsName": "Retro Beeps",
+  "shopItemRetroBeepsDesc": "Classic 8-bit sound effects",
+  "shopItemZenClicksName": "Zen Clicks",
+  "shopItemZenClicksDesc": "Calm minimal tap sounds",
 
   "modeCardTarget": "Target: {target}",
   "@modeCardTarget": {

@@ -16,7 +16,6 @@ class _Item {
   final String equipType; // matches equipCosmetic() type key
   final int price;
   final Color color;
-  final bool comingSoon;
   const _Item({
     required this.id,
     required this.nameKey,
@@ -25,22 +24,33 @@ class _Item {
     required this.categoryKey,
     required this.equipType,
     required this.color,
-    this.comingSoon = false,
   });
 }
 
 const _items = [
+  // ── Timer Skins ──────────────────────────────────────────
   _Item(id: 'timer_skin_neon', nameKey: 'neonTimer', descKey: 'neonTimerDesc',
       price: 12000, categoryKey: 'timerSkins', equipType: 'timerSkin', color: Color(0xFF00FFCC)),
   _Item(id: 'timer_skin_gold', nameKey: 'goldTimer', descKey: 'goldTimerDesc',
       price: 24000, categoryKey: 'timerSkins', equipType: 'timerSkin', color: Color(0xFFFFD700)),
+  _Item(id: 'timer_skin_matrix', nameKey: 'matrixTimer', descKey: 'matrixTimerDesc',
+      price: 20000, categoryKey: 'timerSkins', equipType: 'timerSkin', color: Color(0xFF39FF14)),
+  _Item(id: 'timer_skin_midnight', nameKey: 'midnightTimer', descKey: 'midnightTimerDesc',
+      price: 28000, categoryKey: 'timerSkins', equipType: 'timerSkin', color: Color(0xFF4FC3F7)),
+  // ── Backgrounds ───────────────────────────────────────────
   _Item(id: 'bg_purple', nameKey: 'purpleHaze', descKey: 'purpleHazeDesc',
       price: 18000, categoryKey: 'backgrounds', equipType: 'background', color: Color(0xFF8B5CF6)),
   _Item(id: 'bg_ocean', nameKey: 'oceanDeep', descKey: 'oceanDeepDesc',
       price: 18000, categoryKey: 'backgrounds', equipType: 'background', color: Color(0xFF0EA5E9)),
+  _Item(id: 'bg_ember', nameKey: 'emberNight', descKey: 'emberNightDesc',
+      price: 22000, categoryKey: 'backgrounds', equipType: 'background', color: Color(0xFFFF6B00)),
+  _Item(id: 'bg_arctic', nameKey: 'arcticMist', descKey: 'arcticMistDesc',
+      price: 22000, categoryKey: 'backgrounds', equipType: 'background', color: Color(0xFF80DEEA)),
+  _Item(id: 'bg_crimson', nameKey: 'crimsonDusk', descKey: 'crimsonDuskDesc',
+      price: 25000, categoryKey: 'backgrounds', equipType: 'background', color: Color(0xFFB71C1C)),
+  // ── Celebrations ──────────────────────────────────────────
   _Item(id: 'celebration_fireworks', nameKey: 'fireworks', descKey: 'fireworksDesc',
-      price: 30000, categoryKey: 'celebrations', equipType: 'celebration', color: Color(0xFFFF6B35),
-      comingSoon: true),
+      price: 30000, categoryKey: 'celebrations', equipType: 'celebration', color: Color(0xFFFF6B35)),
 ];
 
 class ShopScreen extends StatelessWidget {
@@ -50,8 +60,13 @@ class ShopScreen extends StatelessWidget {
     return switch (item.nameKey) {
       'neonTimer' => l10n.shopItemNeonTimerName,
       'goldTimer' => l10n.shopItemGoldTimerName,
+      'matrixTimer' => l10n.shopItemMatrixTimerName,
+      'midnightTimer' => l10n.shopItemMidnightTimerName,
       'purpleHaze' => l10n.shopItemPurpleHazeName,
       'oceanDeep' => l10n.shopItemOceanDeepName,
+      'emberNight' => l10n.shopItemEmberNightName,
+      'arcticMist' => l10n.shopItemArcticMistName,
+      'crimsonDusk' => l10n.shopItemCrimsonDuskName,
       'fireworks' => l10n.shopItemFireworksName,
       _ => item.nameKey,
     };
@@ -61,8 +76,13 @@ class ShopScreen extends StatelessWidget {
     return switch (item.descKey) {
       'neonTimerDesc' => l10n.shopItemNeonTimerDesc,
       'goldTimerDesc' => l10n.shopItemGoldTimerDesc,
+      'matrixTimerDesc' => l10n.shopItemMatrixTimerDesc,
+      'midnightTimerDesc' => l10n.shopItemMidnightTimerDesc,
       'purpleHazeDesc' => l10n.shopItemPurpleHazeDesc,
       'oceanDeepDesc' => l10n.shopItemOceanDeepDesc,
+      'emberNightDesc' => l10n.shopItemEmberNightDesc,
+      'arcticMistDesc' => l10n.shopItemArcticMistDesc,
+      'crimsonDuskDesc' => l10n.shopItemCrimsonDuskDesc,
       'fireworksDesc' => l10n.shopItemFireworksDesc,
       _ => item.descKey,
     };
@@ -135,6 +155,7 @@ class ShopScreen extends StatelessWidget {
                               ownedLabel: l10n.shopOwned,
                               equippedLabel: l10n.shopEquipped,
                               equipLabel: l10n.shopEquip,
+                              unequipLabel: l10n.shopUnequip,
                               purchasedMessage: l10n.shopPurchased(_itemName(item, l10n)),
                             )),
                         const SizedBox(height: 20),
@@ -158,6 +179,7 @@ class _ItemCard extends StatelessWidget {
   final String ownedLabel;
   final String equippedLabel;
   final String equipLabel;
+  final String unequipLabel;
   final String purchasedMessage;
 
   const _ItemCard({
@@ -167,6 +189,7 @@ class _ItemCard extends StatelessWidget {
     required this.ownedLabel,
     required this.equippedLabel,
     required this.equipLabel,
+    required this.unequipLabel,
     required this.purchasedMessage,
   });
 
@@ -213,21 +236,18 @@ class _ItemCard extends StatelessWidget {
               ],
             ),
           ),
-          if (item.comingSoon)
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-              decoration: BoxDecoration(
-                  color: AppColors.textHint, borderRadius: BorderRadius.circular(20)),
-              child: const Text('Soon',
-                  style: TextStyle(color: AppColors.textDisabled, fontSize: 12, fontWeight: FontWeight.w600)),
-            )
-          else if (equipped)
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              decoration: BoxDecoration(
-                  color: item.color.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(20)),
-              child: Text(equippedLabel,
-                  style: TextStyle(color: item.color, fontSize: 12, fontWeight: FontWeight.w600)),
+          if (equipped)
+            GestureDetector(
+              onTap: () => gs.unequipCosmetic(item.equipType),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                    color: item.color.withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: item.color.withValues(alpha: 0.5))),
+                child: Text(unequipLabel,
+                    style: TextStyle(color: item.color, fontSize: 12, fontWeight: FontWeight.w600)),
+              ),
             )
           else if (owned)
             GestureDetector(

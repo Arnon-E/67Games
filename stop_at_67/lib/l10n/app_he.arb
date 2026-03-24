@@ -135,6 +135,7 @@
   "shopOwned": "נרכש",
   "shopEquipped": "מצויד",
   "shopEquip": "צייד",
+  "shopUnequip": "הסר",
   "shopPurchased": "{name} נרכש!",
   "@shopPurchased": {
     "placeholders": {
@@ -143,6 +144,7 @@
   },
   "shopCategoryTimerSkins": "עיצובי טיימר",
   "shopCategoryBackgrounds": "רקעים",
+  "shopCategorySoundPacks": "חבילות צליל",
   "shopCategoryCelebrations": "חגיגות",
   "shopItemNeonTimerName": "טיימר ניאון",
   "shopItemNeonTimerDesc": "תצוגת ניאון זוהרת",
@@ -154,6 +156,20 @@
   "shopItemOceanDeepDesc": "ערכת נושא ים כהה",
   "shopItemFireworksName": "זיקוקים",
   "shopItemFireworksDesc": "חגוג עם זיקוקים",
+  "shopItemMatrixTimerName": "טיימר מטריקס",
+  "shopItemMatrixTimerDesc": "תצוגת גשם דיגיטלי ירוק",
+  "shopItemMidnightTimerName": "טיימר חצות",
+  "shopItemMidnightTimerDesc": "תצוגת חצות כחולה קרירה",
+  "shopItemEmberNightName": "לילת גחלים",
+  "shopItemEmberNightDesc": "ערכת נושא לילה כתומה",
+  "shopItemArcticMistName": "ערפל ארקטי",
+  "shopItemArcticMistDesc": "ערכת נושא כחולה קרירה",
+  "shopItemCrimsonDuskName": "דמדומים שנהביים",
+  "shopItemCrimsonDuskDesc": "ערכת נושא שקיעה אדומה עמוקה",
+  "shopItemRetroBeepsName": "צפצופי רטרו",
+  "shopItemRetroBeepsDesc": "אפקטי צליל 8-ביט קלאסיים",
+  "shopItemZenClicksName": "לחיצות זן",
+  "shopItemZenClicksDesc": "צלילי הקשה מינימליים שקטים",
 
   "modeCardTarget": "יעד: {target}",
   "@modeCardTarget": {
@@ -243,9 +259,9 @@
       "score": { "type": "int" }
     }
   },
-  "surgeFailLabel": "GAME OVER",
-  "resultsTotalScore": "Total Score",
-  "resultsLives": "Lives",
+  "surgeFailLabel": "משחק נגמר",
+  "resultsTotalScore": "ניקוד כולל",
+  "resultsLives": "חיים",
   "resultsLivesHeartEmoji": "❤️",
 
   "weeklyMissionsTitle": "משימות שבועיות",

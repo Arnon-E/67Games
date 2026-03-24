@@ -242,7 +242,7 @@ class TimerState {
     this.speedMultiplier = 1.0,
   });
 
-  factory TimerState.initial() => const TimerState(isRunning: false, elapsedMs: 0, displayTime: '0.000');
+  factory TimerState.initial() => const TimerState(isRunning: false, elapsedMs: 0, displayTime: '0.0000');
 
   TimerState copyWith({bool? isRunning, int? elapsedMs, String? displayTime, double? speedMultiplier}) => TimerState(
     isRunning: isRunning ?? this.isRunning,

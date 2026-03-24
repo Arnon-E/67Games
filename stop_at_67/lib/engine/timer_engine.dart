@@ -8,15 +8,17 @@ class PrecisionTimer {
   final Stopwatch _stopwatch = Stopwatch();
   Timer? _ticker;
   bool _countdown = false;
+  // Stored internally in tenths-of-ms (0.1 ms units) for 4-decimal display.
   int _countdownFrom = 0;
   double _speedMultiplier = 1.0;
+  // _virtualElapsed is in tenths-of-ms. Each 16 ms tick = 160 tenths.
   int _virtualElapsed = 0;
 
   PrecisionTimer({required this.onTick});
 
   void setCountdown(bool enabled, int fromMs) {
     _countdown = enabled;
-    _countdownFrom = fromMs;
+    _countdownFrom = fromMs * 10; // convert ms → tenths-of-ms
   }
 
   void setSpeedMultiplier(double multiplier) {
@@ -32,17 +34,20 @@ class PrecisionTimer {
   }
 
   void _tick(Timer t) {
-    _virtualElapsed += (16 * _speedMultiplier).round();
-    final displayMs = _countdown ? max(0, _countdownFrom - _virtualElapsed) : _virtualElapsed;
+    // Each 16 ms tick = 160 tenths-of-ms at 1× speed.
+    _virtualElapsed += (160 * _speedMultiplier).round();
+    final displayTenths = _countdown
+        ? max(0, _countdownFrom - _virtualElapsed)
+        : _virtualElapsed;
 
     onTick(TimerState(
       isRunning: true,
       elapsedMs: _stopwatch.elapsedMilliseconds,
-      displayTime: _formatTime(displayMs),
+      displayTime: _formatTime(displayTenths),
       speedMultiplier: _speedMultiplier,
     ));
 
-    if (_countdown && displayMs <= 0) {
+    if (_countdown && displayTenths <= 0) {
       stop();
     }
   }
@@ -54,22 +59,25 @@ class PrecisionTimer {
     _stopwatch.stop();
 
     final elapsed = _stopwatch.elapsedMilliseconds;
-    final displayMs = _countdown ? max(0, _countdownFrom - _virtualElapsed) : _virtualElapsed;
+    final displayTenths = _countdown
+        ? max(0, _countdownFrom - _virtualElapsed)
+        : _virtualElapsed;
 
     onTick(TimerState(
       isRunning: false,
       elapsedMs: elapsed,
-      displayTime: _formatTime(displayMs),
+      displayTime: _formatTime(displayTenths),
       speedMultiplier: _speedMultiplier,
     ));
 
     return elapsed;
   }
 
-  /// Returns the virtual (displayed) elapsed value — used for scoring in speed modes.
+  /// Returns the virtual (displayed) elapsed value in whole ms —
+  /// used for scoring. Converts internal tenths-of-ms back to ms.
   int getStoppedValue(int elapsedMs) {
-    if (_countdown) return max(0, _countdownFrom - _virtualElapsed);
-    return _virtualElapsed;
+    if (_countdown) return max(0, _countdownFrom - _virtualElapsed) ~/ 10;
+    return _virtualElapsed ~/ 10;
   }
 
   void reset() {
@@ -91,10 +99,12 @@ class PrecisionTimer {
     _stopwatch.stop();
   }
 
-  String _formatTime(int ms) {
-    final totalMs = ms.clamp(0, 9999999);
-    final seconds = totalMs ~/ 1000;
-    final millis = totalMs % 1000;
-    return '$seconds.${millis.toString().padLeft(3, '0')}';
+  /// Formats tenths-of-ms into a 4-decimal display string.
+  /// e.g. 67040 tenths → "6.7040", 670000 tenths → "67.0000"
+  String _formatTime(int tenths) {
+    final totalTenths = tenths.clamp(0, 9999999);
+    final seconds = totalTenths ~/ 10000;
+    final sub = totalTenths % 10000;
+    return '$seconds.${sub.toString().padLeft(4, '0')}';
   }
 }

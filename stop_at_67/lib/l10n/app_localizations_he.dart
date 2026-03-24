@@ -320,6 +320,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get shopEquip => 'צייד';
 
   @override
+  String get shopUnequip => 'הסר';
+
+  @override
   String shopPurchased(String name) {
     return '$name נרכש!';
   }
@@ -329,6 +332,9 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get shopCategoryBackgrounds => 'רקעים';
+
+  @override
+  String get shopCategorySoundPacks => 'חבילות צליל';
 
   @override
   String get shopCategoryCelebrations => 'חגיגות';
@@ -362,6 +368,48 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get shopItemFireworksDesc => 'חגוג עם זיקוקים';
+
+  @override
+  String get shopItemMatrixTimerName => 'טיימר מטריקס';
+
+  @override
+  String get shopItemMatrixTimerDesc => 'תצוגת גשם דיגיטלי ירוק';
+
+  @override
+  String get shopItemMidnightTimerName => 'טיימר חצות';
+
+  @override
+  String get shopItemMidnightTimerDesc => 'תצוגת חצות כחולה קרירה';
+
+  @override
+  String get shopItemEmberNightName => 'לילת גחלים';
+
+  @override
+  String get shopItemEmberNightDesc => 'ערכת נושא לילה כתומה';
+
+  @override
+  String get shopItemArcticMistName => 'ערפל ארקטי';
+
+  @override
+  String get shopItemArcticMistDesc => 'ערכת נושא כחולה קרירה';
+
+  @override
+  String get shopItemCrimsonDuskName => 'דמדומים שנהביים';
+
+  @override
+  String get shopItemCrimsonDuskDesc => 'ערכת נושא שקיעה אדומה עמוקה';
+
+  @override
+  String get shopItemRetroBeepsName => 'צפצופי רטרו';
+
+  @override
+  String get shopItemRetroBeepsDesc => 'אפקטי צליל 8-ביט קלאסיים';
+
+  @override
+  String get shopItemZenClicksName => 'לחיצות זן';
+
+  @override
+  String get shopItemZenClicksDesc => 'צלילי הקשה מינימליים שקטים';
 
   @override
   String modeCardTarget(String target) {
@@ -573,13 +621,13 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
-  String get surgeFailLabel => 'GAME OVER';
+  String get surgeFailLabel => 'משחק נגמר';
 
   @override
-  String get resultsTotalScore => 'Total Score';
+  String get resultsTotalScore => 'ניקוד כולל';
 
   @override
-  String get resultsLives => 'Lives';
+  String get resultsLives => 'חיים';
 
   @override
   String get resultsLivesHeartEmoji => '❤️';
