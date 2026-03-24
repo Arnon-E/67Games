@@ -812,7 +812,8 @@ class GameState extends ChangeNotifier {
     await startCountdown();
   }
 
-  void returnToMenu() {
+  Future<void> returnToMenu() async {
+    await _sound.cleanup();
     _precisionTimer?.dispose();
     _precisionTimer = null;
     _currentMode = null;
