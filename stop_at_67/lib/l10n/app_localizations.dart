@@ -790,6 +790,29 @@ abstract class AppLocalizations {
   /// **'Celebrate with fireworks'**
   String get shopItemFireworksDesc;
 
+  String get shopCategorySoundPacks;
+
+  String get shopItemMatrixTimerName;
+  String get shopItemMatrixTimerDesc;
+
+  String get shopItemMidnightTimerName;
+  String get shopItemMidnightTimerDesc;
+
+  String get shopItemEmberNightName;
+  String get shopItemEmberNightDesc;
+
+  String get shopItemArcticMistName;
+  String get shopItemArcticMistDesc;
+
+  String get shopItemCrimsonDuskName;
+  String get shopItemCrimsonDuskDesc;
+
+  String get shopItemRetroBeepsName;
+  String get shopItemRetroBeepsDesc;
+
+  String get shopItemZenClicksName;
+  String get shopItemZenClicksDesc;
+
   /// No description provided for @modeCardTarget.
   ///
   /// In en, this message translates to:

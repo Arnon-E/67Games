@@ -364,6 +364,51 @@ class AppLocalizationsEn extends AppLocalizations {
   String get shopItemFireworksDesc => 'Celebrate with fireworks';
 
   @override
+  String get shopCategorySoundPacks => 'Sound Packs';
+
+  @override
+  String get shopItemMatrixTimerName => 'Matrix Timer';
+
+  @override
+  String get shopItemMatrixTimerDesc => 'Glowing green code display';
+
+  @override
+  String get shopItemMidnightTimerName => 'Midnight Timer';
+
+  @override
+  String get shopItemMidnightTimerDesc => 'Ice-blue deep midnight style';
+
+  @override
+  String get shopItemEmberNightName => 'Ember Night';
+
+  @override
+  String get shopItemEmberNightDesc => 'Dark background lit with embers';
+
+  @override
+  String get shopItemArcticMistName => 'Arctic Mist';
+
+  @override
+  String get shopItemArcticMistDesc => 'Cool icy cyan background';
+
+  @override
+  String get shopItemCrimsonDuskName => 'Crimson Dusk';
+
+  @override
+  String get shopItemCrimsonDuskDesc => 'Deep dark red background';
+
+  @override
+  String get shopItemRetroBeepsName => 'Retro Beeps';
+
+  @override
+  String get shopItemRetroBeepsDesc => '8-bit arcade sound effects';
+
+  @override
+  String get shopItemZenClicksName => 'Zen Clicks';
+
+  @override
+  String get shopItemZenClicksDesc => 'Soft calming tap sounds';
+
+  @override
   String modeCardTarget(String target) {
     return 'Target: $target';
   }

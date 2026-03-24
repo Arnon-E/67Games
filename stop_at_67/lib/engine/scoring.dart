@@ -1,5 +1,26 @@
+import 'dart:math';
 import 'constants.dart';
 import 'types.dart';
+
+// ============================================================
+// CALCULATE RAW SCORE (exponential decay)
+// ============================================================
+//
+// Formula: score = maxScore × exp(−deviationDecay × deviationMs)
+//
+// This makes accuracy matter exponentially:
+//   • 50 ms off  → ~849 pts  (~6× more than 600 ms off)
+//   • 250 ms off → ~443 pts
+//   • 600 ms off → ~141 pts
+// Even small differences at high precision cause noticeable
+// score changes (e.g. 250 ms vs 299 ms → 443 vs 377 pts).
+
+int calculateRawScore(int deviationMs) {
+  final raw = (kScoringConfig.maxScore *
+          exp(-kScoringConfig.deviationDecay * deviationMs))
+      .round();
+  return raw.clamp(0, kScoringConfig.maxScore);
+}
 
 // ============================================================
 // CALCULATE SCORE
@@ -14,7 +35,7 @@ ScoreResult calculateScore(
 }) {
   final targetMs = overrideTargetMs ?? mode.targetMs;
   final deviationMs = (stoppedAtMs - targetMs).abs();
-  final rawScore = (kScoringConfig.maxScore - deviationMs).clamp(0, kScoringConfig.maxScore);
+  final rawScore = calculateRawScore(deviationMs);
   final streakMultiplier = calculateStreakMultiplier(currentStreak);
   final finalScore = (rawScore * streakMultiplier).round();
   final rating = getRating(deviationMs);
@@ -101,13 +122,13 @@ class StreakManager {
 // ============================================================
 
 String formatDeviation(int deviationMs) {
-  if (deviationMs == 0) return '±0.000s';
+  if (deviationMs == 0) return '±0.0000s';
   final seconds = deviationMs ~/ 1000;
   final millis = deviationMs % 1000;
   if (seconds > 0) {
-    return '±$seconds.${millis.toString().padLeft(3, '0')}s';
+    return '±$seconds.${millis.toString().padLeft(3, '0')}0s';
   }
-  return '±0.${millis.toString().padLeft(3, '0')}s';
+  return '±0.${millis.toString().padLeft(3, '0')}0s';
 }
 
 String formatScore(int score) => score.toString();

@@ -364,6 +364,51 @@ class AppLocalizationsHe extends AppLocalizations {
   String get shopItemFireworksDesc => 'חגוג עם זיקוקים';
 
   @override
+  String get shopCategorySoundPacks => 'חבילות סאונד';
+
+  @override
+  String get shopItemMatrixTimerName => 'טיימר מטריקס';
+
+  @override
+  String get shopItemMatrixTimerDesc => 'תצוגת קוד ירוק זוהר';
+
+  @override
+  String get shopItemMidnightTimerName => 'טיימר חצות';
+
+  @override
+  String get shopItemMidnightTimerDesc => 'סגנון כחול קרחוני עמוק';
+
+  @override
+  String get shopItemEmberNightName => 'ליל גחלים';
+
+  @override
+  String get shopItemEmberNightDesc => 'רקע כהה עם גחלים';
+
+  @override
+  String get shopItemArcticMistName => 'ערפל ארקטי';
+
+  @override
+  String get shopItemArcticMistDesc => 'רקע טורקיז קרחוני';
+
+  @override
+  String get shopItemCrimsonDuskName => 'דמדומים ארגמן';
+
+  @override
+  String get shopItemCrimsonDuskDesc => 'רקע אדום כהה עמוק';
+
+  @override
+  String get shopItemRetroBeepsName => 'צפצופי רטרו';
+
+  @override
+  String get shopItemRetroBeepsDesc => 'צלילי ארקייד 8-ביט';
+
+  @override
+  String get shopItemZenClicksName => 'לחיצות זן';
+
+  @override
+  String get shopItemZenClicksDesc => 'צלילי הקשה רכים ומרגיעים';
+
+  @override
   String modeCardTarget(String target) {
     return 'יעד: $target';
   }

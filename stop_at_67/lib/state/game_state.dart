@@ -453,9 +453,8 @@ class GameState extends ChangeNotifier {
     ScoreResult result;
 
     if (mode.doubleTap) {
-      // Build score directly from combined deviation
-      final rawScore = (kScoringConfig.maxScore - effectiveDeviation)
-          .clamp(0, kScoringConfig.maxScore);
+      // Build score directly from combined deviation (exponential curve)
+      final rawScore = calculateRawScore(effectiveDeviation);
       final streakMult = calculateStreakMultiplier(streakResult.streakForScoring);
       final finalScore = (rawScore * streakMult).round();
       result = ScoreResult(

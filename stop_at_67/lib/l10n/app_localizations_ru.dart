@@ -365,6 +365,51 @@ class AppLocalizationsRu extends AppLocalizations {
   String get shopItemFireworksDesc => 'Отпразднуйте с фейерверком';
 
   @override
+  String get shopCategorySoundPacks => 'Звуковые пакеты';
+
+  @override
+  String get shopItemMatrixTimerName => 'Матричный таймер';
+
+  @override
+  String get shopItemMatrixTimerDesc => 'Зелёный кодовый дисплей';
+
+  @override
+  String get shopItemMidnightTimerName => 'Полночный таймер';
+
+  @override
+  String get shopItemMidnightTimerDesc => 'Ледяной синий глубокий стиль';
+
+  @override
+  String get shopItemEmberNightName => 'Ночь огней';
+
+  @override
+  String get shopItemEmberNightDesc => 'Тёмный фон с тлеющими углями';
+
+  @override
+  String get shopItemArcticMistName => 'Арктический туман';
+
+  @override
+  String get shopItemArcticMistDesc => 'Прохладный ледяной фон';
+
+  @override
+  String get shopItemCrimsonDuskName => 'Багряные сумерки';
+
+  @override
+  String get shopItemCrimsonDuskDesc => 'Глубокий тёмно-красный фон';
+
+  @override
+  String get shopItemRetroBeepsName => 'Ретро-сигналы';
+
+  @override
+  String get shopItemRetroBeepsDesc => '8-битные аркадные звуки';
+
+  @override
+  String get shopItemZenClicksName => 'Дзен-клики';
+
+  @override
+  String get shopItemZenClicksDesc => 'Мягкие успокаивающие звуки касания';
+
+  @override
   String modeCardTarget(String target) {
     return 'Цель: $target';
   }

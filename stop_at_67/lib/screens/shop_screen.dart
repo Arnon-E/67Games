@@ -30,14 +30,32 @@ class _Item {
 }
 
 const _items = [
+  // ── Timer Skins ──────────────────────────────────────────
   _Item(id: 'timer_skin_neon', nameKey: 'neonTimer', descKey: 'neonTimerDesc',
       price: 12000, categoryKey: 'timerSkins', equipType: 'timerSkin', color: Color(0xFF00FFCC)),
   _Item(id: 'timer_skin_gold', nameKey: 'goldTimer', descKey: 'goldTimerDesc',
       price: 24000, categoryKey: 'timerSkins', equipType: 'timerSkin', color: Color(0xFFFFD700)),
+  _Item(id: 'timer_skin_matrix', nameKey: 'matrixTimer', descKey: 'matrixTimerDesc',
+      price: 20000, categoryKey: 'timerSkins', equipType: 'timerSkin', color: Color(0xFF39FF14)),
+  _Item(id: 'timer_skin_midnight', nameKey: 'midnightTimer', descKey: 'midnightTimerDesc',
+      price: 28000, categoryKey: 'timerSkins', equipType: 'timerSkin', color: Color(0xFF4FC3F7)),
+  // ── Backgrounds ───────────────────────────────────────────
   _Item(id: 'bg_purple', nameKey: 'purpleHaze', descKey: 'purpleHazeDesc',
       price: 18000, categoryKey: 'backgrounds', equipType: 'background', color: Color(0xFF8B5CF6)),
   _Item(id: 'bg_ocean', nameKey: 'oceanDeep', descKey: 'oceanDeepDesc',
       price: 18000, categoryKey: 'backgrounds', equipType: 'background', color: Color(0xFF0EA5E9)),
+  _Item(id: 'bg_ember', nameKey: 'emberNight', descKey: 'emberNightDesc',
+      price: 22000, categoryKey: 'backgrounds', equipType: 'background', color: Color(0xFFFF6B00)),
+  _Item(id: 'bg_arctic', nameKey: 'arcticMist', descKey: 'arcticMistDesc',
+      price: 22000, categoryKey: 'backgrounds', equipType: 'background', color: Color(0xFF80DEEA)),
+  _Item(id: 'bg_crimson', nameKey: 'crimsonDusk', descKey: 'crimsonDuskDesc',
+      price: 25000, categoryKey: 'backgrounds', equipType: 'background', color: Color(0xFFB71C1C)),
+  // ── Sound Packs ───────────────────────────────────────────
+  _Item(id: 'sound_retro', nameKey: 'retroBeeps', descKey: 'retroBeepsDesc',
+      price: 15000, categoryKey: 'soundPacks', equipType: 'soundPack', color: Color(0xFFFFD54F)),
+  _Item(id: 'sound_zen', nameKey: 'zenClicks', descKey: 'zenClicksDesc',
+      price: 15000, categoryKey: 'soundPacks', equipType: 'soundPack', color: Color(0xFF80CBC4)),
+  // ── Celebrations ──────────────────────────────────────────
   _Item(id: 'celebration_fireworks', nameKey: 'fireworks', descKey: 'fireworksDesc',
       price: 30000, categoryKey: 'celebrations', equipType: 'celebration', color: Color(0xFFFF6B35),
       comingSoon: true),
@@ -50,8 +68,15 @@ class ShopScreen extends StatelessWidget {
     return switch (item.nameKey) {
       'neonTimer' => l10n.shopItemNeonTimerName,
       'goldTimer' => l10n.shopItemGoldTimerName,
+      'matrixTimer' => l10n.shopItemMatrixTimerName,
+      'midnightTimer' => l10n.shopItemMidnightTimerName,
       'purpleHaze' => l10n.shopItemPurpleHazeName,
       'oceanDeep' => l10n.shopItemOceanDeepName,
+      'emberNight' => l10n.shopItemEmberNightName,
+      'arcticMist' => l10n.shopItemArcticMistName,
+      'crimsonDusk' => l10n.shopItemCrimsonDuskName,
+      'retroBeeps' => l10n.shopItemRetroBeepsName,
+      'zenClicks' => l10n.shopItemZenClicksName,
       'fireworks' => l10n.shopItemFireworksName,
       _ => item.nameKey,
     };
@@ -61,8 +86,15 @@ class ShopScreen extends StatelessWidget {
     return switch (item.descKey) {
       'neonTimerDesc' => l10n.shopItemNeonTimerDesc,
       'goldTimerDesc' => l10n.shopItemGoldTimerDesc,
+      'matrixTimerDesc' => l10n.shopItemMatrixTimerDesc,
+      'midnightTimerDesc' => l10n.shopItemMidnightTimerDesc,
       'purpleHazeDesc' => l10n.shopItemPurpleHazeDesc,
       'oceanDeepDesc' => l10n.shopItemOceanDeepDesc,
+      'emberNightDesc' => l10n.shopItemEmberNightDesc,
+      'arcticMistDesc' => l10n.shopItemArcticMistDesc,
+      'crimsonDuskDesc' => l10n.shopItemCrimsonDuskDesc,
+      'retroBeepsDesc' => l10n.shopItemRetroBeepsDesc,
+      'zenClicksDesc' => l10n.shopItemZenClicksDesc,
       'fireworksDesc' => l10n.shopItemFireworksDesc,
       _ => item.descKey,
     };
@@ -72,6 +104,7 @@ class ShopScreen extends StatelessWidget {
     return switch (key) {
       'timerSkins' => l10n.shopCategoryTimerSkins,
       'backgrounds' => l10n.shopCategoryBackgrounds,
+      'soundPacks' => l10n.shopCategorySoundPacks,
       'celebrations' => l10n.shopCategoryCelebrations,
       _ => key,
     };
