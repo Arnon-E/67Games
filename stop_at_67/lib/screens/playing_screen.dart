@@ -30,14 +30,14 @@ class _PlayingScreenState extends State<PlayingScreen> {
       final bool midHit = gs.doubleTapMid();
       if (!midHit) {
         // Midpoint missed too badly — end the game immediately
-        _stopped = true;
+        setState(() { _stopped = true; });
         Haptics.vibrate(HapticsType.error).catchError((_) {});
         await gs.stopGame();
       }
       return; // Either way, do not fall through to normal stop handling
     }
 
-    _stopped = true;
+    setState(() { _stopped = true; });
     Haptics.vibrate(HapticsType.medium).catchError((_) {});
     await gs.stopGame();
   }
