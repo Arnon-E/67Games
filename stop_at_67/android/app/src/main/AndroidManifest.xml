@@ -8,8 +8,7 @@
         <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:launchMode="singleTop"
-            android:taskAffinity=""
+            android:launchMode="singleTask"
             android:theme="@style/LaunchTheme"
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
             android:hardwareAccelerated="true"
@@ -27,6 +26,40 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+        <!-- Override Unity Ads activities to share the same task as the game.
+             Without this, Unity Ads launches its Activity with FLAG_ACTIVITY_NEW_TASK
+             which creates a separate entry in the Android overview, letting users
+             switch back to the game and effectively skip the ad. By giving these
+             activities the same taskAffinity as the app, Android reuses the existing
+             task instead of creating a new one. -->
+        <activity
+            android:name="com.unity3d.services.ads.adunit.AdUnitActivity"
+            android:taskAffinity="com.sixtysevengames.stop_at_67"
+            android:launchMode="singleTask"
+            android:exported="false"
+            android:hardwareAccelerated="true"
+            android:configChanges="fontScale|keyboard|keyboardHidden|locale|mnc|mcc|navigation|orientation|screenLayout|screenSize|smallestScreenSize|uiMode|touchscreen" />
+        <activity
+            android:name="com.unity3d.services.ads.adunit.AdUnitTransparentActivity"
+            android:taskAffinity="com.sixtysevengames.stop_at_67"
+            android:launchMode="singleTask"
+            android:exported="false"
+            android:hardwareAccelerated="true"
+            android:configChanges="fontScale|keyboard|keyboardHidden|locale|mnc|mcc|navigation|orientation|screenLayout|screenSize|smallestScreenSize|uiMode|touchscreen" />
+        <activity
+            android:name="com.unity3d.services.ads.adunit.AdUnitTransparentSoftwareActivity"
+            android:taskAffinity="com.sixtysevengames.stop_at_67"
+            android:launchMode="singleTask"
+            android:exported="false"
+            android:hardwareAccelerated="false"
+            android:configChanges="fontScale|keyboard|keyboardHidden|locale|mnc|mcc|navigation|orientation|screenLayout|screenSize|smallestScreenSize|uiMode|touchscreen" />
+        <activity
+            android:name="com.unity3d.services.ads.adunit.AdUnitSoftwareActivity"
+            android:taskAffinity="com.sixtysevengames.stop_at_67"
+            android:launchMode="singleTask"
+            android:exported="false"
+            android:hardwareAccelerated="false"
+            android:configChanges="fontScale|keyboard|keyboardHidden|locale|mnc|mcc|navigation|orientation|screenLayout|screenSize|smallestScreenSize|uiMode|touchscreen" />
         <!-- AppLovin MAX SDK Key — replace with your key from applovin.com → Account → Keys -->
         <meta-data
             android:name="applovin.sdk.key"
