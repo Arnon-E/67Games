@@ -707,24 +707,7 @@ class GameState extends ChangeNotifier {
       );
     }
 
-    // Persist
-    if (persistStats) {
-      await Future.wait([
-        _storage.saveStats(newStats),
-        _storage.saveCoins(newCoins),
-        _storage.saveAchievements([
-          ..._achievements,
-          ...newAchievements.map((a) => a.id),
-        ]),
-        _storage.saveStreak(
-          streakResult.newStreak,
-          _streakManager.getBestStreak(),
-        ),
-        _storage.saveWeeklyMissions(_weeklyMissions),
-      ]);
-    }
-
-    // Apply state
+    // Apply state and transition to results immediately (storage persists in background)
     _lastResult = mode.isCalibration &&
             _calibrationResults.length >= mode.calibrationRounds
         ? resultToSave
@@ -744,6 +727,20 @@ class GameState extends ChangeNotifier {
 
     // Sound feedback
     _playResultFeedback(resultToSave);
+
+    // Persist asynchronously — fire and forget so the UI isn't blocked
+    if (persistStats) {
+      Future.wait([
+        _storage.saveStats(_stats),
+        _storage.saveCoins(_coins),
+        _storage.saveAchievements(_achievements),
+        _storage.saveStreak(
+          streakResult.newStreak,
+          _streakManager.getBestStreak(),
+        ),
+        _storage.saveWeeklyMissions(_weeklyMissions),
+      ]).catchError((_) {});
+    }
 
     // Submit to online leaderboard if signed in.
     // For normal modes: submit the session cumulative score when it beats the stored best.

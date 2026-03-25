@@ -43,16 +43,22 @@ class _StopButtonState extends State<StopButton>
 
   @override
   Widget build(BuildContext context) {
+    Widget orb;
     if (MediaQuery.of(context).disableAnimations) {
-      return _buildOrb(glowIntensity: 0.5, scale: 1.0);
+      orb = _buildOrb(glowIntensity: 0.5, scale: 1.0);
+    } else {
+      orb = AnimatedBuilder(
+        animation: _ctrl,
+        builder: (_, __) => _buildOrb(
+          glowIntensity: _glow.value,
+          scale: _scale.value,
+        ),
+      );
     }
-    return AnimatedBuilder(
-      animation: _ctrl,
-      builder: (_, __) => _buildOrb(
-        glowIntensity: _glow.value,
-        scale: _scale.value,
-      ),
-    );
+    if (widget.disabled) {
+      return Opacity(opacity: 0.4, child: orb);
+    }
+    return orb;
   }
 
   Widget _buildOrb({required double glowIntensity, required double scale}) {
