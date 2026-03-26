@@ -3,6 +3,9 @@ import 'package:flutter/foundation.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 class AdsService {
+  // Set to true on April 18 when AdMob suspension lifts
+  static const bool adsEnabled = false;
+
   // TODO: Replace these test IDs with your real AdMob ad unit IDs from admob.google.com
   // Test App IDs are already set in AndroidManifest.xml / Info.plist
   static const _interstitialAdUnitId = kDebugMode
@@ -21,7 +24,7 @@ class AdsService {
   bool _initialized = false;
 
   Future<void> initialize() async {
-    if (_initialized) return;
+    if (!adsEnabled || _initialized) return;
     await MobileAds.instance.initialize();
 
     // Enforce G-rated (General Audiences) content to block adult/inappropriate ads.
@@ -75,6 +78,7 @@ class AdsService {
   }
 
   Future<bool> showInterstitial() async {
+    if (!adsEnabled) return false;
     if (!_initialized) await initialize();
     if (!_interstitialReady || _interstitialAd == null) {
       _loadInterstitial();
@@ -105,6 +109,7 @@ class AdsService {
   }
 
   Future<bool> showRewarded(void Function(dynamic reward) onRewarded) async {
+    if (!adsEnabled) return false;
     if (!_initialized) await initialize();
     if (!_rewardedReady || _rewardedAd == null) {
       _loadRewarded();
