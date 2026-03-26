@@ -26,44 +26,11 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <!-- Override Unity Ads activities to share the same task as the game.
-             Without this, Unity Ads launches its Activity with FLAG_ACTIVITY_NEW_TASK
-             which creates a separate entry in the Android overview, letting users
-             switch back to the game and effectively skip the ad. By giving these
-             activities the same taskAffinity as the app, Android reuses the existing
-             task instead of creating a new one. -->
-        <activity
-            android:name="com.unity3d.services.ads.adunit.AdUnitActivity"
-            android:taskAffinity="com.sixtysevengames.stop_at_67"
-            android:launchMode="singleTask"
-            android:exported="false"
-            android:hardwareAccelerated="true"
-            android:configChanges="fontScale|keyboard|keyboardHidden|locale|mnc|mcc|navigation|orientation|screenLayout|screenSize|smallestScreenSize|uiMode|touchscreen" />
-        <activity
-            android:name="com.unity3d.services.ads.adunit.AdUnitTransparentActivity"
-            android:taskAffinity="com.sixtysevengames.stop_at_67"
-            android:launchMode="singleTask"
-            android:exported="false"
-            android:hardwareAccelerated="true"
-            android:configChanges="fontScale|keyboard|keyboardHidden|locale|mnc|mcc|navigation|orientation|screenLayout|screenSize|smallestScreenSize|uiMode|touchscreen" />
-        <activity
-            android:name="com.unity3d.services.ads.adunit.AdUnitTransparentSoftwareActivity"
-            android:taskAffinity="com.sixtysevengames.stop_at_67"
-            android:launchMode="singleTask"
-            android:exported="false"
-            android:hardwareAccelerated="false"
-            android:configChanges="fontScale|keyboard|keyboardHidden|locale|mnc|mcc|navigation|orientation|screenLayout|screenSize|smallestScreenSize|uiMode|touchscreen" />
-        <activity
-            android:name="com.unity3d.services.ads.adunit.AdUnitSoftwareActivity"
-            android:taskAffinity="com.sixtysevengames.stop_at_67"
-            android:launchMode="singleTask"
-            android:exported="false"
-            android:hardwareAccelerated="false"
-            android:configChanges="fontScale|keyboard|keyboardHidden|locale|mnc|mcc|navigation|orientation|screenLayout|screenSize|smallestScreenSize|uiMode|touchscreen" />
-        <!-- AppLovin MAX SDK Key — replace with your key from applovin.com → Account → Keys -->
+        <!-- TODO: Replace with your real AdMob App ID from admob.google.com -->
+        <!-- Using Google's test App ID for development; swap before release -->
         <meta-data
-            android:name="applovin.sdk.key"
-            android:value="YOUR_APPLOVIN_SDK_KEY"/>
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-3940256099942544~3347511713"/>
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
         <meta-data
