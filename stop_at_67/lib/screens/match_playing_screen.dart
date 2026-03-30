@@ -20,6 +20,9 @@ class MatchPlayingScreen extends StatefulWidget {
 }
 
 class _MatchPlayingScreenState extends State<MatchPlayingScreen> {
+  /// Whether the local UI has handled the stop tap (prevents double-taps).
+  /// Distinct from `gs.matchPlayerStopped` which tracks whether the result
+  /// has been submitted to Firestore.
   bool _stopped = false;
 
   Future<void> _onStop() async {

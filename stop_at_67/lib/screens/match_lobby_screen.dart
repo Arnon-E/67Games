@@ -5,7 +5,6 @@ import 'package:provider/provider.dart';
 
 import '../l10n/app_localizations.dart';
 import '../state/game_state.dart';
-import '../engine/types.dart';
 import '../theme/app_colors.dart';
 import '../widgets/app_gradient_background.dart';
 
@@ -18,13 +17,14 @@ class MatchLobbyScreen extends StatefulWidget {
 }
 
 class _MatchLobbyScreenState extends State<MatchLobbyScreen> {
+  static const _kCountdownIntervalMs = 800;
   int _countdown = 3;
   Timer? _timer;
 
   @override
   void initState() {
     super.initState();
-    _timer = Timer.periodic(const Duration(milliseconds: 800), _tick);
+    _timer = Timer.periodic(const Duration(milliseconds: _kCountdownIntervalMs), _tick);
   }
 
   void _tick(Timer _) {

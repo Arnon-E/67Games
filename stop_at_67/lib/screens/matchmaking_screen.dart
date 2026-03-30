@@ -5,7 +5,6 @@ import '../l10n/app_localizations.dart';
 import '../state/game_state.dart';
 import '../state/auth_state.dart';
 import '../theme/app_colors.dart';
-import '../theme/app_text_styles.dart';
 import '../widgets/app_gradient_background.dart';
 import '../widgets/screen_header.dart';
 

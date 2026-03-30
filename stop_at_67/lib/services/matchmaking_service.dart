@@ -29,45 +29,52 @@ class MatchmakingService {
   }) async {
     final queueRef = _db.collection('matchmaking_queue');
 
-    // Look for an existing waiting player in the same mode
-    final waiting = await queueRef
-        .where('modeId', isEqualTo: modeId)
-        .where('uid', isNotEqualTo: uid)
-        .limit(1)
-        .get();
+    // Use a transaction to atomically claim an opponent from the queue.
+    // This prevents two players from matching with the same opponent.
+    final matchId = await _db.runTransaction<String?>((tx) async {
+      // Look for an existing waiting player in the same mode
+      final waiting = await queueRef
+          .where('modeId', isEqualTo: modeId)
+          .where('uid', isNotEqualTo: uid)
+          .limit(1)
+          .get();
 
-    if (waiting.docs.isNotEmpty) {
-      // Found an opponent — create the match
-      final opponentDoc = waiting.docs.first;
-      final opponentData = opponentDoc.data();
+      if (waiting.docs.isNotEmpty) {
+        final opponentDoc = waiting.docs.first;
+        // Re-read the opponent doc inside the transaction to guard against
+        // concurrent claims.
+        final opponentSnap = await tx.get(opponentDoc.reference);
+        if (!opponentSnap.exists) return null; // already claimed
 
-      final matchRef = _db.collection('matches').doc();
-      final matchId = matchRef.id;
+        final opponentData = opponentSnap.data()!;
+        final matchRef = _db.collection('matches').doc();
 
-      final batch = _db.batch();
+        tx.set(matchRef, {
+          'modeId': modeId,
+          'targetMs': targetMs,
+          'status': MatchStatus.countdown.name,
+          'player1': {
+            'uid': opponentData['uid'],
+            'displayName': opponentData['displayName'],
+          },
+          'player2': {
+            'uid': uid,
+            'displayName': displayName,
+          },
+          'createdAt': FieldValue.serverTimestamp(),
+        });
 
-      batch.set(matchRef, {
-        'modeId': modeId,
-        'targetMs': targetMs,
-        'status': MatchStatus.countdown.name,
-        'player1': {
-          'uid': opponentData['uid'],
-          'displayName': opponentData['displayName'],
-        },
-        'player2': {
-          'uid': uid,
-          'displayName': displayName,
-        },
-        'createdAt': FieldValue.serverTimestamp(),
-      });
+        // Remove both queue entries
+        tx.delete(opponentDoc.reference);
+        tx.delete(queueRef.doc(uid));
 
-      // Remove both queue entries
-      batch.delete(opponentDoc.reference);
-      batch.delete(queueRef.doc(uid));
+        return matchRef.id;
+      }
 
-      await batch.commit();
-      return matchId;
-    }
+      return null; // no opponent found
+    });
+
+    if (matchId != null) return matchId;
 
     // No opponent found — add to queue
     await queueRef.doc(uid).set({
@@ -153,12 +160,6 @@ class MatchmakingService {
       final data = snap.data()!;
       final p1 = data['player1'] as Map<String, dynamic>;
       final p2 = data['player2'] as Map<String, dynamic>?;
-
-      final resultData = {
-        'stoppedAtMs': stoppedAtMs,
-        'deviationMs': deviationMs,
-        'score': score,
-      };
 
       if (p1['uid'] == uid) {
         tx.update(matchRef, {
