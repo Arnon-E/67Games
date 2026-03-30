@@ -316,5 +316,23 @@
   "settingsRulesCalibrationBody": "Make 5 attempts in a row. Your score is based on the average deviation across all 5 — consistency is everything.",
 
   "settingsRulesPressureTitle": "Pressure",
-  "settingsRulesPressureBody": "Stop within the allowed tolerance window. Each success tightens the window. Survive as many rounds as you can."
+  "settingsRulesPressureBody": "Stop within the allowed tolerance window. Each success tightens the window. Survive as many rounds as you can.",
+
+  "menuMultiplayer": "1v1 MATCH",
+  "matchmakingTitle": "Find Opponent",
+  "matchmakingSearching": "Searching...",
+  "matchmakingWaiting": "Looking for an opponent",
+  "matchmakingClassicMode": "Classic • 6.700s",
+  "matchLobbyTitle": "HEAD TO HEAD",
+  "matchLobbyGetReady": "GET READY",
+  "matchPlayingLive1v1": "⚔️ LIVE 1v1",
+  "matchPlayingOpponentStopped": "Opponent has stopped!",
+  "matchPlayingWaitingOpponent": "Waiting for opponent...",
+  "matchResultsYou": "YOU",
+  "matchResultsOpponent": "OPPONENT",
+  "matchResultsYouWin": "YOU WIN!",
+  "matchResultsYouLose": "YOU LOSE",
+  "matchResultsTie": "TIE!",
+  "matchResultsWaiting": "Waiting...",
+  "matchResultsPlayAgain": "REMATCH"
 }

@@ -745,4 +745,55 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get settingsRulesPressureBody =>
       'עצור בתוך חלון הטווח המותר. כל הצלחה מצמצמת את החלון. שרוד כמה שיותר סיבובים.';
+
+  @override
+  String get menuMultiplayer => 'משחק 1 נגד 1';
+
+  @override
+  String get matchmakingTitle => 'חיפוש יריב';
+
+  @override
+  String get matchmakingSearching => 'מחפש...';
+
+  @override
+  String get matchmakingWaiting => 'מחפש יריב';
+
+  @override
+  String get matchmakingClassicMode => 'קלאסי • 6.700s';
+
+  @override
+  String get matchLobbyTitle => 'ראש בראש';
+
+  @override
+  String get matchLobbyGetReady => 'התכוננו';
+
+  @override
+  String get matchPlayingLive1v1 => '⚔️ 1 נגד 1 חי';
+
+  @override
+  String get matchPlayingOpponentStopped => 'היריב עצר!';
+
+  @override
+  String get matchPlayingWaitingOpponent => 'ממתין ליריב...';
+
+  @override
+  String get matchResultsYou => 'אתה';
+
+  @override
+  String get matchResultsOpponent => 'יריב';
+
+  @override
+  String get matchResultsYouWin => 'ניצחת!';
+
+  @override
+  String get matchResultsYouLose => 'הפסדת';
+
+  @override
+  String get matchResultsTie => 'תיקו!';
+
+  @override
+  String get matchResultsWaiting => 'ממתין...';
+
+  @override
+  String get matchResultsPlayAgain => 'משחק חוזר';
 }

@@ -316,5 +316,23 @@
   "settingsRulesCalibrationBody": "Сделайте 5 попыток подряд. Счёт основан на среднем отклонении за все 5 — главное стабильность.",
 
   "settingsRulesPressureTitle": "Давление",
-  "settingsRulesPressureBody": "Остановитесь в пределах допуска. Каждый успех сужает окно. Выживите как можно больше раундов."
+  "settingsRulesPressureBody": "Остановитесь в пределах допуска. Каждый успех сужает окно. Выживите как можно больше раундов.",
+
+  "menuMultiplayer": "МАТЧ 1 на 1",
+  "matchmakingTitle": "Поиск соперника",
+  "matchmakingSearching": "Поиск...",
+  "matchmakingWaiting": "Ищем соперника",
+  "matchmakingClassicMode": "Классика • 6.700с",
+  "matchLobbyTitle": "ОДИН НА ОДИН",
+  "matchLobbyGetReady": "ПРИГОТОВЬТЕСЬ",
+  "matchPlayingLive1v1": "⚔️ ЖИВОЙ 1 на 1",
+  "matchPlayingOpponentStopped": "Соперник остановился!",
+  "matchPlayingWaitingOpponent": "Ожидание соперника...",
+  "matchResultsYou": "ВЫ",
+  "matchResultsOpponent": "СОПЕРНИК",
+  "matchResultsYouWin": "ПОБЕДА!",
+  "matchResultsYouLose": "ПОРАЖЕНИЕ",
+  "matchResultsTie": "НИЧЬЯ!",
+  "matchResultsWaiting": "Ожидание...",
+  "matchResultsPlayAgain": "РЕВАНШ"
 }

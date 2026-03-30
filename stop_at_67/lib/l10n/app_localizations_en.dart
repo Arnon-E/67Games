@@ -750,4 +750,55 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get settingsRulesPressureBody =>
       'Stop within the allowed tolerance window. Each success tightens the window. Survive as many rounds as you can.';
+
+  @override
+  String get menuMultiplayer => '1v1 MATCH';
+
+  @override
+  String get matchmakingTitle => 'Find Opponent';
+
+  @override
+  String get matchmakingSearching => 'Searching...';
+
+  @override
+  String get matchmakingWaiting => 'Looking for an opponent';
+
+  @override
+  String get matchmakingClassicMode => 'Classic • 6.700s';
+
+  @override
+  String get matchLobbyTitle => 'HEAD TO HEAD';
+
+  @override
+  String get matchLobbyGetReady => 'GET READY';
+
+  @override
+  String get matchPlayingLive1v1 => '⚔️ LIVE 1v1';
+
+  @override
+  String get matchPlayingOpponentStopped => 'Opponent has stopped!';
+
+  @override
+  String get matchPlayingWaitingOpponent => 'Waiting for opponent...';
+
+  @override
+  String get matchResultsYou => 'YOU';
+
+  @override
+  String get matchResultsOpponent => 'OPPONENT';
+
+  @override
+  String get matchResultsYouWin => 'YOU WIN!';
+
+  @override
+  String get matchResultsYouLose => 'YOU LOSE';
+
+  @override
+  String get matchResultsTie => 'TIE!';
+
+  @override
+  String get matchResultsWaiting => 'Waiting...';
+
+  @override
+  String get matchResultsPlayAgain => 'REMATCH';
 }

@@ -13,6 +13,7 @@ import '../services/storage_service.dart';
 import '../services/sound_service.dart';
 import '../services/ads_service.dart';
 import '../services/leaderboard_service.dart';
+import '../services/matchmaking_service.dart';
 import 'auth_state.dart';
 
 enum AppScreen {
@@ -27,6 +28,10 @@ enum AppScreen {
   profile,
   shop,
   auth,
+  matchmaking,
+  matchLobby,
+  matchPlaying,
+  matchResults,
 }
 
 class GameState extends ChangeNotifier {
@@ -180,6 +185,16 @@ class GameState extends ChangeNotifier {
 
   final AuthState _authState;
   final LeaderboardService _leaderboard;
+  final MatchmakingService _matchmaking;
+
+  // ── Multiplayer 1v1 ─────────────────────────────────────────
+  MatchData? _currentMatch;
+  MatchData? get currentMatch => _currentMatch;
+  StreamSubscription<MatchData?>? _matchStreamSub;
+  bool _matchSearching = false;
+  bool get matchSearching => _matchSearching;
+  bool _matchPlayerStopped = false;
+  bool get matchPlayerStopped => _matchPlayerStopped;
 
   GameState({
     required StorageService storage,
@@ -187,11 +202,13 @@ class GameState extends ChangeNotifier {
     required AdsService ads,
     required AuthState authState,
     required LeaderboardService leaderboard,
+    required MatchmakingService matchmaking,
   })  : _storage = storage,
         _sound = sound,
         _ads = ads,
         _authState = authState,
-        _leaderboard = leaderboard;
+        _leaderboard = leaderboard,
+        _matchmaking = matchmaking;
 
   // ═══════════════════════════════════════════════════════════
   // INIT
@@ -1169,9 +1186,159 @@ class GameState extends ChangeNotifier {
   int get bestStreakValue => _streakManager.getBestStreak();
   double get streakMultiplier => _streakManager.getMultiplier();
 
+  // ═══════════════════════════════════════════════════════════
+  // MULTIPLAYER 1v1
+  // ═══════════════════════════════════════════════════════════
+
+  /// Start searching for a 1v1 opponent. Navigates to the matchmaking screen.
+  Future<void> startMatchmaking() async {
+    if (!_authState.isSignedIn) return;
+    _matchSearching = true;
+    _currentMatch = null;
+    _matchPlayerStopped = false;
+    _screen = AppScreen.matchmaking;
+    notifyListeners();
+
+    final uid = _authState.user!.uid;
+    const modeId = 'classic';
+    const targetMs = 6700;
+
+    final matchId = await _matchmaking.joinQueue(
+      uid: uid,
+      displayName: _authState.userName,
+      modeId: modeId,
+      targetMs: targetMs,
+    );
+
+    if (matchId != null) {
+      // Matched immediately — listen to the match doc
+      _subscribeToMatch(matchId);
+    } else {
+      // Queued — listen for when an opponent creates the match
+      _matchmaking.listenForMatch(
+        uid: uid,
+        modeId: modeId,
+        onMatchFound: (id) {
+          _subscribeToMatch(id);
+        },
+      );
+    }
+  }
+
+  void _subscribeToMatch(String matchId) {
+    _matchStreamSub?.cancel();
+    _matchStreamSub = _matchmaking.watchMatch(matchId).listen((match) {
+      if (match == null) return;
+      _currentMatch = match;
+      _matchSearching = false;
+
+      if (match.status == MatchStatus.countdown &&
+          _screen == AppScreen.matchmaking) {
+        _screen = AppScreen.matchLobby;
+        notifyListeners();
+      } else if (match.status == MatchStatus.playing &&
+          _screen == AppScreen.matchLobby) {
+        // Countdown finished on one client — transition to playing
+        _currentMode = kGameModes[match.modeId] ?? kGameModes['classic']!;
+        _screen = AppScreen.matchPlaying;
+        _timerState = TimerState.initial();
+        _matchPlayerStopped = false;
+        notifyListeners();
+        _startPrecisionTimer();
+      } else if (match.status == MatchStatus.finished) {
+        _screen = AppScreen.matchResults;
+        notifyListeners();
+      } else if (match.status == MatchStatus.cancelled) {
+        _cancelMultiplayer();
+      } else {
+        notifyListeners();
+      }
+    });
+  }
+
+  /// Transition the match to playing (called after shared countdown).
+  Future<void> matchCountdownComplete() async {
+    final match = _currentMatch;
+    if (match == null) return;
+    await _matchmaking.startMatch(match.matchId);
+  }
+
+  /// Stop the timer and submit this player's result.
+  Future<void> stopMatchGame() async {
+    final timer = _precisionTimer;
+    if (timer == null || _matchPlayerStopped) return;
+    _matchPlayerStopped = true;
+
+    final elapsedMs = timer.stop();
+    final stoppedAtMs = timer.getStoppedValue(elapsedMs);
+    final match = _currentMatch;
+    if (match == null) return;
+
+    WakelockPlus.disable().catchError((_) {});
+
+    final deviationMs = (stoppedAtMs - match.targetMs).abs();
+    final rawScore = calculateRawScore(deviationMs);
+
+    _timerState = _timerState.copyWith(isRunning: false);
+    notifyListeners();
+
+    _sound.play(rawScore >= 900 ? 'excellent' : (rawScore >= 700 ? 'great' : 'ok'));
+
+    await _matchmaking.submitResult(
+      matchId: match.matchId,
+      uid: _authState.user!.uid,
+      stoppedAtMs: stoppedAtMs,
+      deviationMs: deviationMs,
+      score: rawScore,
+    );
+  }
+
+  /// Cancel matchmaking or leave a match.
+  Future<void> _cancelMultiplayer() async {
+    _matchStreamSub?.cancel();
+    _matchStreamSub = null;
+    _matchSearching = false;
+    _currentMatch = null;
+    _matchPlayerStopped = false;
+    _precisionTimer?.dispose();
+    _precisionTimer = null;
+    _timerState = TimerState.initial();
+    _screen = AppScreen.menu;
+    WakelockPlus.disable().catchError((_) {});
+    notifyListeners();
+  }
+
+  Future<void> cancelMatchmaking() async {
+    if (_authState.isSignedIn) {
+      await _matchmaking.leaveQueue(_authState.user!.uid);
+    }
+    final match = _currentMatch;
+    if (match != null &&
+        match.status != MatchStatus.finished &&
+        match.status != MatchStatus.cancelled) {
+      await _matchmaking.cancelMatch(match.matchId);
+    }
+    await _cancelMultiplayer();
+  }
+
+  /// Return to menu from match results.
+  void matchReturnToMenu() {
+    _matchStreamSub?.cancel();
+    _matchStreamSub = null;
+    _currentMatch = null;
+    _matchPlayerStopped = false;
+    _precisionTimer?.dispose();
+    _precisionTimer = null;
+    _timerState = TimerState.initial();
+    _screen = AppScreen.menu;
+    notifyListeners();
+  }
+
   @override
   void dispose() {
     _precisionTimer?.dispose();
+    _matchStreamSub?.cancel();
+    _matchmaking.dispose();
     super.dispose();
   }
 }

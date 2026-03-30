@@ -317,5 +317,23 @@
   "settingsRulesCalibrationBody": "בצע 5 ניסיונות ברצף. הניקוד מבוסס על הסטייה הממוצעת בכל 5 הניסיונות — עקביות היא הכל.",
 
   "settingsRulesPressureTitle": "לחץ",
-  "settingsRulesPressureBody": "עצור בתוך חלון הטווח המותר. כל הצלחה מצמצמת את החלון. שרוד כמה שיותר סיבובים."
+  "settingsRulesPressureBody": "עצור בתוך חלון הטווח המותר. כל הצלחה מצמצמת את החלון. שרוד כמה שיותר סיבובים.",
+
+  "menuMultiplayer": "משחק 1 נגד 1",
+  "matchmakingTitle": "חיפוש יריב",
+  "matchmakingSearching": "מחפש...",
+  "matchmakingWaiting": "מחפש יריב",
+  "matchmakingClassicMode": "קלאסי • 6.700s",
+  "matchLobbyTitle": "ראש בראש",
+  "matchLobbyGetReady": "התכוננו",
+  "matchPlayingLive1v1": "⚔️ 1 נגד 1 חי",
+  "matchPlayingOpponentStopped": "היריב עצר!",
+  "matchPlayingWaitingOpponent": "ממתין ליריב...",
+  "matchResultsYou": "אתה",
+  "matchResultsOpponent": "יריב",
+  "matchResultsYouWin": "ניצחת!",
+  "matchResultsYouLose": "הפסדת",
+  "matchResultsTie": "תיקו!",
+  "matchResultsWaiting": "ממתין...",
+  "matchResultsPlayAgain": "משחק חוזר"
 }

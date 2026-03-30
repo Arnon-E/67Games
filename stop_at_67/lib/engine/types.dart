@@ -474,3 +474,95 @@ class SessionStats {
     surgeGamesPlayed: surgeGamesPlayed ?? this.surgeGamesPlayed,
   );
 }
+
+// ============================================================
+// MULTIPLAYER MATCH
+// ============================================================
+
+/// Status of a 1v1 match document in Firestore.
+enum MatchStatus { waiting, countdown, playing, finished, cancelled }
+
+/// A player within a match.
+class MatchPlayer {
+  final String uid;
+  final String displayName;
+  final int? stoppedAtMs;
+  final int? deviationMs;
+  final int? score;
+
+  const MatchPlayer({
+    required this.uid,
+    required this.displayName,
+    this.stoppedAtMs,
+    this.deviationMs,
+    this.score,
+  });
+
+  Map<String, dynamic> toJson() => {
+    'uid': uid,
+    'displayName': displayName,
+    if (stoppedAtMs != null) 'stoppedAtMs': stoppedAtMs,
+    if (deviationMs != null) 'deviationMs': deviationMs,
+    if (score != null) 'score': score,
+  };
+
+  factory MatchPlayer.fromJson(Map<String, dynamic> json) => MatchPlayer(
+    uid: json['uid'] as String? ?? '',
+    displayName: json['displayName'] as String? ?? 'Player',
+    stoppedAtMs: (json['stoppedAtMs'] as num?)?.toInt(),
+    deviationMs: (json['deviationMs'] as num?)?.toInt(),
+    score: (json['score'] as num?)?.toInt(),
+  );
+}
+
+/// Represents a live 1v1 match stored in Firestore.
+class MatchData {
+  final String matchId;
+  final String modeId;
+  final int targetMs;
+  final MatchStatus status;
+  final MatchPlayer player1;
+  final MatchPlayer? player2;
+  final DateTime createdAt;
+
+  const MatchData({
+    required this.matchId,
+    required this.modeId,
+    required this.targetMs,
+    required this.status,
+    required this.player1,
+    this.player2,
+    required this.createdAt,
+  });
+
+  /// Whether both players have submitted their results.
+  bool get isComplete =>
+      player1.score != null && player2 != null && player2!.score != null;
+
+  /// The UID of the winner, or null for a tie / incomplete match.
+  String? get winnerUid {
+    if (!isComplete) return null;
+    if (player1.score! > player2!.score!) return player1.uid;
+    if (player2!.score! > player1.score!) return player2!.uid;
+    return null; // tie
+  }
+
+  factory MatchData.fromJson(String id, Map<String, dynamic> json) => MatchData(
+    matchId: id,
+    modeId: json['modeId'] as String? ?? 'classic',
+    targetMs: (json['targetMs'] as num?)?.toInt() ?? 6700,
+    status: MatchStatus.values.firstWhere(
+      (s) => s.name == (json['status'] as String? ?? 'waiting'),
+      orElse: () => MatchStatus.waiting,
+    ),
+    player1: MatchPlayer.fromJson(
+      (json['player1'] as Map<String, dynamic>?) ?? {},
+    ),
+    player2: json['player2'] != null
+        ? MatchPlayer.fromJson(json['player2'] as Map<String, dynamic>)
+        : null,
+    createdAt: json['createdAt'] != null
+        ? (json['createdAt'] as dynamic).toDate()
+        : DateTime.now(),
+  );
+}
