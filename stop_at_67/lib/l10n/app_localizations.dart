@@ -1528,6 +1528,18 @@ abstract class AppLocalizations {
   /// **'Classic • 6.700s'**
   String get matchmakingClassicMode;
 
+  /// No description provided for @matchmakingTimedOut.
+  ///
+  /// In en, this message translates to:
+  /// **'No opponents found'**
+  String get matchmakingTimedOut;
+
+  /// No description provided for @matchmakingPlayBot.
+  ///
+  /// In en, this message translates to:
+  /// **'PLAY VS BOT'**
+  String get matchmakingPlayBot;
+
   /// No description provided for @matchLobbyTitle.
   ///
   /// In en, this message translates to:

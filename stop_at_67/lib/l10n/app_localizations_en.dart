@@ -767,6 +767,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get matchmakingClassicMode => 'Classic • 6.700s';
 
   @override
+  String get matchmakingTimedOut => 'No opponents found';
+
+  @override
+  String get matchmakingPlayBot => 'PLAY VS BOT';
+
+  @override
   String get matchLobbyTitle => 'HEAD TO HEAD';
 
   @override

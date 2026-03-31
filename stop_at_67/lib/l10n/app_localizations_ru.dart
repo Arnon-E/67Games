@@ -774,6 +774,12 @@ class AppLocalizationsRu extends AppLocalizations {
   String get matchmakingClassicMode => 'Классика • 6.700с';
 
   @override
+  String get matchmakingTimedOut => 'Соперник не найден';
+
+  @override
+  String get matchmakingPlayBot => 'ИГРАТЬ С БОТОМ';
+
+  @override
   String get matchLobbyTitle => 'ОДИН НА ОДИН';
 
   @override

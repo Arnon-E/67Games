@@ -323,6 +323,8 @@
   "matchmakingSearching": "Searching...",
   "matchmakingWaiting": "Looking for an opponent",
   "matchmakingClassicMode": "Classic • 6.700s",
+  "matchmakingTimedOut": "No opponents found",
+  "matchmakingPlayBot": "PLAY VS BOT",
   "matchLobbyTitle": "HEAD TO HEAD",
   "matchLobbyGetReady": "GET READY",
   "matchPlayingLive1v1": "⚔️ LIVE 1v1",

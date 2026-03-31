@@ -323,6 +323,8 @@
   "matchmakingSearching": "Поиск...",
   "matchmakingWaiting": "Ищем соперника",
   "matchmakingClassicMode": "Классика • 6.700с",
+  "matchmakingTimedOut": "Соперник не найден",
+  "matchmakingPlayBot": "ИГРАТЬ С БОТОМ",
   "matchLobbyTitle": "ОДИН НА ОДИН",
   "matchLobbyGetReady": "ПРИГОТОВЬТЕСЬ",
   "matchPlayingLive1v1": "⚔️ ЖИВОЙ 1 на 1",

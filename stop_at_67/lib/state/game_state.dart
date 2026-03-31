@@ -195,6 +195,12 @@ class GameState extends ChangeNotifier {
   bool get matchSearching => _matchSearching;
   bool _matchPlayerStopped = false;
   bool get matchPlayerStopped => _matchPlayerStopped;
+  Timer? _matchmakingTimeout;
+  bool _matchTimedOut = false;
+  bool get matchTimedOut => _matchTimedOut;
+  /// True when the current match is against a local bot (no Firestore writes).
+  bool _isBotMatch = false;
+  bool get isBotMatch => _isBotMatch;
 
   GameState({
     required StorageService storage,
@@ -1196,8 +1202,19 @@ class GameState extends ChangeNotifier {
     _matchSearching = true;
     _currentMatch = null;
     _matchPlayerStopped = false;
+    _matchTimedOut = false;
+    _isBotMatch = false;
     _screen = AppScreen.matchmaking;
     notifyListeners();
+
+    // Start a 60-second timeout — if no opponent is found, show "play vs bot"
+    _matchmakingTimeout?.cancel();
+    _matchmakingTimeout = Timer(const Duration(seconds: 60), () {
+      if (_matchSearching && _screen == AppScreen.matchmaking) {
+        _matchTimedOut = true;
+        notifyListeners();
+      }
+    });
 
     final uid = _authState.user!.uid;
     const modeId = 'classic';
@@ -1212,6 +1229,7 @@ class GameState extends ChangeNotifier {
 
     if (matchId != null) {
       // Matched immediately — listen to the match doc
+      _matchmakingTimeout?.cancel();
       _subscribeToMatch(matchId);
     } else {
       // Queued — listen for when an opponent creates the match
@@ -1219,6 +1237,7 @@ class GameState extends ChangeNotifier {
         uid: uid,
         modeId: modeId,
         onMatchFound: (id) {
+          _matchmakingTimeout?.cancel();
           _subscribeToMatch(id);
         },
       );
@@ -1256,11 +1275,94 @@ class GameState extends ChangeNotifier {
     });
   }
 
-  /// Transition the match to playing (called after shared countdown).
+  /// Cancel matchmaking or leave a match.
+  Future<void> _cancelMultiplayer() async {
+    _matchmakingTimeout?.cancel();
+    _matchStreamSub?.cancel();
+    _matchStreamSub = null;
+    _matchSearching = false;
+    _matchTimedOut = false;
+    _isBotMatch = false;
+    _currentMatch = null;
+    _matchPlayerStopped = false;
+    _precisionTimer?.dispose();
+    _precisionTimer = null;
+    _timerState = TimerState.initial();
+    _screen = AppScreen.menu;
+    WakelockPlus.disable().catchError((_) {});
+    notifyListeners();
+  }
+
+  Future<void> cancelMatchmaking() async {
+    _matchmakingTimeout?.cancel();
+    if (_authState.isSignedIn) {
+      await _matchmaking.leaveQueue(_authState.user!.uid);
+    }
+    final match = _currentMatch;
+    if (match != null &&
+        match.status != MatchStatus.finished &&
+        match.status != MatchStatus.cancelled) {
+      await _matchmaking.cancelMatch(match.matchId);
+    }
+    await _cancelMultiplayer();
+  }
+
+  /// Start a local bot match — zero Firestore writes.
+  /// The bot's result is generated locally after the player stops.
+  Future<void> playAgainstBot() async {
+    if (!_authState.isSignedIn) return;
+
+    // Leave the real queue first
+    _matchmakingTimeout?.cancel();
+    await _matchmaking.leaveQueue(_authState.user!.uid);
+
+    _isBotMatch = true;
+    _matchSearching = false;
+    _matchTimedOut = false;
+
+    final uid = _authState.user!.uid;
+    const targetMs = 6700;
+
+    // Build a purely local MatchData (never touches Firestore)
+    _currentMatch = MatchData(
+      matchId: 'bot_${DateTime.now().millisecondsSinceEpoch}',
+      modeId: 'classic',
+      targetMs: targetMs,
+      status: MatchStatus.countdown,
+      player1: MatchPlayer(uid: uid, displayName: _authState.userName),
+      player2: const MatchPlayer(uid: 'bot', displayName: '🤖 Bot'),
+      createdAt: DateTime.now(),
+    );
+
+    _screen = AppScreen.matchLobby;
+    notifyListeners();
+  }
+
+  /// Called from matchLobby when countdown finishes — handles bot transition.
   Future<void> matchCountdownComplete() async {
     final match = _currentMatch;
     if (match == null) return;
-    await _matchmaking.startMatch(match.matchId);
+
+    if (_isBotMatch) {
+      // Local bot match — skip Firestore, just transition screens
+      _currentMatch = MatchData(
+        matchId: match.matchId,
+        modeId: match.modeId,
+        targetMs: match.targetMs,
+        status: MatchStatus.playing,
+        player1: match.player1,
+        player2: match.player2,
+        createdAt: match.createdAt,
+      );
+      _currentMode = kGameModes[match.modeId] ?? kGameModes['classic']!;
+      _screen = AppScreen.matchPlaying;
+      _timerState = TimerState.initial();
+      _matchPlayerStopped = false;
+      notifyListeners();
+      _startPrecisionTimer();
+    } else {
+      await _matchmaking.startMatch(match.matchId);
+    }
   }
 
   /// Stop the timer and submit this player's result.
@@ -1284,49 +1386,92 @@ class GameState extends ChangeNotifier {
 
     _sound.play(rawScore >= 900 ? 'excellent' : (rawScore >= 700 ? 'great' : 'ok'));
 
-    await _matchmaking.submitResult(
-      matchId: match.matchId,
-      uid: _authState.user!.uid,
-      stoppedAtMs: stoppedAtMs,
-      deviationMs: deviationMs,
-      score: rawScore,
-    );
-  }
-
-  /// Cancel matchmaking or leave a match.
-  Future<void> _cancelMultiplayer() async {
-    _matchStreamSub?.cancel();
-    _matchStreamSub = null;
-    _matchSearching = false;
-    _currentMatch = null;
-    _matchPlayerStopped = false;
-    _precisionTimer?.dispose();
-    _precisionTimer = null;
-    _timerState = TimerState.initial();
-    _screen = AppScreen.menu;
-    WakelockPlus.disable().catchError((_) {});
-    notifyListeners();
-  }
-
-  Future<void> cancelMatchmaking() async {
-    if (_authState.isSignedIn) {
-      await _matchmaking.leaveQueue(_authState.user!.uid);
+    if (_isBotMatch) {
+      // Generate bot result locally — no Firestore writes
+      _completeBotMatch(
+        playerStoppedAtMs: stoppedAtMs,
+        playerDeviationMs: deviationMs,
+        playerScore: rawScore,
+      );
+    } else {
+      await _matchmaking.submitResult(
+        matchId: match.matchId,
+        uid: _authState.user!.uid,
+        stoppedAtMs: stoppedAtMs,
+        deviationMs: deviationMs,
+        score: rawScore,
+      );
     }
+  }
+
+  /// Instantly resolve a bot match. The bot's deviation is random 50–400ms.
+  void _completeBotMatch({
+    required int playerStoppedAtMs,
+    required int playerDeviationMs,
+    required int playerScore,
+  }) {
     final match = _currentMatch;
-    if (match != null &&
-        match.status != MatchStatus.finished &&
-        match.status != MatchStatus.cancelled) {
-      await _matchmaking.cancelMatch(match.matchId);
-    }
-    await _cancelMultiplayer();
+    if (match == null) return;
+
+    final rng = Random();
+    final botDeviationMs = 50 + rng.nextInt(351); // 50..400
+    final botScore = calculateRawScore(botDeviationMs);
+    final botStoppedAtMs = match.targetMs + (rng.nextBool() ? botDeviationMs : -botDeviationMs);
+
+    final uid = _authState.user!.uid;
+    final isPlayer1 = match.player1.uid == uid;
+
+    _currentMatch = MatchData(
+      matchId: match.matchId,
+      modeId: match.modeId,
+      targetMs: match.targetMs,
+      status: MatchStatus.finished,
+      player1: isPlayer1
+          ? MatchPlayer(
+              uid: uid,
+              displayName: match.player1.displayName,
+              stoppedAtMs: playerStoppedAtMs,
+              deviationMs: playerDeviationMs,
+              score: playerScore,
+            )
+          : MatchPlayer(
+              uid: 'bot',
+              displayName: '🤖 Bot',
+              stoppedAtMs: botStoppedAtMs,
+              deviationMs: botDeviationMs,
+              score: botScore,
+            ),
+      player2: isPlayer1
+          ? MatchPlayer(
+              uid: 'bot',
+              displayName: '🤖 Bot',
+              stoppedAtMs: botStoppedAtMs,
+              deviationMs: botDeviationMs,
+              score: botScore,
+            )
+          : MatchPlayer(
+              uid: uid,
+              displayName: match.player2!.displayName,
+              stoppedAtMs: playerStoppedAtMs,
+              deviationMs: playerDeviationMs,
+              score: playerScore,
+            ),
+      createdAt: match.createdAt,
+    );
+
+    _screen = AppScreen.matchResults;
+    notifyListeners();
   }
 
   /// Return to menu from match results.
   void matchReturnToMenu() {
+    _matchmakingTimeout?.cancel();
     _matchStreamSub?.cancel();
     _matchStreamSub = null;
     _currentMatch = null;
     _matchPlayerStopped = false;
+    _isBotMatch = false;
+    _matchTimedOut = false;
     _precisionTimer?.dispose();
     _precisionTimer = null;
     _timerState = TimerState.initial();
@@ -1337,6 +1482,7 @@ class GameState extends ChangeNotifier {
   @override
   void dispose() {
     _precisionTimer?.dispose();
+    _matchmakingTimeout?.cancel();
     _matchStreamSub?.cancel();
     _matchmaking.dispose();
     super.dispose();

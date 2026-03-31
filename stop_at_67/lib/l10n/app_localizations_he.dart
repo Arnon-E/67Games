@@ -762,6 +762,12 @@ class AppLocalizationsHe extends AppLocalizations {
   String get matchmakingClassicMode => 'קלאסי • 6.700s';
 
   @override
+  String get matchmakingTimedOut => 'לא נמצאו יריבים';
+
+  @override
+  String get matchmakingPlayBot => 'שחק נגד בוט';
+
+  @override
   String get matchLobbyTitle => 'ראש בראש';
 
   @override
