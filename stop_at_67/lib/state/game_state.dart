@@ -1325,7 +1325,7 @@ class GameState extends ChangeNotifier {
 
     // Build a purely local MatchData (never touches Firestore)
     _currentMatch = MatchData(
-      matchId: 'bot_${DateTime.now().millisecondsSinceEpoch}',
+      matchId: 'bot_${DateTime.now().millisecondsSinceEpoch}_${Random().nextInt(99999)}',
       modeId: 'classic',
       targetMs: targetMs,
       status: MatchStatus.countdown,
@@ -1414,7 +1414,7 @@ class GameState extends ChangeNotifier {
     if (match == null) return;
 
     final rng = Random();
-    final botDeviationMs = 50 + rng.nextInt(351); // 50..400
+    final botDeviationMs = 30 + rng.nextInt(571); // 30..600 — varied difficulty
     final botScore = calculateRawScore(botDeviationMs);
     final botStoppedAtMs = match.targetMs + (rng.nextBool() ? botDeviationMs : -botDeviationMs);
 
@@ -1451,7 +1451,7 @@ class GameState extends ChangeNotifier {
             )
           : MatchPlayer(
               uid: uid,
-              displayName: match.player2!.displayName,
+              displayName: match.player2?.displayName ?? _authState.userName,
               stoppedAtMs: playerStoppedAtMs,
               deviationMs: playerDeviationMs,
               score: playerScore,
