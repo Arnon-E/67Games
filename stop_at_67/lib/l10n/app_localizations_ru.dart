@@ -814,4 +814,30 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get matchResultsPlayAgain => 'РЕВАНШ';
+
+  @override
+  String get matchResultsRematchSpeedTitle => 'Скорость реванша';
+
+  @override
+  String get matchResultsRematchSpeedBody =>
+      'Включить увеличение скорости для следующего реванша?\nСкорость увеличится только если оба игрока согласятся.';
+
+  @override
+  String get matchResultsRematchSpeedBodyBot =>
+      'Включить увеличение скорости для следующего реванша?\nЕсли выбрать обычную скорость, она останется прежней.';
+
+  @override
+  String get matchResultsRematchSpeedNormal => 'Обычная';
+
+  @override
+  String get matchResultsRematchSpeedUp => 'Ускорить';
+
+  @override
+  String get matchSeriesWinsShort => 'П';
+
+  @override
+  String get matchSeriesLossesShort => 'Пор';
+
+  @override
+  String get matchSeriesTiesShort => 'Н';
 }

@@ -336,5 +336,13 @@
   "matchResultsYouLose": "ПОРАЖЕНИЕ",
   "matchResultsTie": "НИЧЬЯ!",
   "matchResultsWaiting": "Ожидание...",
-  "matchResultsPlayAgain": "РЕВАНШ"
+  "matchResultsPlayAgain": "РЕВАНШ",
+  "matchResultsRematchSpeedTitle": "Скорость реванша",
+  "matchResultsRematchSpeedBody": "Включить увеличение скорости для следующего реванша?\nСкорость увеличится только если оба игрока согласятся.",
+  "matchResultsRematchSpeedBodyBot": "Включить увеличение скорости для следующего реванша?\nЕсли выбрать обычную скорость, она останется прежней.",
+  "matchResultsRematchSpeedNormal": "Обычная",
+  "matchResultsRematchSpeedUp": "Ускорить",
+  "matchSeriesWinsShort": "П",
+  "matchSeriesLossesShort": "Пор",
+  "matchSeriesTiesShort": "Н"
 }

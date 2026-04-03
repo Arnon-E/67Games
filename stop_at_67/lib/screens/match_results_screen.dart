@@ -4,7 +4,6 @@ import 'package:provider/provider.dart';
 import '../l10n/app_localizations.dart';
 import '../state/game_state.dart';
 import '../state/auth_state.dart';
-import '../engine/types.dart';
 import '../theme/app_colors.dart';
 import '../widgets/app_gradient_background.dart';
 import '../widgets/game_button.dart';
@@ -32,6 +31,7 @@ class MatchResultsScreen extends StatelessWidget {
     final bool isWinner = match.winnerUid == myUid;
     final bool isTie = match.isComplete && match.winnerUid == null;
     final bool isLoser = match.isComplete && !isWinner && !isTie;
+    final versusName = gs.isBotMatch ? 'BOT' : opponent.displayName;
 
     final String outcomeText;
     final Color outcomeColor;
@@ -81,6 +81,42 @@ class MatchResultsScreen extends StatelessWidget {
                   ),
                 ),
 
+                const SizedBox(height: 14),
+                Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 24),
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: AppColors.darkCard,
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(color: AppColors.textHint.withValues(alpha: 0.35)),
+                  ),
+                  child: Column(
+                    children: [
+                      Text(
+                        'VS $versusName',
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: AppColors.textDisabled,
+                          letterSpacing: 1.5,
+                          fontWeight: FontWeight.w600,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        '${l10n.matchSeriesWinsShort} ${gs.matchSeriesWins}  ${l10n.matchSeriesLossesShort} ${gs.matchSeriesLosses}  ${l10n.matchSeriesTiesShort} ${gs.matchSeriesTies}',
+                        style: const TextStyle(
+                          fontSize: 16,
+                          color: AppColors.textPrimary,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 1.2,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
                 const SizedBox(height: 40),
 
                 // Score comparison cards
@@ -120,8 +156,21 @@ class MatchResultsScreen extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 40),
                     child: GameButton(
-                      label: l10n.matchResultsPlayAgain,
-                      onPressed: () => gs.startMatchmaking(),
+                      label: gs.isBotMatch
+                          ? l10n.matchResultsPlayAgain
+                          : l10n.matchResultsPlayAgain,
+                      onPressed: () async {
+                        final acceptSpeedUp = await _showRematchSpeedDialog(
+                          context,
+                          isBotMatch: gs.isBotMatch,
+                        );
+                        if (!context.mounted || acceptSpeedUp == null) return;
+                        if (gs.isBotMatch) {
+                          await gs.rematchBot(increaseSpeed: acceptSpeedUp);
+                        } else {
+                          await gs.startMatchmaking(acceptSpeedUp: acceptSpeedUp);
+                        }
+                      },
                       width: double.infinity,
                     ),
                   ),
@@ -130,7 +179,7 @@ class MatchResultsScreen extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(horizontal: 40),
                     child: GameButton(
                       label: l10n.commonMenu,
-                      onPressed: () => gs.matchReturnToMenu(),
+                      onPressed: () async => gs.matchReturnToMenu(),
                       primary: false,
                       width: double.infinity,
                     ),
@@ -143,6 +192,41 @@ class MatchResultsScreen extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+
+  Future<bool?> _showRematchSpeedDialog(
+    BuildContext context, {
+    required bool isBotMatch,
+  }) {
+    final l10n = AppLocalizations.of(context);
+    return showDialog<bool>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          backgroundColor: AppColors.darkCard,
+          title: Text(
+            l10n.matchResultsRematchSpeedTitle,
+            style: const TextStyle(color: AppColors.textPrimary),
+          ),
+          content: Text(
+            isBotMatch
+                ? l10n.matchResultsRematchSpeedBodyBot
+                : l10n.matchResultsRematchSpeedBody,
+            style: const TextStyle(color: AppColors.textSecondary),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(false),
+              child: Text(l10n.matchResultsRematchSpeedNormal),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(true),
+              child: Text(l10n.matchResultsRematchSpeedUp),
+            ),
+          ],
+        );
+      },
     );
   }
 }

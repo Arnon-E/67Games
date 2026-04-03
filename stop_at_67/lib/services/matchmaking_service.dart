@@ -26,18 +26,38 @@ class MatchmakingService {
     required String displayName,
     required String modeId,
     required int targetMs,
+    String? preferOpponentUid,
+    bool acceptSpeedUp = false,
+    int rematchRound = 1,
   }) async {
     final queueRef = _db.collection('matchmaking_queue');
 
     // Use a transaction to atomically claim an opponent from the queue.
     // This prevents two players from matching with the same opponent.
     final matchId = await _db.runTransaction<String?>((tx) async {
-      // Look for an existing waiting player in the same mode
-      final waiting = await queueRef
-          .where('modeId', isEqualTo: modeId)
-          .where('uid', isNotEqualTo: uid)
-          .limit(1)
-          .get();
+      // If we have a preferred opponent (rematch), try them first
+      QuerySnapshot waiting;
+      if (preferOpponentUid != null) {
+        waiting = await queueRef
+            .where('modeId', isEqualTo: modeId)
+            .where('uid', isEqualTo: preferOpponentUid)
+            .limit(1)
+            .get();
+        // Fall back to any opponent if preferred isn't in queue
+        if (waiting.docs.isEmpty) {
+          waiting = await queueRef
+              .where('modeId', isEqualTo: modeId)
+              .where('uid', isNotEqualTo: uid)
+              .limit(1)
+              .get();
+        }
+      } else {
+        waiting = await queueRef
+            .where('modeId', isEqualTo: modeId)
+            .where('uid', isNotEqualTo: uid)
+            .limit(1)
+            .get();
+      }
 
       if (waiting.docs.isNotEmpty) {
         final opponentDoc = waiting.docs.first;
@@ -46,12 +66,24 @@ class MatchmakingService {
         final opponentSnap = await tx.get(opponentDoc.reference);
         if (!opponentSnap.exists) return null; // already claimed
 
-        final opponentData = opponentSnap.data()!;
+        final opponentData = opponentSnap.data()! as Map<String, dynamic>;
         final matchRef = _db.collection('matches').doc();
+
+        final opponentAcceptSpeedUp = opponentData['acceptSpeedUp'] == true;
+        final opponentRematchRound =
+            (opponentData['rematchRound'] as num?)?.toInt() ?? 1;
+        final agreedRematchRound = rematchRound < opponentRematchRound
+            ? rematchRound
+            : opponentRematchRound;
+        final speedMultiplier = (acceptSpeedUp && opponentAcceptSpeedUp)
+            ? ((1.0 + (agreedRematchRound - 1) * 0.2).clamp(1.0, 3.0) as num)
+                .toDouble()
+            : 1.0;
 
         tx.set(matchRef, {
           'modeId': modeId,
           'targetMs': targetMs,
+          'speedMultiplier': speedMultiplier,
           'status': MatchStatus.countdown.name,
           'player1': {
             'uid': opponentData['uid'],
@@ -82,6 +114,8 @@ class MatchmakingService {
       'displayName': displayName,
       'modeId': modeId,
       'targetMs': targetMs,
+      'acceptSpeedUp': acceptSpeedUp,
+      'rematchRound': rematchRound,
       'createdAt': FieldValue.serverTimestamp(),
     });
 

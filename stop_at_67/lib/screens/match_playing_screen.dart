@@ -39,6 +39,8 @@ class _MatchPlayingScreenState extends State<MatchPlayingScreen> {
     final timerState = gs.timerState;
     final match = gs.currentMatch;
     final l10n = AppLocalizations.of(context);
+    final showSpeedBadge = timerState.speedMultiplier > 1.0;
+    final speedText = timerState.speedMultiplier.toStringAsFixed(2);
 
     final targetDisplay = match != null
         ? _formatMs(match.targetMs)
@@ -121,6 +123,29 @@ class _MatchPlayingScreenState extends State<MatchPlayingScreen> {
                           ),
                         ),
                       ),
+
+                      if (showSpeedBadge) ...[
+                        const SizedBox(height: 10),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: AppColors.gold.withValues(alpha: 0.12),
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(
+                              color: AppColors.gold.withValues(alpha: 0.45),
+                            ),
+                          ),
+                          child: Text(
+                            '${l10n.resultsMultiplier}: ${speedText}×',
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: AppColors.gold,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 1,
+                            ),
+                          ),
+                        ),
+                      ],
 
                       const Spacer(),
 

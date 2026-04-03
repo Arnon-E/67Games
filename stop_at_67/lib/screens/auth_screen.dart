@@ -26,14 +26,22 @@ class _AuthScreenState extends State<AuthScreen> {
     super.dispose();
   }
 
+  void _onSignInSuccess(GameState gs) {
+    if (gs.authReturnScreen == AppScreen.matchmaking) {
+      gs.startMatchmaking();
+    } else {
+      gs.setScreen(gs.authReturnScreen);
+    }
+  }
+
   Future<void> _signInGoogle() async {
     final ok = await context.read<AuthState>().signInWithGoogle();
-    if (ok && mounted) context.read<GameState>().setScreen(AppScreen.leaderboard);
+    if (ok && mounted) _onSignInSuccess(context.read<GameState>());
   }
 
   Future<void> _signInGuest() async {
     final ok = await context.read<AuthState>().signInAnonymous(_nameController.text);
-    if (ok && mounted) context.read<GameState>().setScreen(AppScreen.leaderboard);
+    if (ok && mounted) _onSignInSuccess(context.read<GameState>());
   }
 
   @override
@@ -52,7 +60,7 @@ class _AuthScreenState extends State<AuthScreen> {
             children: [
               ScreenHeader(
                 title: l10n.authSignIn,
-                onBack: () => gs.setScreen(AppScreen.leaderboard),
+                onBack: () => gs.setScreen(AppScreen.menu),
               ),
               Expanded(
                 child: SingleChildScrollView(

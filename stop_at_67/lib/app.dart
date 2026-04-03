@@ -62,7 +62,7 @@ class _ScreenSwitcher extends StatelessWidget {
     AppScreen.leaderboard   => AppScreen.menu,
     AppScreen.profile       => AppScreen.menu,
     AppScreen.shop          => AppScreen.menu,
-    AppScreen.auth          => AppScreen.leaderboard,
+    AppScreen.auth          => AppScreen.menu,
     AppScreen.matchmaking   => AppScreen.menu,
     AppScreen.matchLobby    => null, // can't leave a matched lobby
     AppScreen.matchPlaying  => null, // can't leave during play
@@ -76,6 +76,7 @@ class _ScreenSwitcher extends StatelessWidget {
     final languageState = context.watch<LanguageState>();
 
     final backTarget = _backTarget(screen);
+    final allowSystemPop = screen == AppScreen.menu;
 
     Widget child = _buildScreen(screen);
 
@@ -84,11 +85,13 @@ class _ScreenSwitcher extends StatelessWidget {
     }
 
     return PopScope(
-      canPop: backTarget == null, // menu screen: allow exit
+      canPop: allowSystemPop,
       onPopInvokedWithResult: (_, __) {
+        if (allowSystemPop) return;
+
         if (backTarget != null) {
           // Results screen needs game-state cleanup; all others just navigate.
-          if (screen == AppScreen.results) {
+          if (screen == AppScreen.results || screen == AppScreen.playing) {
             gs.returnToMenu();
           } else if (screen == AppScreen.matchmaking) {
             gs.cancelMatchmaking();

@@ -337,5 +337,13 @@
   "matchResultsYouLose": "הפסדת",
   "matchResultsTie": "תיקו!",
   "matchResultsWaiting": "ממתין...",
-  "matchResultsPlayAgain": "משחק חוזר"
+  "matchResultsPlayAgain": "משחק חוזר",
+  "matchResultsRematchSpeedTitle": "מהירות משחק חוזר",
+  "matchResultsRematchSpeedBody": "להפעיל העלאת מהירות במשחק החוזר הבא?\nהמהירות תעלה רק אם שני השחקנים יסכימו.",
+  "matchResultsRematchSpeedBodyBot": "להפעיל העלאת מהירות במשחק החוזר הבא?\nאם תבחר במהירות רגילה, המהירות תישאר כפי שהיא.",
+  "matchResultsRematchSpeedNormal": "רגיל",
+  "matchResultsRematchSpeedUp": "להאיץ",
+  "matchSeriesWinsShort": "נ",
+  "matchSeriesLossesShort": "ה",
+  "matchSeriesTiesShort": "ת"
 }

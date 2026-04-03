@@ -220,7 +220,7 @@ class _MenuScreenState extends State<MenuScreen>
                 ),
               ),
 
-              const Spacer(),
+              const SizedBox(height: 24),
 
               // Logo with shimmer glow
               disableAnimations
@@ -306,12 +306,12 @@ class _MenuScreenState extends State<MenuScreen>
                 },
               ),
 
-              const SizedBox(height: 48),
+              const SizedBox(height: 32),
 
               // Rotating per-mode stats
               const _RotatingModeStats(),
 
-              const SizedBox(height: 48),
+              const SizedBox(height: 32),
 
               // PLAY button with pulse
               Padding(

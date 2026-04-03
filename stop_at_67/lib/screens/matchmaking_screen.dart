@@ -9,7 +9,7 @@ import '../widgets/app_gradient_background.dart';
 import '../widgets/screen_header.dart';
 
 /// Matchmaking screen — shows a searching animation while waiting for an opponent.
-/// After 60 seconds with no match, displays a "Play vs Bot" option.
+/// After 7 seconds with no match, displays a "Play vs Bot" option.
 class MatchmakingScreen extends StatelessWidget {
   const MatchmakingScreen({super.key});
 
@@ -55,7 +55,7 @@ class MatchmakingScreen extends StatelessWidget {
                 ),
               ),
 
-              // "Play vs Bot" button — appears after 60 s timeout
+              // "Play vs Bot" button — appears after timeout
               if (gs.matchTimedOut) ...[
                 const SizedBox(height: 32),
                 Padding(

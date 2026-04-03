@@ -1611,6 +1611,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'REMATCH'**
   String get matchResultsPlayAgain;
+
+  /// No description provided for @matchResultsRematchSpeedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Rematch Speed'**
+  String get matchResultsRematchSpeedTitle;
+
+  /// No description provided for @matchResultsRematchSpeedBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable speed increase for next rematch?\nSpeed increases only if both players accept.'**
+  String get matchResultsRematchSpeedBody;
+
+  /// No description provided for @matchResultsRematchSpeedBodyBot.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable speed increase for next rematch?\nIf you choose Normal, speed stays the same.'**
+  String get matchResultsRematchSpeedBodyBot;
+
+  /// No description provided for @matchResultsRematchSpeedNormal.
+  ///
+  /// In en, this message translates to:
+  /// **'Normal'**
+  String get matchResultsRematchSpeedNormal;
+
+  /// No description provided for @matchResultsRematchSpeedUp.
+  ///
+  /// In en, this message translates to:
+  /// **'Speed Up'**
+  String get matchResultsRematchSpeedUp;
+
+  /// No description provided for @matchSeriesWinsShort.
+  ///
+  /// In en, this message translates to:
+  /// **'W'**
+  String get matchSeriesWinsShort;
+
+  /// No description provided for @matchSeriesLossesShort.
+  ///
+  /// In en, this message translates to:
+  /// **'L'**
+  String get matchSeriesLossesShort;
+
+  /// No description provided for @matchSeriesTiesShort.
+  ///
+  /// In en, this message translates to:
+  /// **'T'**
+  String get matchSeriesTiesShort;
 }
 
 class _AppLocalizationsDelegate

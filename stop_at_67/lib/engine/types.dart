@@ -520,6 +520,7 @@ class MatchData {
   final String matchId;
   final String modeId;
   final int targetMs;
+  final double speedMultiplier;
   final MatchStatus status;
   final MatchPlayer player1;
   final MatchPlayer? player2;
@@ -529,6 +530,7 @@ class MatchData {
     required this.matchId,
     required this.modeId,
     required this.targetMs,
+    this.speedMultiplier = 1.0,
     required this.status,
     required this.player1,
     this.player2,
@@ -551,6 +553,7 @@ class MatchData {
     matchId: id,
     modeId: json['modeId'] as String? ?? 'classic',
     targetMs: (json['targetMs'] as num?)?.toInt() ?? 6700,
+    speedMultiplier: (json['speedMultiplier'] as num?)?.toDouble() ?? 1.0,
     status: MatchStatus.values.firstWhere(
       (s) => s.name == (json['status'] as String? ?? 'waiting'),
       orElse: () => MatchStatus.waiting,

@@ -802,4 +802,30 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get matchResultsPlayAgain => 'משחק חוזר';
+
+  @override
+  String get matchResultsRematchSpeedTitle => 'מהירות משחק חוזר';
+
+  @override
+  String get matchResultsRematchSpeedBody =>
+      'להפעיל העלאת מהירות במשחק החוזר הבא?\nהמהירות תעלה רק אם שני השחקנים יסכימו.';
+
+  @override
+  String get matchResultsRematchSpeedBodyBot =>
+      'להפעיל העלאת מהירות במשחק החוזר הבא?\nאם תבחר במהירות רגילה, המהירות תישאר כפי שהיא.';
+
+  @override
+  String get matchResultsRematchSpeedNormal => 'רגיל';
+
+  @override
+  String get matchResultsRematchSpeedUp => 'להאיץ';
+
+  @override
+  String get matchSeriesWinsShort => 'נ';
+
+  @override
+  String get matchSeriesLossesShort => 'ה';
+
+  @override
+  String get matchSeriesTiesShort => 'ת';
 }

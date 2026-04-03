@@ -336,5 +336,13 @@
   "matchResultsYouLose": "YOU LOSE",
   "matchResultsTie": "TIE!",
   "matchResultsWaiting": "Waiting...",
-  "matchResultsPlayAgain": "REMATCH"
+  "matchResultsPlayAgain": "REMATCH",
+  "matchResultsRematchSpeedTitle": "Rematch Speed",
+  "matchResultsRematchSpeedBody": "Enable speed increase for next rematch?\nSpeed increases only if both players accept.",
+  "matchResultsRematchSpeedBodyBot": "Enable speed increase for next rematch?\nIf you choose Normal, speed stays the same.",
+  "matchResultsRematchSpeedNormal": "Normal",
+  "matchResultsRematchSpeedUp": "Speed Up",
+  "matchSeriesWinsShort": "W",
+  "matchSeriesLossesShort": "L",
+  "matchSeriesTiesShort": "T"
 }

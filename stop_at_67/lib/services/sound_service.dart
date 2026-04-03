@@ -49,6 +49,13 @@ class SoundService {
           await _tts.setPitch(0.8);
           await _tts.setSpeechRate(1.0);
           await _tts.speak('Miss');
+        case 'winner':
+          await _tts.stop();
+          await _player.stop();
+          await _player.play(AssetSource('sounds/Victory.mp3'));
+        case 'loser':
+          await _player.stop();
+          await _player.play(AssetSource('sounds/Loser.mp3'));
         case 'levelUp':
           await _tts.stop();
           await _tts.setPitch(1.2);

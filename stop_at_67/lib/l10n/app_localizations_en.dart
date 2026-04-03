@@ -807,4 +807,30 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get matchResultsPlayAgain => 'REMATCH';
+
+  @override
+  String get matchResultsRematchSpeedTitle => 'Rematch Speed';
+
+  @override
+  String get matchResultsRematchSpeedBody =>
+      'Enable speed increase for next rematch?\nSpeed increases only if both players accept.';
+
+  @override
+  String get matchResultsRematchSpeedBodyBot =>
+      'Enable speed increase for next rematch?\nIf you choose Normal, speed stays the same.';
+
+  @override
+  String get matchResultsRematchSpeedNormal => 'Normal';
+
+  @override
+  String get matchResultsRematchSpeedUp => 'Speed Up';
+
+  @override
+  String get matchSeriesWinsShort => 'W';
+
+  @override
+  String get matchSeriesLossesShort => 'L';
+
+  @override
+  String get matchSeriesTiesShort => 'T';
 }
