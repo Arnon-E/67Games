@@ -783,6 +783,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get matchLobbyTitle => 'ОДИН НА ОДИН';
 
   @override
+  String get matchLobbyVs => 'VS';
+
+  @override
   String get matchLobbyGetReady => 'ПРИГОТОВЬТЕСЬ';
 
   @override
@@ -805,6 +808,14 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get matchResultsYouLose => 'ПОРАЖЕНИЕ';
+
+  @override
+  String get matchBotName => 'БОТ';
+
+  @override
+  String matchResultsVs(String name) {
+    return 'VS $name';
+  }
 
   @override
   String get matchResultsTie => 'НИЧЬЯ!';

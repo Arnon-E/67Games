@@ -776,6 +776,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get matchLobbyTitle => 'HEAD TO HEAD';
 
   @override
+  String get matchLobbyVs => 'VS';
+
+  @override
   String get matchLobbyGetReady => 'GET READY';
 
   @override
@@ -798,6 +801,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get matchResultsYouLose => 'YOU LOSE';
+
+  @override
+  String get matchBotName => 'BOT';
+
+  @override
+  String matchResultsVs(String name) {
+    return 'VS $name';
+  }
 
   @override
   String get matchResultsTie => 'TIE!';

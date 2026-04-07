@@ -327,6 +327,7 @@
   "matchmakingTimedOut": "לא נמצאו יריבים",
   "matchmakingPlayBot": "שחק נגד בוט",
   "matchLobbyTitle": "ראש בראש",
+  "matchLobbyVs": "נגד",
   "matchLobbyGetReady": "התכוננו",
   "matchPlayingLive1v1": "⚔️ 1 נגד 1 חי",
   "matchPlayingOpponentStopped": "היריב עצר!",
@@ -335,6 +336,13 @@
   "matchResultsOpponent": "יריב",
   "matchResultsYouWin": "ניצחת!",
   "matchResultsYouLose": "הפסדת",
+  "matchBotName": "בוט",
+  "matchResultsVs": "מול {name}",
+  "@matchResultsVs": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
   "matchResultsTie": "תיקו!",
   "matchResultsWaiting": "ממתין...",
   "matchResultsPlayAgain": "משחק חוזר",

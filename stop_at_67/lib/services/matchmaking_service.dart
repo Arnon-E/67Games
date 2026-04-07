@@ -85,6 +85,7 @@ class MatchmakingService {
           'targetMs': targetMs,
           'speedMultiplier': speedMultiplier,
           'status': MatchStatus.countdown.name,
+          'playerUids': [opponentData['uid'], uid],
           'player1': {
             'uid': opponentData['uid'],
             'displayName': opponentData['displayName'],
@@ -138,22 +139,18 @@ class MatchmakingService {
   }) {
     _queueSub?.cancel();
 
-    // Listen to matches where this user is player1 or player2 and status is countdown
+    // Listen only to matches that include this user — O(1) reads via arrayContains index.
+    // No status filter: handles the race where the match is already `playing` on first snapshot.
     _queueSub = _db
         .collection('matches')
-        .where('status', isEqualTo: MatchStatus.countdown.name)
+        .where('playerUids', arrayContains: uid)
+        .limit(1)
         .snapshots()
         .listen((snapshot) {
-      for (final doc in snapshot.docs) {
-        final data = doc.data();
-        final p1Uid = (data['player1'] as Map?)?['uid'] as String?;
-        final p2Uid = (data['player2'] as Map?)?['uid'] as String?;
-        if (p1Uid == uid || p2Uid == uid) {
-          _queueSub?.cancel();
-          _queueSub = null;
-          onMatchFound(doc.id);
-          return;
-        }
+      if (snapshot.docs.isNotEmpty) {
+        _queueSub?.cancel();
+        _queueSub = null;
+        onMatchFound(snapshot.docs.first.id);
       }
     });
   }

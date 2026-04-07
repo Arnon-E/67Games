@@ -771,6 +771,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get matchLobbyTitle => 'ראש בראש';
 
   @override
+  String get matchLobbyVs => 'נגד';
+
+  @override
   String get matchLobbyGetReady => 'התכוננו';
 
   @override
@@ -793,6 +796,14 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get matchResultsYouLose => 'הפסדת';
+
+  @override
+  String get matchBotName => 'בוט';
+
+  @override
+  String matchResultsVs(String name) {
+    return 'מול $name';
+  }
 
   @override
   String get matchResultsTie => 'תיקו!';

@@ -79,9 +79,9 @@ class _MatchLobbyScreenState extends State<MatchLobbyScreen> {
                 // Player cards
                 _PlayerCard(name: player1Name, color: AppColors.orange),
                 const SizedBox(height: 20),
-                const Text(
-                  'VS',
-                  style: TextStyle(
+                Text(
+                  l10n.matchLobbyVs,
+                  style: const TextStyle(
                     fontSize: 28,
                     fontWeight: FontWeight.w800,
                     color: AppColors.gold,

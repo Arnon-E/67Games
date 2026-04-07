@@ -1546,6 +1546,12 @@ abstract class AppLocalizations {
   /// **'HEAD TO HEAD'**
   String get matchLobbyTitle;
 
+  /// No description provided for @matchLobbyVs.
+  ///
+  /// In en, this message translates to:
+  /// **'VS'**
+  String get matchLobbyVs;
+
   /// No description provided for @matchLobbyGetReady.
   ///
   /// In en, this message translates to:
@@ -1593,6 +1599,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'YOU LOSE'**
   String get matchResultsYouLose;
+
+  /// No description provided for @matchBotName.
+  ///
+  /// In en, this message translates to:
+  /// **'BOT'**
+  String get matchBotName;
+
+  /// No description provided for @matchResultsVs.
+  ///
+  /// In en, this message translates to:
+  /// **'VS {name}'**
+  String matchResultsVs(String name);
 
   /// No description provided for @matchResultsTie.
   ///

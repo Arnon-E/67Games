@@ -1315,8 +1315,9 @@ class GameState extends ChangeNotifier {
         _screen = AppScreen.matchLobby;
         notifyListeners();
       } else if (match.status == MatchStatus.playing &&
-          _screen == AppScreen.matchLobby) {
-        // Countdown finished on one client — transition to playing
+          (_screen == AppScreen.matchLobby ||
+              _screen == AppScreen.matchmaking)) {
+        // Countdown finished — also handles first snapshot arriving as playing
         _currentMode = kGameModes[match.modeId] ?? kGameModes['classic']!;
         _screen = AppScreen.matchPlaying;
         _timerState = TimerState.initial();

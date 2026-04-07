@@ -326,6 +326,7 @@
   "matchmakingTimedOut": "No opponents found",
   "matchmakingPlayBot": "PLAY VS BOT",
   "matchLobbyTitle": "HEAD TO HEAD",
+  "matchLobbyVs": "VS",
   "matchLobbyGetReady": "GET READY",
   "matchPlayingLive1v1": "⚔️ LIVE 1v1",
   "matchPlayingOpponentStopped": "Opponent has stopped!",
@@ -334,6 +335,13 @@
   "matchResultsOpponent": "OPPONENT",
   "matchResultsYouWin": "YOU WIN!",
   "matchResultsYouLose": "YOU LOSE",
+  "matchBotName": "BOT",
+  "matchResultsVs": "VS {name}",
+  "@matchResultsVs": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
   "matchResultsTie": "TIE!",
   "matchResultsWaiting": "Waiting...",
   "matchResultsPlayAgain": "REMATCH",

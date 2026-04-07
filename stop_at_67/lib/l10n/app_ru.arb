@@ -326,6 +326,7 @@
   "matchmakingTimedOut": "Соперник не найден",
   "matchmakingPlayBot": "ИГРАТЬ С БОТОМ",
   "matchLobbyTitle": "ОДИН НА ОДИН",
+  "matchLobbyVs": "VS",
   "matchLobbyGetReady": "ПРИГОТОВЬТЕСЬ",
   "matchPlayingLive1v1": "⚔️ ЖИВОЙ 1 на 1",
   "matchPlayingOpponentStopped": "Соперник остановился!",
@@ -334,6 +335,13 @@
   "matchResultsOpponent": "СОПЕРНИК",
   "matchResultsYouWin": "ПОБЕДА!",
   "matchResultsYouLose": "ПОРАЖЕНИЕ",
+  "matchBotName": "БОТ",
+  "matchResultsVs": "VS {name}",
+  "@matchResultsVs": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
   "matchResultsTie": "НИЧЬЯ!",
   "matchResultsWaiting": "Ожидание...",
   "matchResultsPlayAgain": "РЕВАНШ",

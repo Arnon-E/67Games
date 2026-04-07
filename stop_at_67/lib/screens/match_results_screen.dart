@@ -31,7 +31,7 @@ class MatchResultsScreen extends StatelessWidget {
     final bool isWinner = match.winnerUid == myUid;
     final bool isTie = match.isComplete && match.winnerUid == null;
     final bool isLoser = match.isComplete && !isWinner && !isTie;
-    final versusName = gs.isBotMatch ? 'BOT' : opponent.displayName;
+    final versusName = gs.isBotMatch ? l10n.matchBotName : opponent.displayName;
 
     final String outcomeText;
     final Color outcomeColor;
@@ -93,7 +93,7 @@ class MatchResultsScreen extends StatelessWidget {
                   child: Column(
                     children: [
                       Text(
-                        'VS $versusName',
+                        l10n.matchResultsVs(versusName),
                         style: const TextStyle(
                           fontSize: 12,
                           color: AppColors.textDisabled,
@@ -156,9 +156,7 @@ class MatchResultsScreen extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 40),
                     child: GameButton(
-                      label: gs.isBotMatch
-                          ? l10n.matchResultsPlayAgain
-                          : l10n.matchResultsPlayAgain,
+                      label: l10n.matchResultsPlayAgain,
                       onPressed: () async {
                         final acceptSpeedUp = await _showRematchSpeedDialog(
                           context,
