@@ -89,6 +89,7 @@ class GameState extends ChangeNotifier {
     'bg_default',
     'sound_default',
     'celebration_default',
+    'wrestler_default',
   ];
   List<String> get ownedCosmetics => _ownedCosmetics;
 
@@ -217,6 +218,25 @@ class GameState extends ChangeNotifier {
   int get matchSeriesLosses => _matchSeriesLosses;
   int _matchSeriesTies = 0;
   int get matchSeriesTies => _matchSeriesTies;
+
+  // ── Fight mode ───────────────────────────────────────────────
+  static const int kFightMaxHp = 3;
+  bool _fightModeActive = false;
+  bool get fightModeActive => _fightModeActive;
+  int _myFightHp = kFightMaxHp;
+  int get myFightHp => _myFightHp;
+  int _opponentFightHp = kFightMaxHp;
+  int get opponentFightHp => _opponentFightHp;
+  int _fightRound = 1;
+  int get fightRound => _fightRound;
+  /// Damage dealt to opponent this round (0 if opponent won or tie).
+  int _lastRoundMyDamage = 0;
+  int get lastRoundMyDamage => _lastRoundMyDamage;
+  /// Damage taken this round (0 if I won or tie).
+  int _lastRoundOpponentDamage = 0;
+  int get lastRoundOpponentDamage => _lastRoundOpponentDamage;
+  bool get isFightOver =>
+      _fightModeActive && (_myFightHp <= 0 || _opponentFightHp <= 0);
 
   GameState({
     required StorageService storage,
@@ -1077,10 +1097,11 @@ class GameState extends ChangeNotifier {
   void equipCosmetic(String type, String cosmeticId) {
     if (!_ownedCosmetics.contains(cosmeticId)) return;
     _loadout = switch (type) {
-      'timerSkin' => _loadout.copyWith(timerSkin: cosmeticId),
-      'background' => _loadout.copyWith(background: cosmeticId),
-      'soundPack' => _loadout.copyWith(soundPack: cosmeticId),
-      'celebration' => _loadout.copyWith(celebration: cosmeticId),
+      'timerSkin'    => _loadout.copyWith(timerSkin: cosmeticId),
+      'background'   => _loadout.copyWith(background: cosmeticId),
+      'soundPack'    => _loadout.copyWith(soundPack: cosmeticId),
+      'celebration'  => _loadout.copyWith(celebration: cosmeticId),
+      'wrestlerSkin' => _loadout.copyWith(wrestlerSkin: cosmeticId),
       _ => _loadout,
     };
     _storage.saveLoadout(_loadout);
@@ -1089,10 +1110,11 @@ class GameState extends ChangeNotifier {
 
   void unequipCosmetic(String type) {
     _loadout = switch (type) {
-      'timerSkin' => _loadout.copyWith(timerSkin: 'timer_skin_default'),
-      'background' => _loadout.copyWith(background: 'bg_default'),
-      'soundPack' => _loadout.copyWith(soundPack: 'sound_default'),
-      'celebration' => _loadout.copyWith(celebration: 'celebration_default'),
+      'timerSkin'    => _loadout.copyWith(timerSkin: 'timer_skin_default'),
+      'background'   => _loadout.copyWith(background: 'bg_default'),
+      'soundPack'    => _loadout.copyWith(soundPack: 'sound_default'),
+      'celebration'  => _loadout.copyWith(celebration: 'celebration_default'),
+      'wrestlerSkin' => _loadout.copyWith(wrestlerSkin: 'wrestler_default'),
       _ => _loadout,
     };
     _storage.saveLoadout(_loadout);
@@ -1302,6 +1324,85 @@ class GameState extends ChangeNotifier {
     }
   }
 
+  // ── Fight mode helpers ───────────────────────────────────────
+
+  /// Start a fight-mode session against the bot.
+  Future<void> startFightVsBot() async {
+    _fightModeActive = true;
+    _myFightHp = kFightMaxHp;
+    _opponentFightHp = kFightMaxHp;
+    _fightRound = 1;
+    _lastRoundMyDamage = 0;
+    _lastRoundOpponentDamage = 0;
+    _rematchRound = 1;
+    _matchSpeedMultiplier = 1.0;
+    await playAgainstBot();
+  }
+
+  /// Start fight-mode matchmaking against a real opponent.
+  Future<void> startFightMatchmaking() async {
+    _fightModeActive = true;
+    _myFightHp = kFightMaxHp;
+    _opponentFightHp = kFightMaxHp;
+    _fightRound = 1;
+    _lastRoundMyDamage = 0;
+    _lastRoundOpponentDamage = 0;
+    await startMatchmaking(acceptSpeedUp: false);
+  }
+
+  /// Continue the fight to the next round (called from results screen).
+  /// Speed increases automatically each round in fight mode.
+  Future<void> fightNextRound() async {
+    if (_isBotMatch) {
+      await rematchBot(increaseSpeed: true);
+    } else {
+      await startMatchmaking(acceptSpeedUp: true);
+    }
+  }
+
+  /// Calculate damage dealt by the round winner.
+  int _computeFightDamage({
+    required int winnerDeviationMs,
+    required double speedMultiplier,
+  }) {
+    int damage = 1;
+    // Perfect stop = critical hit
+    if (winnerDeviationMs == 0) damage++;
+    // Speed ≥ 2.0× makes hits harder
+    if (speedMultiplier >= 2.0) damage++;
+    return damage.clamp(1, 2); // cap so 3 HP fights last ≥ 2 rounds
+  }
+
+  /// Process fight-round HP changes after a match finishes.
+  void _processFightRound({
+    required int myScore,
+    required int oppScore,
+    required int myDeviationMs,
+    required int oppDeviationMs,
+  }) {
+    if (!_fightModeActive) return;
+    _lastRoundMyDamage = 0;
+    _lastRoundOpponentDamage = 0;
+
+    if (myScore > oppScore) {
+      final dmg = _computeFightDamage(
+        winnerDeviationMs: myDeviationMs,
+        speedMultiplier: _matchSpeedMultiplier,
+      );
+      _lastRoundOpponentDamage = dmg;
+      _opponentFightHp = (_opponentFightHp - dmg).clamp(0, kFightMaxHp);
+    } else if (oppScore > myScore) {
+      final dmg = _computeFightDamage(
+        winnerDeviationMs: oppDeviationMs,
+        speedMultiplier: _matchSpeedMultiplier,
+      );
+      _lastRoundMyDamage = dmg;
+      _myFightHp = (_myFightHp - dmg).clamp(0, kFightMaxHp);
+    }
+    // Tie = no damage
+    _fightRound++;
+  }
+
   void _subscribeToMatch(String matchId) {
     _matchStreamSub?.cancel();
     _matchStreamSub = _matchmaking.watchMatch(matchId).listen((match) {
@@ -1337,7 +1438,15 @@ class GameState extends ChangeNotifier {
         final oppPlayer = myUid == match.player1.uid ? match.player2 : match.player1;
         final myScore = myPlayer?.score ?? 0;
         final oppScore = oppPlayer?.score ?? 0;
+        final myDev = myPlayer?.deviationMs ?? 999;
+        final oppDev = oppPlayer?.deviationMs ?? 999;
         _updateMatchSeriesRecord(myScore: myScore, oppScore: oppScore);
+        _processFightRound(
+          myScore: myScore,
+          oppScore: oppScore,
+          myDeviationMs: myDev,
+          oppDeviationMs: oppDev,
+        );
         if (myScore == oppScore) {
           _sound.play('great');
         } else {
@@ -1364,6 +1473,12 @@ class GameState extends ChangeNotifier {
     _currentMatch = null;
     _matchPlayerStopped = false;
     _resetMatchSeriesRecord();
+    _fightModeActive = false;
+    _myFightHp = kFightMaxHp;
+    _opponentFightHp = kFightMaxHp;
+    _fightRound = 1;
+    _lastRoundMyDamage = 0;
+    _lastRoundOpponentDamage = 0;
     _precisionTimer?.dispose();
     _precisionTimer = null;
     _timerState = TimerState.initial();
@@ -1580,6 +1695,12 @@ class GameState extends ChangeNotifier {
     final didWin = playerScore > botScore;
     final isTie = playerScore == botScore;
     _updateMatchSeriesRecord(myScore: playerScore, oppScore: botScore);
+    _processFightRound(
+      myScore: playerScore,
+      oppScore: botScore,
+      myDeviationMs: playerDeviationMs,
+      oppDeviationMs: botDeviationMs,
+    );
     _sound.play(isTie ? 'great' : (didWin ? 'winner' : 'loser'));
 
     _screen = AppScreen.matchResults;
@@ -1600,6 +1721,13 @@ class GameState extends ChangeNotifier {
     _rematchRound = 1;
     _matchSpeedMultiplier = 1.0;
     _resetMatchSeriesRecord();
+    // Reset fight mode
+    _fightModeActive = false;
+    _myFightHp = kFightMaxHp;
+    _opponentFightHp = kFightMaxHp;
+    _fightRound = 1;
+    _lastRoundMyDamage = 0;
+    _lastRoundOpponentDamage = 0;
     _precisionTimer?.dispose();
     _precisionTimer = null;
     _timerState = TimerState.initial();

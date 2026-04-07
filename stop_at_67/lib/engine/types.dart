@@ -253,6 +253,33 @@ class TimerState {
 }
 
 // ============================================================
+// WRESTLER SKIN
+// ============================================================
+
+class WrestlerSkin {
+  final String id;
+  final String name;
+  final String description;
+  final Color bodyColor;
+  final Color accentColor;
+  final Color skinColor;
+  /// One of: 'headband' | 'mask' | 'visor' | 'crown' | 'flare' | 'belt'
+  final String accessoryType;
+  final int priceCoin; // 0 = free
+
+  const WrestlerSkin({
+    required this.id,
+    required this.name,
+    required this.description,
+    required this.bodyColor,
+    required this.accentColor,
+    required this.skinColor,
+    required this.accessoryType,
+    this.priceCoin = 0,
+  });
+}
+
+// ============================================================
 // PLAYER LOADOUT
 // ============================================================
 
@@ -261,12 +288,14 @@ class PlayerLoadout {
   final String background;
   final String soundPack;
   final String celebration;
+  final String wrestlerSkin;
 
   const PlayerLoadout({
     this.timerSkin = 'timer_skin_default',
     this.background = 'bg_default',
     this.soundPack = 'sound_default',
     this.celebration = 'celebration_default',
+    this.wrestlerSkin = 'wrestler_default',
   });
 
   Map<String, dynamic> toJson() => {
@@ -274,6 +303,7 @@ class PlayerLoadout {
     'background': background,
     'soundPack': soundPack,
     'celebration': celebration,
+    'wrestlerSkin': wrestlerSkin,
   };
 
   factory PlayerLoadout.fromJson(Map<String, dynamic> json) => PlayerLoadout(
@@ -281,15 +311,22 @@ class PlayerLoadout {
     background: json['background'] as String? ?? 'bg_default',
     soundPack: json['soundPack'] as String? ?? 'sound_default',
     celebration: json['celebration'] as String? ?? 'celebration_default',
+    wrestlerSkin: json['wrestlerSkin'] as String? ?? 'wrestler_default',
   );
 
-  PlayerLoadout copyWith({String? timerSkin, String? background, String? soundPack, String? celebration}) =>
-      PlayerLoadout(
-        timerSkin: timerSkin ?? this.timerSkin,
-        background: background ?? this.background,
-        soundPack: soundPack ?? this.soundPack,
-        celebration: celebration ?? this.celebration,
-      );
+  PlayerLoadout copyWith({
+    String? timerSkin,
+    String? background,
+    String? soundPack,
+    String? celebration,
+    String? wrestlerSkin,
+  }) => PlayerLoadout(
+    timerSkin: timerSkin ?? this.timerSkin,
+    background: background ?? this.background,
+    soundPack: soundPack ?? this.soundPack,
+    celebration: celebration ?? this.celebration,
+    wrestlerSkin: wrestlerSkin ?? this.wrestlerSkin,
+  );
 }
 
 // ============================================================

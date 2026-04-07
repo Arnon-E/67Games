@@ -398,7 +398,7 @@ class _MenuScreenState extends State<MenuScreen>
                   width: double.infinity,
                   height: 48,
                   child: OutlinedButton.icon(
-                    onPressed: () => gs.startMatchmaking(),
+                    onPressed: () => _showMatchModeSheet(context, gs, l10n),
                     icon: const Icon(Icons.people, size: 20),
                     label: Text(
                       l10n.menuMultiplayer,
@@ -480,6 +480,145 @@ class _MenuScreenState extends State<MenuScreen>
                 ),
               ),
             ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showMatchModeSheet(
+      BuildContext context, GameState gs, AppLocalizations l10n) {
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: AppColors.darkCard,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(24, 20, 24, 28),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Handle
+              Container(
+                width: 36,
+                height: 4,
+                margin: const EdgeInsets.only(bottom: 20),
+                decoration: BoxDecoration(
+                  color: AppColors.textHint,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              Text(
+                l10n.matchModeSheetTitle,
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.textPrimary,
+                  letterSpacing: 1,
+                ),
+              ),
+              const SizedBox(height: 20),
+              // Quick Match
+              _MatchModeOption(
+                emoji: '⚡',
+                title: l10n.matchModeQuickTitle,
+                subtitle: l10n.matchModeQuickSubtitle,
+                color: AppColors.cyan,
+                onTap: () {
+                  Navigator.pop(context);
+                  gs.startMatchmaking();
+                },
+              ),
+              const SizedBox(height: 12),
+              // Fight Mode
+              _MatchModeOption(
+                emoji: '🥊',
+                title: l10n.matchModeFightTitle,
+                subtitle: l10n.matchModeFightSubtitle,
+                color: AppColors.orange,
+                onTap: () {
+                  Navigator.pop(context);
+                  _showFightModeSheet(context, gs, l10n);
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showFightModeSheet(
+      BuildContext context, GameState gs, AppLocalizations l10n) {
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: AppColors.darkCard,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(24, 20, 24, 28),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 36,
+                height: 4,
+                margin: const EdgeInsets.only(bottom: 20),
+                decoration: BoxDecoration(
+                  color: AppColors.textHint,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              const Text(
+                '🥊',
+                style: TextStyle(fontSize: 36),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                l10n.matchModeFightTitle,
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.orange,
+                  letterSpacing: 1,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                l10n.matchModeFightDescription,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 13,
+                  color: AppColors.textDisabled,
+                ),
+              ),
+              const SizedBox(height: 20),
+              _MatchModeOption(
+                emoji: '🤖',
+                title: l10n.matchModeFightVsBot,
+                subtitle: l10n.matchModeFightVsBotSubtitle,
+                color: AppColors.orange,
+                onTap: () {
+                  Navigator.pop(context);
+                  gs.startFightVsBot();
+                },
+              ),
+              const SizedBox(height: 12),
+              _MatchModeOption(
+                emoji: '🌐',
+                title: l10n.matchModeFightVsPlayer,
+                subtitle: l10n.matchModeFightVsPlayerSubtitle,
+                color: AppColors.cyan,
+                onTap: () {
+                  Navigator.pop(context);
+                  gs.startFightMatchmaking();
+                },
+              ),
+            ],
           ),
         ),
       ),
@@ -942,6 +1081,70 @@ class _MissionRow extends StatelessWidget {
             ],
           ),
         ],
+      ),
+    );
+  }
+}
+
+// ── Match mode bottom-sheet option tile ──────────────────────
+
+class _MatchModeOption extends StatelessWidget {
+  final String emoji;
+  final String title;
+  final String subtitle;
+  final Color color;
+  final VoidCallback onTap;
+
+  const _MatchModeOption({
+    required this.emoji,
+    required this.title,
+    required this.subtitle,
+    required this.color,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.08),
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: color.withValues(alpha: 0.35)),
+        ),
+        child: Row(
+          children: [
+            Text(emoji, style: const TextStyle(fontSize: 26)),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w700,
+                      color: color,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    subtitle,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: AppColors.textDisabled,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Icon(Icons.chevron_right, color: color.withValues(alpha: 0.6), size: 20),
+          ],
+        ),
       ),
     );
   }

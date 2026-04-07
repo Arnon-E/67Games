@@ -851,4 +851,65 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get matchSeriesTiesShort => 'Н';
+
+  @override
+  String get matchModeSheetTitle => 'Выберите тип матча';
+
+  @override
+  String get matchModeQuickTitle => 'Быстрый матч';
+
+  @override
+  String get matchModeQuickSubtitle => 'Один раунд — побеждает лучший счёт';
+
+  @override
+  String get matchModeFightTitle => 'Режим боя';
+
+  @override
+  String get matchModeFightSubtitle => '3 HP у каждого — атакуй до нокаута';
+
+  @override
+  String get matchModeFightDescription =>
+      'У каждого игрока 3 HP. Победи в раунде, чтобы ударить соперника. Идеальная остановка = 2 урона. Первый с 0 HP проигрывает!';
+
+  @override
+  String get matchModeFightVsBot => 'Против бота';
+
+  @override
+  String get matchModeFightVsBotSubtitle => 'Бой с ботом — мгновенный матч';
+
+  @override
+  String get matchModeFightVsPlayer => 'Против игрока';
+
+  @override
+  String get matchModeFightVsPlayerSubtitle => 'Найди реального соперника онлайн';
+
+  @override
+  String fightRoundLabel(int round) => 'РАУНД $round';
+
+  @override
+  String get fightRoundWin => 'РАУНД ВЫИГРАН!';
+
+  @override
+  String get fightRoundLoss => 'РАУНД ПРОИГРАН';
+
+  @override
+  String fightNextRound(int seconds) => 'СЛЕДУЮЩИЙ РАУНД (${seconds}с)';
+
+  @override
+  String get fightKnockout => 'НОКАУТ!';
+
+  @override
+  String get fightKnockedOut => 'НОКАУТ!';
+
+  @override
+  String fightRoundsPlayed(int count) => '$count раундов сыграно';
+
+  @override
+  String get fightPlayAgain => 'БОЙ СНОВА';
+
+  @override
+  String get fightHpLabel => 'HP';
+
+  @override
+  String get fightSpeedLabel => 'СКОРОСТЬ';
 }

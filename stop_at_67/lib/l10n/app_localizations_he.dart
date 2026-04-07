@@ -839,4 +839,65 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get matchSeriesTiesShort => 'ת';
+
+  @override
+  String get matchModeSheetTitle => 'בחר סוג משחק';
+
+  @override
+  String get matchModeQuickTitle => 'משחק מהיר';
+
+  @override
+  String get matchModeQuickSubtitle => 'סיבוב אחד — הניקוד הגבוה ביותר מנצח';
+
+  @override
+  String get matchModeFightTitle => 'מצב לחימה';
+
+  @override
+  String get matchModeFightSubtitle => '3 HP כל אחד — גרום נזק עד ה-KO';
+
+  @override
+  String get matchModeFightDescription =>
+      'לכל שחקן יש 3 HP. נצח סיבוב כדי להכות את היריב. עצירה מושלמת = 2 נזק. הראשון שמגיע ל-0 HP מפסיד!';
+
+  @override
+  String get matchModeFightVsBot => 'נגד בוט';
+
+  @override
+  String get matchModeFightVsBotSubtitle => 'לחם נגד הבוט — התאמה מיידית';
+
+  @override
+  String get matchModeFightVsPlayer => 'נגד שחקן';
+
+  @override
+  String get matchModeFightVsPlayerSubtitle => 'מצא יריב אמיתי אונליין';
+
+  @override
+  String fightRoundLabel(int round) => 'סיבוב $round';
+
+  @override
+  String get fightRoundWin => 'ניצחת סיבוב!';
+
+  @override
+  String get fightRoundLoss => 'הפסדת סיבוב';
+
+  @override
+  String fightNextRound(int seconds) => 'סיבוב הבא (${seconds}ש׳)';
+
+  @override
+  String get fightKnockout => 'נוקאאוט!';
+
+  @override
+  String get fightKnockedOut => 'הופלת!';
+
+  @override
+  String fightRoundsPlayed(int count) => '$count סיבובים נלחמו';
+
+  @override
+  String get fightPlayAgain => 'לחם שוב';
+
+  @override
+  String get fightHpLabel => 'HP';
+
+  @override
+  String get fightSpeedLabel => 'מהירות';
 }

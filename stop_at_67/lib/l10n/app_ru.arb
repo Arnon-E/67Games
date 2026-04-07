@@ -352,5 +352,42 @@
   "matchResultsRematchSpeedUp": "Ускорить",
   "matchSeriesWinsShort": "П",
   "matchSeriesLossesShort": "Пор",
-  "matchSeriesTiesShort": "Н"
+  "matchSeriesTiesShort": "Н",
+
+  "matchModeSheetTitle": "Выберите тип матча",
+  "matchModeQuickTitle": "Быстрый матч",
+  "matchModeQuickSubtitle": "Один раунд — побеждает лучший счёт",
+  "matchModeFightTitle": "Режим боя",
+  "matchModeFightSubtitle": "3 HP у каждого — атакуй до нокаута",
+  "matchModeFightDescription": "У каждого игрока 3 HP. Победи в раунде, чтобы ударить соперника. Идеальная остановка = 2 урона. Первый с 0 HP проигрывает!",
+  "matchModeFightVsBot": "Против бота",
+  "matchModeFightVsBotSubtitle": "Бой с ботом — мгновенный матч",
+  "matchModeFightVsPlayer": "Против игрока",
+  "matchModeFightVsPlayerSubtitle": "Найди реального соперника онлайн",
+
+  "fightRoundLabel": "РАУНД {round}",
+  "@fightRoundLabel": {
+    "placeholders": {
+      "round": { "type": "int" }
+    }
+  },
+  "fightRoundWin": "РАУНД ВЫИГРАН!",
+  "fightRoundLoss": "РАУНД ПРОИГРАН",
+  "fightNextRound": "СЛЕДУЮЩИЙ РАУНД ({seconds}с)",
+  "@fightNextRound": {
+    "placeholders": {
+      "seconds": { "type": "int" }
+    }
+  },
+  "fightKnockout": "НОКАУТ!",
+  "fightKnockedOut": "НОКАУТ!",
+  "fightRoundsPlayed": "{count} раундов сыграно",
+  "@fightRoundsPlayed": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "fightPlayAgain": "БОЙ СНОВА",
+  "fightHpLabel": "HP",
+  "fightSpeedLabel": "СКОРОСТЬ"
 }

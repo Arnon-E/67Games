@@ -1677,6 +1677,28 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'T'**
   String get matchSeriesTiesShort;
+
+  String get matchModeSheetTitle;
+  String get matchModeQuickTitle;
+  String get matchModeQuickSubtitle;
+  String get matchModeFightTitle;
+  String get matchModeFightSubtitle;
+  String get matchModeFightDescription;
+  String get matchModeFightVsBot;
+  String get matchModeFightVsBotSubtitle;
+  String get matchModeFightVsPlayer;
+  String get matchModeFightVsPlayerSubtitle;
+
+  String fightRoundLabel(int round);
+  String get fightRoundWin;
+  String get fightRoundLoss;
+  String fightNextRound(int seconds);
+  String get fightKnockout;
+  String get fightKnockedOut;
+  String fightRoundsPlayed(int count);
+  String get fightPlayAgain;
+  String get fightHpLabel;
+  String get fightSpeedLabel;
 }
 
 class _AppLocalizationsDelegate

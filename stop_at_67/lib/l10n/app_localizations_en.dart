@@ -844,4 +844,65 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get matchSeriesTiesShort => 'T';
+
+  @override
+  String get matchModeSheetTitle => 'Choose Match Type';
+
+  @override
+  String get matchModeQuickTitle => 'Quick Match';
+
+  @override
+  String get matchModeQuickSubtitle => 'One round — highest score wins';
+
+  @override
+  String get matchModeFightTitle => 'Fight Mode';
+
+  @override
+  String get matchModeFightSubtitle => '3 HP each — deal damage until KO';
+
+  @override
+  String get matchModeFightDescription =>
+      'Each player has 3 HP. Win a round to hit your opponent. Perfect stop = 2 damage. First to 0 HP loses!';
+
+  @override
+  String get matchModeFightVsBot => 'vs Bot';
+
+  @override
+  String get matchModeFightVsBotSubtitle => 'Fight the bot — instant match';
+
+  @override
+  String get matchModeFightVsPlayer => 'vs Player';
+
+  @override
+  String get matchModeFightVsPlayerSubtitle => 'Find a real opponent online';
+
+  @override
+  String fightRoundLabel(int round) => 'ROUND $round';
+
+  @override
+  String get fightRoundWin => 'ROUND WIN!';
+
+  @override
+  String get fightRoundLoss => 'ROUND LOST';
+
+  @override
+  String fightNextRound(int seconds) => 'NEXT ROUND (${seconds}s)';
+
+  @override
+  String get fightKnockout => 'KNOCKOUT!';
+
+  @override
+  String get fightKnockedOut => "KO'd!";
+
+  @override
+  String fightRoundsPlayed(int count) => '$count rounds fought';
+
+  @override
+  String get fightPlayAgain => 'FIGHT AGAIN';
+
+  @override
+  String get fightHpLabel => 'HP';
+
+  @override
+  String get fightSpeedLabel => 'SPEED';
 }

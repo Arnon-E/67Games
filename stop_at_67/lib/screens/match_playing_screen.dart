@@ -105,24 +105,32 @@ class _MatchPlayingScreenState extends State<MatchPlayingScreen> {
 
                       const SizedBox(height: 8),
 
-                      // 1v1 badge
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: AppColors.cyan.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: AppColors.cyan.withValues(alpha: 0.4)),
-                        ),
-                        child: Text(
-                          l10n.matchPlayingLive1v1,
-                          style: const TextStyle(
-                            fontSize: 12,
-                            color: AppColors.cyan,
-                            fontWeight: FontWeight.w600,
-                            letterSpacing: 2,
+                      // Fight mode HP bars OR standard 1v1 badge
+                      if (gs.fightModeActive)
+                        _FightHpRow(
+                          myHp: gs.myFightHp,
+                          opponentHp: gs.opponentFightHp,
+                          maxHp: GameState.kFightMaxHp,
+                          round: gs.fightRound,
+                        )
+                      else
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: AppColors.cyan.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(color: AppColors.cyan.withValues(alpha: 0.4)),
+                          ),
+                          child: Text(
+                            l10n.matchPlayingLive1v1,
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: AppColors.cyan,
+                              fontWeight: FontWeight.w600,
+                              letterSpacing: 2,
+                            ),
                           ),
                         ),
-                      ),
 
                       if (showSpeedBadge) ...[
                         const SizedBox(height: 10),
@@ -211,5 +219,82 @@ class _MatchPlayingScreenState extends State<MatchPlayingScreen> {
     final s = ms ~/ 1000;
     final millis = ms % 1000;
     return '$s.${millis.toString().padLeft(3, '0')}s';
+  }
+}
+
+// ── Fight HP row displayed during fight rounds ────────────────
+
+class _FightHpRow extends StatelessWidget {
+  final int myHp;
+  final int opponentHp;
+  final int maxHp;
+  final int round;
+
+  const _FightHpRow({
+    required this.myHp,
+    required this.opponentHp,
+    required this.maxHp,
+    required this.round,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 24),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      decoration: BoxDecoration(
+        color: AppColors.darkCard,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: AppColors.orange.withValues(alpha: 0.3)),
+      ),
+      child: Row(
+        children: [
+          // My HP
+          _HpHearts(hp: myHp, maxHp: maxHp, color: AppColors.orange),
+          const Spacer(),
+          // Round label
+          Text(
+            l10n.fightRoundLabel(round),
+            style: const TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w700,
+              color: AppColors.gold,
+              letterSpacing: 1.5,
+            ),
+          ),
+          const Spacer(),
+          // Opponent HP (reversed so hearts go right-to-left)
+          _HpHearts(hp: opponentHp, maxHp: maxHp, color: AppColors.cyan, reversed: true),
+        ],
+      ),
+    );
+  }
+}
+
+class _HpHearts extends StatelessWidget {
+  final int hp;
+  final int maxHp;
+  final Color color;
+  final bool reversed;
+
+  const _HpHearts({
+    required this.hp,
+    required this.maxHp,
+    required this.color,
+    this.reversed = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final hearts = List.generate(maxHp, (i) {
+      final filled = i < hp;
+      return Icon(
+        filled ? Icons.favorite : Icons.favorite_border,
+        color: filled ? Colors.redAccent : AppColors.textHint,
+        size: 20,
+      );
+    });
+    return Row(children: reversed ? hearts.reversed.toList() : hearts);
   }
 }
