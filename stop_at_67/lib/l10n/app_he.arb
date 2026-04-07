@@ -317,5 +317,41 @@
   "settingsRulesCalibrationBody": "בצע 5 ניסיונות ברצף. הניקוד מבוסס על הסטייה הממוצעת בכל 5 הניסיונות — עקביות היא הכל.",
 
   "settingsRulesPressureTitle": "לחץ",
-  "settingsRulesPressureBody": "עצור בתוך חלון הטווח המותר. כל הצלחה מצמצמת את החלון. שרוד כמה שיותר סיבובים."
+  "settingsRulesPressureBody": "עצור בתוך חלון הטווח המותר. כל הצלחה מצמצמת את החלון. שרוד כמה שיותר סיבובים.",
+
+  "menuMultiplayer": "משחק 1 נגד 1",
+  "matchmakingTitle": "חיפוש יריב",
+  "matchmakingSearching": "מחפש...",
+  "matchmakingWaiting": "מחפש יריב",
+  "matchmakingClassicMode": "קלאסי • 6.700s",
+  "matchmakingTimedOut": "לא נמצאו יריבים",
+  "matchmakingPlayBot": "שחק נגד בוט",
+  "matchLobbyTitle": "ראש בראש",
+  "matchLobbyVs": "נגד",
+  "matchLobbyGetReady": "התכוננו",
+  "matchPlayingLive1v1": "⚔️ 1 נגד 1 חי",
+  "matchPlayingOpponentStopped": "היריב עצר!",
+  "matchPlayingWaitingOpponent": "ממתין ליריב...",
+  "matchResultsYou": "אתה",
+  "matchResultsOpponent": "יריב",
+  "matchResultsYouWin": "ניצחת!",
+  "matchResultsYouLose": "הפסדת",
+  "matchBotName": "בוט",
+  "matchResultsVs": "מול {name}",
+  "@matchResultsVs": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "matchResultsTie": "תיקו!",
+  "matchResultsWaiting": "ממתין...",
+  "matchResultsPlayAgain": "משחק חוזר",
+  "matchResultsRematchSpeedTitle": "מהירות משחק חוזר",
+  "matchResultsRematchSpeedBody": "להפעיל העלאת מהירות במשחק החוזר הבא?\nהמהירות תעלה רק אם שני השחקנים יסכימו.",
+  "matchResultsRematchSpeedBodyBot": "להפעיל העלאת מהירות במשחק החוזר הבא?\nאם תבחר במהירות רגילה, המהירות תישאר כפי שהיא.",
+  "matchResultsRematchSpeedNormal": "רגיל",
+  "matchResultsRematchSpeedUp": "להאיץ",
+  "matchSeriesWinsShort": "נ",
+  "matchSeriesLossesShort": "ה",
+  "matchSeriesTiesShort": "ת"
 }

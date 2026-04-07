@@ -220,7 +220,7 @@ class _MenuScreenState extends State<MenuScreen>
                 ),
               ),
 
-              const Spacer(),
+              const SizedBox(height: 24),
 
               // Logo with shimmer glow
               disableAnimations
@@ -306,12 +306,12 @@ class _MenuScreenState extends State<MenuScreen>
                 },
               ),
 
-              const SizedBox(height: 48),
+              const SizedBox(height: 32),
 
               // Rotating per-mode stats
               const _RotatingModeStats(),
 
-              const SizedBox(height: 48),
+              const SizedBox(height: 32),
 
               // PLAY button with pulse
               Padding(
@@ -383,6 +383,36 @@ class _MenuScreenState extends State<MenuScreen>
                           fontWeight: FontWeight.w700,
                           letterSpacing: 3,
                         ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 24),
+
+              // 1v1 Multiplayer button
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 48),
+                child: SizedBox(
+                  width: double.infinity,
+                  height: 48,
+                  child: OutlinedButton.icon(
+                    onPressed: () => gs.startMatchmaking(),
+                    icon: const Icon(Icons.people, size: 20),
+                    label: Text(
+                      l10n.menuMultiplayer,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 1.5,
+                      ),
+                    ),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: AppColors.cyan,
+                      side: BorderSide(color: AppColors.cyan.withValues(alpha: 0.5)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(24),
                       ),
                     ),
                   ),

@@ -9,6 +9,7 @@ import 'services/ads_service.dart';
 import 'services/subscription_service.dart';
 import 'services/auth_service.dart';
 import 'services/leaderboard_service.dart';
+import 'services/matchmaking_service.dart';
 import 'state/game_state.dart';
 import 'state/language_state.dart';
 import 'state/subscription_state.dart';
@@ -28,8 +29,9 @@ void main() async {
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
     statusBarColor: Colors.transparent,
     statusBarIconBrightness: Brightness.light,
-    systemNavigationBarColor: Color(0xFF0a0a0f),
+    systemNavigationBarColor: Colors.transparent,
     systemNavigationBarIconBrightness: Brightness.light,
+    systemNavigationBarContrastEnforced: false,
   ));
 
   // Initialize Firebase
@@ -42,6 +44,7 @@ void main() async {
   final subscriptions = SubscriptionService();
   final authService = AuthService();
   final leaderboard = LeaderboardService();
+  final matchmaking = MatchmakingService();
 
   // Initialize in parallel
   await Future.wait([
@@ -59,6 +62,7 @@ void main() async {
     ads: ads,
     authState: authState,
     leaderboard: leaderboard,
+    matchmaking: matchmaking,
   );
 
   await Future.wait([

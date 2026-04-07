@@ -750,4 +750,98 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get settingsRulesPressureBody =>
       'Stop within the allowed tolerance window. Each success tightens the window. Survive as many rounds as you can.';
+
+  @override
+  String get menuMultiplayer => '1v1 MATCH';
+
+  @override
+  String get matchmakingTitle => 'Find Opponent';
+
+  @override
+  String get matchmakingSearching => 'Searching...';
+
+  @override
+  String get matchmakingWaiting => 'Looking for an opponent';
+
+  @override
+  String get matchmakingClassicMode => 'Classic • 6.700s';
+
+  @override
+  String get matchmakingTimedOut => 'No opponents found';
+
+  @override
+  String get matchmakingPlayBot => 'PLAY VS BOT';
+
+  @override
+  String get matchLobbyTitle => 'HEAD TO HEAD';
+
+  @override
+  String get matchLobbyVs => 'VS';
+
+  @override
+  String get matchLobbyGetReady => 'GET READY';
+
+  @override
+  String get matchPlayingLive1v1 => '⚔️ LIVE 1v1';
+
+  @override
+  String get matchPlayingOpponentStopped => 'Opponent has stopped!';
+
+  @override
+  String get matchPlayingWaitingOpponent => 'Waiting for opponent...';
+
+  @override
+  String get matchResultsYou => 'YOU';
+
+  @override
+  String get matchResultsOpponent => 'OPPONENT';
+
+  @override
+  String get matchResultsYouWin => 'YOU WIN!';
+
+  @override
+  String get matchResultsYouLose => 'YOU LOSE';
+
+  @override
+  String get matchBotName => 'BOT';
+
+  @override
+  String matchResultsVs(String name) {
+    return 'VS $name';
+  }
+
+  @override
+  String get matchResultsTie => 'TIE!';
+
+  @override
+  String get matchResultsWaiting => 'Waiting...';
+
+  @override
+  String get matchResultsPlayAgain => 'REMATCH';
+
+  @override
+  String get matchResultsRematchSpeedTitle => 'Rematch Speed';
+
+  @override
+  String get matchResultsRematchSpeedBody =>
+      'Enable speed increase for next rematch?\nSpeed increases only if both players accept.';
+
+  @override
+  String get matchResultsRematchSpeedBodyBot =>
+      'Enable speed increase for next rematch?\nIf you choose Normal, speed stays the same.';
+
+  @override
+  String get matchResultsRematchSpeedNormal => 'Normal';
+
+  @override
+  String get matchResultsRematchSpeedUp => 'Speed Up';
+
+  @override
+  String get matchSeriesWinsShort => 'W';
+
+  @override
+  String get matchSeriesLossesShort => 'L';
+
+  @override
+  String get matchSeriesTiesShort => 'T';
 }

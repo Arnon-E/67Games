@@ -757,4 +757,98 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get settingsRulesPressureBody =>
       'Остановитесь в пределах допуска. Каждый успех сужает окно. Выживите как можно больше раундов.';
+
+  @override
+  String get menuMultiplayer => 'МАТЧ 1 на 1';
+
+  @override
+  String get matchmakingTitle => 'Поиск соперника';
+
+  @override
+  String get matchmakingSearching => 'Поиск...';
+
+  @override
+  String get matchmakingWaiting => 'Ищем соперника';
+
+  @override
+  String get matchmakingClassicMode => 'Классика • 6.700с';
+
+  @override
+  String get matchmakingTimedOut => 'Соперник не найден';
+
+  @override
+  String get matchmakingPlayBot => 'ИГРАТЬ С БОТОМ';
+
+  @override
+  String get matchLobbyTitle => 'ОДИН НА ОДИН';
+
+  @override
+  String get matchLobbyVs => 'VS';
+
+  @override
+  String get matchLobbyGetReady => 'ПРИГОТОВЬТЕСЬ';
+
+  @override
+  String get matchPlayingLive1v1 => '⚔️ ЖИВОЙ 1 на 1';
+
+  @override
+  String get matchPlayingOpponentStopped => 'Соперник остановился!';
+
+  @override
+  String get matchPlayingWaitingOpponent => 'Ожидание соперника...';
+
+  @override
+  String get matchResultsYou => 'ВЫ';
+
+  @override
+  String get matchResultsOpponent => 'СОПЕРНИК';
+
+  @override
+  String get matchResultsYouWin => 'ПОБЕДА!';
+
+  @override
+  String get matchResultsYouLose => 'ПОРАЖЕНИЕ';
+
+  @override
+  String get matchBotName => 'БОТ';
+
+  @override
+  String matchResultsVs(String name) {
+    return 'VS $name';
+  }
+
+  @override
+  String get matchResultsTie => 'НИЧЬЯ!';
+
+  @override
+  String get matchResultsWaiting => 'Ожидание...';
+
+  @override
+  String get matchResultsPlayAgain => 'РЕВАНШ';
+
+  @override
+  String get matchResultsRematchSpeedTitle => 'Скорость реванша';
+
+  @override
+  String get matchResultsRematchSpeedBody =>
+      'Включить увеличение скорости для следующего реванша?\nСкорость увеличится только если оба игрока согласятся.';
+
+  @override
+  String get matchResultsRematchSpeedBodyBot =>
+      'Включить увеличение скорости для следующего реванша?\nЕсли выбрать обычную скорость, она останется прежней.';
+
+  @override
+  String get matchResultsRematchSpeedNormal => 'Обычная';
+
+  @override
+  String get matchResultsRematchSpeedUp => 'Ускорить';
+
+  @override
+  String get matchSeriesWinsShort => 'П';
+
+  @override
+  String get matchSeriesLossesShort => 'Пор';
+
+  @override
+  String get matchSeriesTiesShort => 'Н';
 }

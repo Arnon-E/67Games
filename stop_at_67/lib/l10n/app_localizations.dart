@@ -1497,6 +1497,186 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Stop within the allowed tolerance window. Each success tightens the window. Survive as many rounds as you can.'**
   String get settingsRulesPressureBody;
+
+  /// No description provided for @menuMultiplayer.
+  ///
+  /// In en, this message translates to:
+  /// **'1v1 MATCH'**
+  String get menuMultiplayer;
+
+  /// No description provided for @matchmakingTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Find Opponent'**
+  String get matchmakingTitle;
+
+  /// No description provided for @matchmakingSearching.
+  ///
+  /// In en, this message translates to:
+  /// **'Searching...'**
+  String get matchmakingSearching;
+
+  /// No description provided for @matchmakingWaiting.
+  ///
+  /// In en, this message translates to:
+  /// **'Looking for an opponent'**
+  String get matchmakingWaiting;
+
+  /// No description provided for @matchmakingClassicMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Classic • 6.700s'**
+  String get matchmakingClassicMode;
+
+  /// No description provided for @matchmakingTimedOut.
+  ///
+  /// In en, this message translates to:
+  /// **'No opponents found'**
+  String get matchmakingTimedOut;
+
+  /// No description provided for @matchmakingPlayBot.
+  ///
+  /// In en, this message translates to:
+  /// **'PLAY VS BOT'**
+  String get matchmakingPlayBot;
+
+  /// No description provided for @matchLobbyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'HEAD TO HEAD'**
+  String get matchLobbyTitle;
+
+  /// No description provided for @matchLobbyVs.
+  ///
+  /// In en, this message translates to:
+  /// **'VS'**
+  String get matchLobbyVs;
+
+  /// No description provided for @matchLobbyGetReady.
+  ///
+  /// In en, this message translates to:
+  /// **'GET READY'**
+  String get matchLobbyGetReady;
+
+  /// No description provided for @matchPlayingLive1v1.
+  ///
+  /// In en, this message translates to:
+  /// **'⚔️ LIVE 1v1'**
+  String get matchPlayingLive1v1;
+
+  /// No description provided for @matchPlayingOpponentStopped.
+  ///
+  /// In en, this message translates to:
+  /// **'Opponent has stopped!'**
+  String get matchPlayingOpponentStopped;
+
+  /// No description provided for @matchPlayingWaitingOpponent.
+  ///
+  /// In en, this message translates to:
+  /// **'Waiting for opponent...'**
+  String get matchPlayingWaitingOpponent;
+
+  /// No description provided for @matchResultsYou.
+  ///
+  /// In en, this message translates to:
+  /// **'YOU'**
+  String get matchResultsYou;
+
+  /// No description provided for @matchResultsOpponent.
+  ///
+  /// In en, this message translates to:
+  /// **'OPPONENT'**
+  String get matchResultsOpponent;
+
+  /// No description provided for @matchResultsYouWin.
+  ///
+  /// In en, this message translates to:
+  /// **'YOU WIN!'**
+  String get matchResultsYouWin;
+
+  /// No description provided for @matchResultsYouLose.
+  ///
+  /// In en, this message translates to:
+  /// **'YOU LOSE'**
+  String get matchResultsYouLose;
+
+  /// No description provided for @matchBotName.
+  ///
+  /// In en, this message translates to:
+  /// **'BOT'**
+  String get matchBotName;
+
+  /// No description provided for @matchResultsVs.
+  ///
+  /// In en, this message translates to:
+  /// **'VS {name}'**
+  String matchResultsVs(String name);
+
+  /// No description provided for @matchResultsTie.
+  ///
+  /// In en, this message translates to:
+  /// **'TIE!'**
+  String get matchResultsTie;
+
+  /// No description provided for @matchResultsWaiting.
+  ///
+  /// In en, this message translates to:
+  /// **'Waiting...'**
+  String get matchResultsWaiting;
+
+  /// No description provided for @matchResultsPlayAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'REMATCH'**
+  String get matchResultsPlayAgain;
+
+  /// No description provided for @matchResultsRematchSpeedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Rematch Speed'**
+  String get matchResultsRematchSpeedTitle;
+
+  /// No description provided for @matchResultsRematchSpeedBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable speed increase for next rematch?\nSpeed increases only if both players accept.'**
+  String get matchResultsRematchSpeedBody;
+
+  /// No description provided for @matchResultsRematchSpeedBodyBot.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable speed increase for next rematch?\nIf you choose Normal, speed stays the same.'**
+  String get matchResultsRematchSpeedBodyBot;
+
+  /// No description provided for @matchResultsRematchSpeedNormal.
+  ///
+  /// In en, this message translates to:
+  /// **'Normal'**
+  String get matchResultsRematchSpeedNormal;
+
+  /// No description provided for @matchResultsRematchSpeedUp.
+  ///
+  /// In en, this message translates to:
+  /// **'Speed Up'**
+  String get matchResultsRematchSpeedUp;
+
+  /// No description provided for @matchSeriesWinsShort.
+  ///
+  /// In en, this message translates to:
+  /// **'W'**
+  String get matchSeriesWinsShort;
+
+  /// No description provided for @matchSeriesLossesShort.
+  ///
+  /// In en, this message translates to:
+  /// **'L'**
+  String get matchSeriesLossesShort;
+
+  /// No description provided for @matchSeriesTiesShort.
+  ///
+  /// In en, this message translates to:
+  /// **'T'**
+  String get matchSeriesTiesShort;
 }
 
 class _AppLocalizationsDelegate

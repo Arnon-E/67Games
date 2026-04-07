@@ -13,6 +13,7 @@ import '../services/storage_service.dart';
 import '../services/sound_service.dart';
 import '../services/ads_service.dart';
 import '../services/leaderboard_service.dart';
+import '../services/matchmaking_service.dart';
 import 'auth_state.dart';
 
 enum AppScreen {
@@ -27,6 +28,10 @@ enum AppScreen {
   profile,
   shop,
   auth,
+  matchmaking,
+  matchLobby,
+  matchPlaying,
+  matchResults,
 }
 
 class GameState extends ChangeNotifier {
@@ -37,6 +42,8 @@ class GameState extends ChangeNotifier {
   // ── Navigation ─────────────────────────────────────────────
   AppScreen _screen = AppScreen.menu;
   AppScreen get screen => _screen;
+  AppScreen _authReturnScreen = AppScreen.menu;
+  AppScreen get authReturnScreen => _authReturnScreen;
 
   // ── Game session ────────────────────────────────────────────
   GameMode? _currentMode;
@@ -180,6 +187,36 @@ class GameState extends ChangeNotifier {
 
   final AuthState _authState;
   final LeaderboardService _leaderboard;
+  final MatchmakingService _matchmaking;
+
+  // ── Multiplayer 1v1 ─────────────────────────────────────────
+  MatchData? _currentMatch;
+  MatchData? get currentMatch => _currentMatch;
+  StreamSubscription<MatchData?>? _matchStreamSub;
+  bool _matchSearching = false;
+  bool get matchSearching => _matchSearching;
+  bool _matchPlayerStopped = false;
+  bool get matchPlayerStopped => _matchPlayerStopped;
+  Timer? _matchmakingTimeout;
+  bool _matchTimedOut = false;
+  bool get matchTimedOut => _matchTimedOut;
+  /// True when the current match is against a local bot (no Firestore writes).
+  bool _isBotMatch = false;
+  bool get isBotMatch => _isBotMatch;
+  /// Opponent UID to rematch with (set after a real match, cleared on menu return).
+  String? _rematchOpponentUid;
+  /// Round number within the current rematch streak (1 = first game, 2 = second, etc.)
+  int _rematchRound = 1;
+  int get rematchRound => _rematchRound;
+  /// Speed multiplier applied to the match timer — increases each rematch round.
+  double _matchSpeedMultiplier = 1.0;
+  double get matchSpeedMultiplier => _matchSpeedMultiplier;
+  int _matchSeriesWins = 0;
+  int get matchSeriesWins => _matchSeriesWins;
+  int _matchSeriesLosses = 0;
+  int get matchSeriesLosses => _matchSeriesLosses;
+  int _matchSeriesTies = 0;
+  int get matchSeriesTies => _matchSeriesTies;
 
   GameState({
     required StorageService storage,
@@ -187,11 +224,13 @@ class GameState extends ChangeNotifier {
     required AdsService ads,
     required AuthState authState,
     required LeaderboardService leaderboard,
+    required MatchmakingService matchmaking,
   })  : _storage = storage,
         _sound = sound,
         _ads = ads,
         _authState = authState,
-        _leaderboard = leaderboard;
+        _leaderboard = leaderboard,
+        _matchmaking = matchmaking;
 
   // ═══════════════════════════════════════════════════════════
   // INIT
@@ -235,6 +274,7 @@ class GameState extends ChangeNotifier {
   // ═══════════════════════════════════════════════════════════
 
   void setScreen(AppScreen screen) {
+    if (screen == AppScreen.auth) _authReturnScreen = AppScreen.menu;
     _screen = screen;
     notifyListeners();
   }
@@ -364,6 +404,8 @@ class GameState extends ChangeNotifier {
     }
     if (mode.id == 'surge') {
       _precisionTimer!.setSpeedMultiplier(_computeSurgeMultiplier());
+    } else if (_matchSpeedMultiplier > 1.0) {
+      _precisionTimer!.setSpeedMultiplier(_matchSpeedMultiplier);
     }
     _precisionTimer!.start();
   }
@@ -739,7 +781,7 @@ class GameState extends ChangeNotifier {
           _streakManager.getBestStreak(),
         ),
         _storage.saveWeeklyMissions(_weeklyMissions),
-      ]).catchError((_) {});
+      ]).catchError((_) => <void>[]);
     }
 
     // Submit to online leaderboard if signed in.
@@ -774,7 +816,6 @@ class GameState extends ChangeNotifier {
       _sound.play('miss');
       return;
     }
-    // Surge fail round (below excellent loses a life): play failure sound
     final mode = _currentMode;
     // Pressure failure (any round, including game-over): play failure sound
     if (mode != null && mode.isPressure && !_pressureLastRoundSuccess) {
@@ -1169,9 +1210,428 @@ class GameState extends ChangeNotifier {
   int get bestStreakValue => _streakManager.getBestStreak();
   double get streakMultiplier => _streakManager.getMultiplier();
 
+  // ═══════════════════════════════════════════════════════════
+  // MULTIPLAYER 1v1
+  // ═══════════════════════════════════════════════════════════
+
+  /// Start searching for a 1v1 opponent. Navigates to the matchmaking screen.
+  Future<void> startMatchmaking({bool acceptSpeedUp = false}) async {
+    if (!_authState.isSignedIn) {
+      _authReturnScreen = AppScreen.matchmaking;
+      _screen = AppScreen.auth;
+      notifyListeners();
+      return;
+    }
+    await _sound.cleanup();
+
+    // Fresh matchmaking resets rematch state; coming from results keeps it
+    final isRematch = _rematchOpponentUid != null;
+    if (!isRematch) {
+      _rematchRound = 1;
+      _matchSpeedMultiplier = 1.0;
+      _resetMatchSeriesRecord();
+    }
+    final preferOpponent = _rematchOpponentUid;
+    final queuedRematchRound = _rematchRound;
+    final allowSpeedUp = isRematch && acceptSpeedUp;
+    _rematchOpponentUid = null;
+
+    _matchSearching = true;
+    _currentMatch = null;
+    _matchPlayerStopped = false;
+    _matchTimedOut = false;
+    _isBotMatch = false;
+    _screen = AppScreen.matchmaking;
+    notifyListeners();
+
+    final uid = _authState.user!.uid;
+    const modeId = 'classic';
+    const targetMs = 6700;
+
+    // Start a 7-second timeout — if no opponent found, try once more then show bot option
+    _matchmakingTimeout?.cancel();
+    _matchmakingTimeout = Timer(const Duration(seconds: 7), () async {
+      if (!_matchSearching || _screen != AppScreen.matchmaking) return;
+      // Try to match with any waiting player one last time
+      try {
+        final lateMatchId = await _matchmaking.joinQueue(
+          uid: uid,
+          displayName: _authState.userName,
+          modeId: modeId,
+          targetMs: targetMs,
+          preferOpponentUid: preferOpponent,
+          acceptSpeedUp: allowSpeedUp,
+          rematchRound: queuedRematchRound,
+        );
+        if (lateMatchId != null && _matchSearching && _screen == AppScreen.matchmaking) {
+          _subscribeToMatch(lateMatchId);
+          return;
+        }
+      } catch (_) {}
+      // No opponent found — show bot option
+      if (_matchSearching && _screen == AppScreen.matchmaking) {
+        _matchTimedOut = true;
+        notifyListeners();
+      }
+    });
+
+    final matchId = await _matchmaking.joinQueue(
+      uid: uid,
+      displayName: _authState.userName,
+      modeId: modeId,
+      targetMs: targetMs,
+      preferOpponentUid: preferOpponent,
+      acceptSpeedUp: allowSpeedUp,
+      rematchRound: queuedRematchRound,
+    );
+
+    if (matchId != null) {
+      // Matched immediately — listen to the match doc
+      _matchmakingTimeout?.cancel();
+      _subscribeToMatch(matchId);
+    } else {
+      // Queued — listen for when an opponent creates the match
+      _matchmaking.listenForMatch(
+        uid: uid,
+        modeId: modeId,
+        onMatchFound: (id) {
+          _matchmakingTimeout?.cancel();
+          _subscribeToMatch(id);
+        },
+      );
+    }
+  }
+
+  void _subscribeToMatch(String matchId) {
+    _matchStreamSub?.cancel();
+    _matchStreamSub = _matchmaking.watchMatch(matchId).listen((match) {
+      if (match == null) return;
+      _currentMatch = match;
+      _matchSpeedMultiplier = match.speedMultiplier;
+      _matchSearching = false;
+
+      if (match.status == MatchStatus.countdown &&
+          _screen == AppScreen.matchmaking) {
+        _screen = AppScreen.matchLobby;
+        notifyListeners();
+      } else if (match.status == MatchStatus.playing &&
+          (_screen == AppScreen.matchLobby ||
+              _screen == AppScreen.matchmaking)) {
+        // Countdown finished — also handles first snapshot arriving as playing
+        _currentMode = kGameModes[match.modeId] ?? kGameModes['classic']!;
+        _screen = AppScreen.matchPlaying;
+        _timerState = TimerState.initial();
+        _matchPlayerStopped = false;
+        notifyListeners();
+        _startPrecisionTimer();
+      } else if (match.status == MatchStatus.finished) {
+        // Remember opponent for rematch and bump speed for next round
+        final myUid = _authState.user?.uid;
+        _rematchOpponentUid = myUid == match.player1.uid
+            ? match.player2?.uid
+            : match.player1.uid;
+        _rematchRound++;
+        _matchSpeedMultiplier = 1.0;
+        // Play winner/loser sound
+        final myPlayer = myUid == match.player1.uid ? match.player1 : match.player2;
+        final oppPlayer = myUid == match.player1.uid ? match.player2 : match.player1;
+        final myScore = myPlayer?.score ?? 0;
+        final oppScore = oppPlayer?.score ?? 0;
+        _updateMatchSeriesRecord(myScore: myScore, oppScore: oppScore);
+        if (myScore == oppScore) {
+          _sound.play('great');
+        } else {
+          _sound.play(myScore > oppScore ? 'winner' : 'loser');
+        }
+        _screen = AppScreen.matchResults;
+        notifyListeners();
+      } else if (match.status == MatchStatus.cancelled) {
+        _cancelMultiplayer();
+      } else {
+        notifyListeners();
+      }
+    });
+  }
+
+  /// Cancel matchmaking or leave a match.
+  Future<void> _cancelMultiplayer() async {
+    _matchmakingTimeout?.cancel();
+    _matchStreamSub?.cancel();
+    _matchStreamSub = null;
+    _matchSearching = false;
+    _matchTimedOut = false;
+    _isBotMatch = false;
+    _currentMatch = null;
+    _matchPlayerStopped = false;
+    _resetMatchSeriesRecord();
+    _precisionTimer?.dispose();
+    _precisionTimer = null;
+    _timerState = TimerState.initial();
+    _screen = AppScreen.menu;
+    WakelockPlus.disable().catchError((_) {});
+    notifyListeners();
+  }
+
+  Future<void> cancelMatchmaking() async {
+    _matchmakingTimeout?.cancel();
+    if (_authState.isSignedIn) {
+      try {
+        await _matchmaking.leaveQueue(_authState.user!.uid);
+      } catch (_) {}
+    }
+    final match = _currentMatch;
+    if (match != null &&
+        match.status != MatchStatus.finished &&
+        match.status != MatchStatus.cancelled) {
+      await _matchmaking.cancelMatch(match.matchId);
+    }
+    await _cancelMultiplayer();
+  }
+
+  /// Start a local bot match — zero Firestore writes.
+  /// The bot's result is generated locally after the player stops.
+  Future<void> playAgainstBot() async {
+    if (!_authState.isSignedIn) return;
+
+    // Leave the real queue first (may fail if never queued due to Firestore rules — ignore)
+    _matchmakingTimeout?.cancel();
+    try {
+      await _matchmaking.leaveQueue(_authState.user!.uid);
+    } catch (_) {}
+
+    _isBotMatch = true;
+    _matchSearching = false;
+    _matchTimedOut = false;
+    _resetMatchSeriesRecord();
+
+    final uid = _authState.user!.uid;
+    const targetMs = 6700;
+
+    // Build a purely local MatchData (never touches Firestore)
+    _currentMatch = MatchData(
+      matchId: 'bot_${DateTime.now().millisecondsSinceEpoch}_${Random().nextInt(99999)}',
+      modeId: 'classic',
+      targetMs: targetMs,
+      speedMultiplier: 1.0,
+      status: MatchStatus.countdown,
+      player1: MatchPlayer(uid: uid, displayName: _authState.userName),
+      player2: const MatchPlayer(uid: 'bot', displayName: '🤖 Bot'),
+      createdAt: DateTime.now(),
+    );
+
+    _screen = AppScreen.matchLobby;
+    notifyListeners();
+  }
+
+  /// Rematch directly against a bot — skips queue entirely (used from match results).
+  /// If [increaseSpeed] is false, keeps the current speed multiplier.
+  Future<void> rematchBot({bool increaseSpeed = false}) async {
+    if (!_authState.isSignedIn) return;
+    await _sound.cleanup();
+    _matchmakingTimeout?.cancel();
+    _matchStreamSub?.cancel();
+    _matchStreamSub = null;
+    _isBotMatch = true;
+    _matchSearching = false;
+    _matchTimedOut = false;
+    _matchPlayerStopped = false;
+    if (increaseSpeed) {
+      _rematchRound++;
+      _matchSpeedMultiplier =
+          (1.0 + (_rematchRound - 1) * 0.2).clamp(1.0, 3.0);
+    }
+
+    final uid = _authState.user!.uid;
+    _currentMatch = MatchData(
+      matchId: 'bot_${DateTime.now().millisecondsSinceEpoch}_${Random().nextInt(99999)}',
+      modeId: 'classic',
+      targetMs: 6700,
+      speedMultiplier: _matchSpeedMultiplier,
+      status: MatchStatus.countdown,
+      player1: MatchPlayer(uid: uid, displayName: _authState.userName),
+      player2: const MatchPlayer(uid: 'bot', displayName: '🤖 Bot'),
+      createdAt: DateTime.now(),
+    );
+    _screen = AppScreen.matchLobby;
+    notifyListeners();
+  }
+
+  /// Called from matchLobby when countdown finishes — handles bot transition.
+  Future<void> matchCountdownComplete() async {
+    final match = _currentMatch;
+    if (match == null) return;
+
+    if (_isBotMatch) {
+      // Local bot match — skip Firestore, just transition screens
+      _currentMatch = MatchData(
+        matchId: match.matchId,
+        modeId: match.modeId,
+        targetMs: match.targetMs,
+        speedMultiplier: match.speedMultiplier,
+        status: MatchStatus.playing,
+        player1: match.player1,
+        player2: match.player2,
+        createdAt: match.createdAt,
+      );
+      _currentMode = kGameModes[match.modeId] ?? kGameModes['classic']!;
+      _screen = AppScreen.matchPlaying;
+      _timerState = TimerState.initial();
+      _matchPlayerStopped = false;
+      notifyListeners();
+      _startPrecisionTimer();
+    } else {
+      await _matchmaking.startMatch(match.matchId);
+    }
+  }
+
+  /// Stop the timer and submit this player's result.
+  Future<void> stopMatchGame() async {
+    final timer = _precisionTimer;
+    if (timer == null || _matchPlayerStopped) return;
+    _matchPlayerStopped = true;
+
+    final elapsedMs = timer.stop();
+    final stoppedAtMs = timer.getStoppedValue(elapsedMs);
+    final match = _currentMatch;
+    if (match == null) return;
+
+    WakelockPlus.disable().catchError((_) {});
+
+    final deviationMs = (stoppedAtMs - match.targetMs).abs();
+    final rawScore = calculateRawScore(deviationMs);
+
+    _timerState = _timerState.copyWith(isRunning: false);
+    notifyListeners();
+
+    if (_isBotMatch) {
+      // Generate bot result locally — no Firestore writes
+      _completeBotMatch(
+        playerStoppedAtMs: stoppedAtMs,
+        playerDeviationMs: deviationMs,
+        playerScore: rawScore,
+      );
+    } else {
+      await _matchmaking.submitResult(
+        matchId: match.matchId,
+        uid: _authState.user!.uid,
+        stoppedAtMs: stoppedAtMs,
+        deviationMs: deviationMs,
+        score: rawScore,
+      );
+    }
+  }
+
+  /// Instantly resolve a bot match. The bot's deviation is random 50–400ms.
+  void _completeBotMatch({
+    required int playerStoppedAtMs,
+    required int playerDeviationMs,
+    required int playerScore,
+  }) {
+    final match = _currentMatch;
+    if (match == null) return;
+
+    final rng = Random();
+    final botDeviationMs = 20 + rng.nextInt(131); // 20..150ms — bot always stops within ±150ms
+    final botScore = calculateRawScore(botDeviationMs);
+    final botStoppedAtMs = match.targetMs + (rng.nextBool() ? botDeviationMs : -botDeviationMs);
+
+    final uid = _authState.user!.uid;
+    final isPlayer1 = match.player1.uid == uid;
+
+    _currentMatch = MatchData(
+      matchId: match.matchId,
+      modeId: match.modeId,
+      targetMs: match.targetMs,
+      speedMultiplier: match.speedMultiplier,
+      status: MatchStatus.finished,
+      player1: isPlayer1
+          ? MatchPlayer(
+              uid: uid,
+              displayName: match.player1.displayName,
+              stoppedAtMs: playerStoppedAtMs,
+              deviationMs: playerDeviationMs,
+              score: playerScore,
+            )
+          : MatchPlayer(
+              uid: 'bot',
+              displayName: '🤖 Bot',
+              stoppedAtMs: botStoppedAtMs,
+              deviationMs: botDeviationMs,
+              score: botScore,
+            ),
+      player2: isPlayer1
+          ? MatchPlayer(
+              uid: 'bot',
+              displayName: '🤖 Bot',
+              stoppedAtMs: botStoppedAtMs,
+              deviationMs: botDeviationMs,
+              score: botScore,
+            )
+          : MatchPlayer(
+              uid: uid,
+              displayName: match.player2?.displayName ?? _authState.userName,
+              stoppedAtMs: playerStoppedAtMs,
+              deviationMs: playerDeviationMs,
+              score: playerScore,
+            ),
+      createdAt: match.createdAt,
+    );
+
+    final didWin = playerScore > botScore;
+    final isTie = playerScore == botScore;
+    _updateMatchSeriesRecord(myScore: playerScore, oppScore: botScore);
+    _sound.play(isTie ? 'great' : (didWin ? 'winner' : 'loser'));
+
+    _screen = AppScreen.matchResults;
+    notifyListeners();
+  }
+
+  /// Return to menu from match results.
+  Future<void> matchReturnToMenu() async {
+    await _sound.cleanup();
+    _matchmakingTimeout?.cancel();
+    _matchStreamSub?.cancel();
+    _matchStreamSub = null;
+    _currentMatch = null;
+    _matchPlayerStopped = false;
+    _isBotMatch = false;
+    _matchTimedOut = false;
+    _rematchOpponentUid = null;
+    _rematchRound = 1;
+    _matchSpeedMultiplier = 1.0;
+    _resetMatchSeriesRecord();
+    _precisionTimer?.dispose();
+    _precisionTimer = null;
+    _timerState = TimerState.initial();
+    _screen = AppScreen.menu;
+    notifyListeners();
+  }
+
   @override
   void dispose() {
     _precisionTimer?.dispose();
+    _matchmakingTimeout?.cancel();
+    _matchStreamSub?.cancel();
+    _matchmaking.dispose();
     super.dispose();
+  }
+
+  void _resetMatchSeriesRecord() {
+    _matchSeriesWins = 0;
+    _matchSeriesLosses = 0;
+    _matchSeriesTies = 0;
+  }
+
+  void _updateMatchSeriesRecord({
+    required int myScore,
+    required int oppScore,
+  }) {
+    if (myScore > oppScore) {
+      _matchSeriesWins++;
+    } else if (myScore < oppScore) {
+      _matchSeriesLosses++;
+    } else {
+      _matchSeriesTies++;
+    }
   }
 }

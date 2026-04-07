@@ -18,6 +18,10 @@ import 'screens/profile_screen.dart';
 import 'screens/shop_screen.dart';
 import 'screens/auth_screen.dart';
 import 'screens/fortune_wheel_screen.dart';
+import 'screens/matchmaking_screen.dart';
+import 'screens/match_lobby_screen.dart';
+import 'screens/match_playing_screen.dart';
+import 'screens/match_results_screen.dart';
 
 class StopAt67App extends StatelessWidget {
   const StopAt67App({super.key});
@@ -48,17 +52,21 @@ class _ScreenSwitcher extends StatelessWidget {
 
   /// Returns the screen to go back to, or null if we should exit the app.
   AppScreen? _backTarget(AppScreen screen) => switch (screen) {
-    AppScreen.menu        => null, // exit app
-    AppScreen.modeSelect  => AppScreen.menu,
-    AppScreen.fortuneWheel => AppScreen.modeSelect,
-    AppScreen.countdown   => AppScreen.modeSelect,
-    AppScreen.playing     => null, // handled by PlayingScreen's own PopScope
-    AppScreen.results     => AppScreen.menu,
-    AppScreen.settings    => AppScreen.menu,
-    AppScreen.leaderboard => AppScreen.menu,
-    AppScreen.profile     => AppScreen.menu,
-    AppScreen.shop        => AppScreen.menu,
-    AppScreen.auth        => AppScreen.leaderboard,
+    AppScreen.menu          => null, // exit app
+    AppScreen.modeSelect    => AppScreen.menu,
+    AppScreen.fortuneWheel  => AppScreen.modeSelect,
+    AppScreen.countdown     => AppScreen.modeSelect,
+    AppScreen.playing       => null, // handled by PlayingScreen's own PopScope
+    AppScreen.results       => AppScreen.menu,
+    AppScreen.settings      => AppScreen.menu,
+    AppScreen.leaderboard   => AppScreen.menu,
+    AppScreen.profile       => AppScreen.menu,
+    AppScreen.shop          => AppScreen.menu,
+    AppScreen.auth          => AppScreen.menu,
+    AppScreen.matchmaking   => AppScreen.menu,
+    AppScreen.matchLobby    => null, // can't leave a matched lobby
+    AppScreen.matchPlaying  => null, // can't leave during play
+    AppScreen.matchResults  => AppScreen.menu,
   };
 
   @override
@@ -68,6 +76,7 @@ class _ScreenSwitcher extends StatelessWidget {
     final languageState = context.watch<LanguageState>();
 
     final backTarget = _backTarget(screen);
+    final allowSystemPop = screen == AppScreen.menu;
 
     Widget child = _buildScreen(screen);
 
@@ -76,12 +85,18 @@ class _ScreenSwitcher extends StatelessWidget {
     }
 
     return PopScope(
-      canPop: backTarget == null, // menu screen: allow exit
+      canPop: allowSystemPop,
       onPopInvokedWithResult: (_, __) {
+        if (allowSystemPop) return;
+
         if (backTarget != null) {
           // Results screen needs game-state cleanup; all others just navigate.
-          if (screen == AppScreen.results) {
+          if (screen == AppScreen.results || screen == AppScreen.playing) {
             gs.returnToMenu();
+          } else if (screen == AppScreen.matchmaking) {
+            gs.cancelMatchmaking();
+          } else if (screen == AppScreen.matchResults) {
+            gs.matchReturnToMenu();
           } else {
             gs.setScreen(backTarget);
           }
@@ -99,17 +114,21 @@ class _ScreenSwitcher extends StatelessWidget {
 
   Widget _buildScreen(AppScreen screen) {
     return switch (screen) {
-      AppScreen.menu        => const MenuScreen(),
-      AppScreen.modeSelect  => const ModeSelectScreen(),
-      AppScreen.fortuneWheel => const FortuneWheelScreen(),
-      AppScreen.countdown   => const CountdownScreen(),
-      AppScreen.playing     => const PlayingScreen(),
-      AppScreen.results     => const ResultsScreen(),
-      AppScreen.settings    => const SettingsScreen(),
-      AppScreen.leaderboard => const LeaderboardScreen(),
-      AppScreen.profile     => const ProfileScreen(),
-      AppScreen.shop        => const ShopScreen(),
-      AppScreen.auth        => const AuthScreen(),
+      AppScreen.menu          => const MenuScreen(),
+      AppScreen.modeSelect    => const ModeSelectScreen(),
+      AppScreen.fortuneWheel  => const FortuneWheelScreen(),
+      AppScreen.countdown     => const CountdownScreen(),
+      AppScreen.playing       => const PlayingScreen(),
+      AppScreen.results       => const ResultsScreen(),
+      AppScreen.settings      => const SettingsScreen(),
+      AppScreen.leaderboard   => const LeaderboardScreen(),
+      AppScreen.profile       => const ProfileScreen(),
+      AppScreen.shop          => const ShopScreen(),
+      AppScreen.auth          => const AuthScreen(),
+      AppScreen.matchmaking   => const MatchmakingScreen(),
+      AppScreen.matchLobby    => const MatchLobbyScreen(),
+      AppScreen.matchPlaying  => const MatchPlayingScreen(),
+      AppScreen.matchResults  => const MatchResultsScreen(),
     };
   }
 }
