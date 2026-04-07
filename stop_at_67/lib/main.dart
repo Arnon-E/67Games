@@ -29,8 +29,9 @@ void main() async {
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
     statusBarColor: Colors.transparent,
     statusBarIconBrightness: Brightness.light,
-    systemNavigationBarColor: Color(0xFF0a0a0f),
+    systemNavigationBarColor: Colors.transparent,
     systemNavigationBarIconBrightness: Brightness.light,
+    systemNavigationBarContrastEnforced: false,
   ));
 
   // Initialize Firebase
