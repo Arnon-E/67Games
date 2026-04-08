@@ -12,6 +12,7 @@ import '../engine/types.dart';
 /// 4. Match goes through: waiting → countdown → playing → finished.
 /// 5. Each player submits their result; when both are in, match is complete.
 class MatchmakingService {
+  static const _matchStaleDuration = Duration(minutes: 2);
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 
   StreamSubscription<DocumentSnapshot>? _matchSub;
@@ -139,18 +140,40 @@ class MatchmakingService {
   }) {
     _queueSub?.cancel();
 
-    // Listen only to matches that include this user — O(1) reads via arrayContains index.
-    // No status filter: handles the race where the match is already `playing` on first snapshot.
+    // Listen to matches that include this user.
+    // We filter client-side for active status and recency to skip old
+    // finished/cancelled matches that would otherwise fire immediately.
     _queueSub = _db
         .collection('matches')
         .where('playerUids', arrayContains: uid)
-        .limit(1)
         .snapshots()
         .listen((snapshot) {
-      if (snapshot.docs.isNotEmpty) {
+      final cutoff = Timestamp.fromDate(
+        DateTime.now().subtract(_matchStaleDuration),
+      );
+
+      for (final doc in snapshot.docs) {
+        final data = doc.data();
+        final status = data['status'] as String?;
+
+        // Only consider active matches (countdown or playing).
+        if (status != MatchStatus.countdown.name &&
+            status != MatchStatus.playing.name) {
+          continue;
+        }
+
+        // Skip matches older than 2 minutes (abandoned from prior sessions).
+        // Null createdAt means server timestamp hasn't resolved yet — this is
+        // a brand-new doc, so allow it through.
+        final createdAt = data['createdAt'] as Timestamp?;
+        if (createdAt != null && createdAt.compareTo(cutoff) < 0) {
+          continue;
+        }
+
         _queueSub?.cancel();
         _queueSub = null;
-        onMatchFound(snapshot.docs.first.id);
+        onMatchFound(doc.id);
+        return;
       }
     });
   }
