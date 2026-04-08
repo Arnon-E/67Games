@@ -55,6 +55,7 @@ class MatchmakingService {
       // on `modeId` and filter out ourselves client-side, so no composite
       // index is needed.
       if (opponentSnap == null) {
+        // Fetch a small batch and filter out ourselves client-side.
         final allSnap = await queueRef
             .where('modeId', isEqualTo: modeId)
             .limit(5)
