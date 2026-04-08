@@ -37,76 +37,76 @@ class MatchmakingService {
     // Use a transaction to atomically claim an opponent from the queue.
     // This prevents two players from matching with the same opponent.
     final matchId = await _db.runTransaction<String?>((tx) async {
-      // If we have a preferred opponent (rematch), try them first
-      QuerySnapshot waiting;
+      DocumentSnapshot? opponentSnap;
+
+      // If we have a preferred opponent (rematch), try them first via direct
+      // document lookup (no composite index required).
       if (preferOpponentUid != null) {
-        waiting = await queueRef
-            .where('modeId', isEqualTo: modeId)
-            .where('uid', isEqualTo: preferOpponentUid)
-            .limit(1)
-            .get();
-        // Fall back to any opponent if preferred isn't in queue
-        if (waiting.docs.isEmpty) {
-          waiting = await queueRef
-              .where('modeId', isEqualTo: modeId)
-              .where('uid', isNotEqualTo: uid)
-              .limit(1)
-              .get();
+        final snap = await tx.get(queueRef.doc(preferOpponentUid));
+        if (snap.exists) {
+          final data = snap.data() as Map<String, dynamic>?;
+          if (data != null && data['modeId'] == modeId) {
+            opponentSnap = snap;
+          }
         }
-      } else {
-        waiting = await queueRef
+      }
+
+      // Fall back to any waiting opponent.  Use a simple single-field query
+      // on `modeId` and filter out ourselves client-side, so no composite
+      // index is needed.
+      if (opponentSnap == null) {
+        final allSnap = await queueRef
             .where('modeId', isEqualTo: modeId)
-            .where('uid', isNotEqualTo: uid)
-            .limit(1)
+            .limit(5)
             .get();
+        final opponents = allSnap.docs.where((d) => d.id != uid).toList();
+        if (opponents.isNotEmpty) {
+          // Re-read inside the transaction to guard against concurrent claims.
+          final snap = await tx.get(opponents.first.reference);
+          if (snap.exists) {
+            opponentSnap = snap;
+          }
+        }
       }
 
-      if (waiting.docs.isNotEmpty) {
-        final opponentDoc = waiting.docs.first;
-        // Re-read the opponent doc inside the transaction to guard against
-        // concurrent claims.
-        final opponentSnap = await tx.get(opponentDoc.reference);
-        if (!opponentSnap.exists) return null; // already claimed
+      if (opponentSnap == null) return null; // no opponent found
 
-        final opponentData = opponentSnap.data()! as Map<String, dynamic>;
-        final matchRef = _db.collection('matches').doc();
+      final opponentData = opponentSnap.data()! as Map<String, dynamic>;
+      final matchRef = _db.collection('matches').doc();
 
-        final opponentAcceptSpeedUp = opponentData['acceptSpeedUp'] == true;
-        final opponentRematchRound =
-            (opponentData['rematchRound'] as num?)?.toInt() ?? 1;
-        final agreedRematchRound = rematchRound < opponentRematchRound
-            ? rematchRound
-            : opponentRematchRound;
-        final speedMultiplier = (acceptSpeedUp && opponentAcceptSpeedUp)
-            ? ((1.0 + (agreedRematchRound - 1) * 0.2).clamp(1.0, 3.0) as num)
-                .toDouble()
-            : 1.0;
+      final opponentAcceptSpeedUp = opponentData['acceptSpeedUp'] == true;
+      final opponentRematchRound =
+          (opponentData['rematchRound'] as num?)?.toInt() ?? 1;
+      final agreedRematchRound = rematchRound < opponentRematchRound
+          ? rematchRound
+          : opponentRematchRound;
+      final speedMultiplier = (acceptSpeedUp && opponentAcceptSpeedUp)
+          ? ((1.0 + (agreedRematchRound - 1) * 0.2).clamp(1.0, 3.0) as num)
+              .toDouble()
+          : 1.0;
 
-        tx.set(matchRef, {
-          'modeId': modeId,
-          'targetMs': targetMs,
-          'speedMultiplier': speedMultiplier,
-          'status': MatchStatus.countdown.name,
-          'playerUids': [opponentData['uid'], uid],
-          'player1': {
-            'uid': opponentData['uid'],
-            'displayName': opponentData['displayName'],
-          },
-          'player2': {
-            'uid': uid,
-            'displayName': displayName,
-          },
-          'createdAt': FieldValue.serverTimestamp(),
-        });
+      tx.set(matchRef, {
+        'modeId': modeId,
+        'targetMs': targetMs,
+        'speedMultiplier': speedMultiplier,
+        'status': MatchStatus.countdown.name,
+        'playerUids': [opponentData['uid'], uid],
+        'player1': {
+          'uid': opponentData['uid'],
+          'displayName': opponentData['displayName'],
+        },
+        'player2': {
+          'uid': uid,
+          'displayName': displayName,
+        },
+        'createdAt': FieldValue.serverTimestamp(),
+      });
 
-        // Remove both queue entries
-        tx.delete(opponentDoc.reference);
-        tx.delete(queueRef.doc(uid));
+      // Remove both queue entries
+      tx.delete(opponentSnap.reference);
+      tx.delete(queueRef.doc(uid));
 
-        return matchRef.id;
-      }
-
-      return null; // no opponent found
+      return matchRef.id;
     });
 
     if (matchId != null) return matchId;
@@ -123,6 +123,27 @@ class MatchmakingService {
     });
 
     return null; // queued, waiting for opponent
+  }
+
+  /// Ensure the player has a queue entry — safety fallback for when
+  /// [joinQueue] fails (e.g. network error).
+  Future<void> ensureInQueue({
+    required String uid,
+    required String displayName,
+    required String modeId,
+    required int targetMs,
+    bool acceptSpeedUp = false,
+    int rematchRound = 1,
+  }) async {
+    await _db.collection('matchmaking_queue').doc(uid).set({
+      'uid': uid,
+      'displayName': displayName,
+      'modeId': modeId,
+      'targetMs': targetMs,
+      'acceptSpeedUp': acceptSpeedUp,
+      'rematchRound': rematchRound,
+      'createdAt': FieldValue.serverTimestamp(),
+    });
   }
 
   /// Leave the matchmaking queue (cancel search).

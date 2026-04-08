@@ -1248,46 +1248,35 @@ class GameState extends ChangeNotifier {
     const modeId = 'classic';
     const targetMs = 6700;
 
-    // Start a 7-second timeout — if no opponent found, try once more then show bot option
-    _matchmakingTimeout?.cancel();
-    _matchmakingTimeout = Timer(const Duration(seconds: 7), () async {
-      if (!_matchSearching || _screen != AppScreen.matchmaking) return;
-      // Try to match with any waiting player one last time
+    // Try to find an opponent or join the queue.
+    String? matchId;
+    try {
+      matchId = await _matchmaking.joinQueue(
+        uid: uid,
+        displayName: _authState.userName,
+        modeId: modeId,
+        targetMs: targetMs,
+        preferOpponentUid: preferOpponent,
+        acceptSpeedUp: allowSpeedUp,
+        rematchRound: queuedRematchRound,
+      );
+    } catch (_) {
+      // joinQueue failed (e.g. missing index, network) — ensure we're at
+      // least in the queue so opponents can still find us.
       try {
-        final lateMatchId = await _matchmaking.joinQueue(
+        await _matchmaking.ensureInQueue(
           uid: uid,
           displayName: _authState.userName,
           modeId: modeId,
           targetMs: targetMs,
-          preferOpponentUid: preferOpponent,
           acceptSpeedUp: allowSpeedUp,
           rematchRound: queuedRematchRound,
         );
-        if (lateMatchId != null && _matchSearching && _screen == AppScreen.matchmaking) {
-          _subscribeToMatch(lateMatchId);
-          return;
-        }
       } catch (_) {}
-      // No opponent found — show bot option
-      if (_matchSearching && _screen == AppScreen.matchmaking) {
-        _matchTimedOut = true;
-        notifyListeners();
-      }
-    });
-
-    final matchId = await _matchmaking.joinQueue(
-      uid: uid,
-      displayName: _authState.userName,
-      modeId: modeId,
-      targetMs: targetMs,
-      preferOpponentUid: preferOpponent,
-      acceptSpeedUp: allowSpeedUp,
-      rematchRound: queuedRematchRound,
-    );
+    }
 
     if (matchId != null) {
       // Matched immediately — listen to the match doc
-      _matchmakingTimeout?.cancel();
       _subscribeToMatch(matchId);
     } else {
       // Queued — listen for when an opponent creates the match
@@ -1296,9 +1285,47 @@ class GameState extends ChangeNotifier {
         modeId: modeId,
         onMatchFound: (id) {
           _matchmakingTimeout?.cancel();
-          _subscribeToMatch(id);
+          if (_matchSearching) _subscribeToMatch(id);
         },
       );
+
+      // Periodically retry matching — handles the race where both players
+      // join the queue at the same time and neither finds the other on the
+      // first attempt. Show the bot option after ~10 s, stop retrying at ~60 s.
+      _matchmakingTimeout?.cancel();
+      _matchmakingTimeout = Timer.periodic(const Duration(seconds: 5), (timer) async {
+        if (!_matchSearching || _screen != AppScreen.matchmaking) {
+          timer.cancel();
+          return;
+        }
+        try {
+          final retryMatchId = await _matchmaking.joinQueue(
+            uid: uid,
+            displayName: _authState.userName,
+            modeId: modeId,
+            targetMs: targetMs,
+            preferOpponentUid: preferOpponent,
+            acceptSpeedUp: allowSpeedUp,
+            rematchRound: queuedRematchRound,
+          );
+          if (retryMatchId != null &&
+              _matchSearching &&
+              _screen == AppScreen.matchmaking) {
+            timer.cancel();
+            _subscribeToMatch(retryMatchId);
+            return;
+          }
+        } catch (_) {}
+        // Show bot option after ~10 seconds (tick 2 × 5 s)
+        if (timer.tick >= 2 && !_matchTimedOut) {
+          _matchTimedOut = true;
+          notifyListeners();
+        }
+        // Stop retrying after ~60 seconds (tick 12 × 5 s)
+        if (timer.tick >= 12) {
+          timer.cancel();
+        }
+      });
     }
   }
 
