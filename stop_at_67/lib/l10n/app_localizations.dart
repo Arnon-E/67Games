@@ -1678,26 +1678,124 @@ abstract class AppLocalizations {
   /// **'T'**
   String get matchSeriesTiesShort;
 
+  /// No description provided for @matchModeSheetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose Match Type'**
   String get matchModeSheetTitle;
+
+  /// No description provided for @matchModeQuickTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Quick Match'**
   String get matchModeQuickTitle;
+
+  /// No description provided for @matchModeQuickSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'One round — highest score wins'**
   String get matchModeQuickSubtitle;
+
+  /// No description provided for @matchModeFightTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Fight Mode'**
   String get matchModeFightTitle;
+
+  /// No description provided for @matchModeFightSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'3 HP each — deal damage until KO'**
   String get matchModeFightSubtitle;
+
+  /// No description provided for @matchModeFightDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Each player has 3 HP. Win a round to hit your opponent. Perfect stop = 2 damage. First to 0 HP loses!'**
   String get matchModeFightDescription;
+
+  /// No description provided for @matchModeFightVsBot.
+  ///
+  /// In en, this message translates to:
+  /// **'vs Bot'**
   String get matchModeFightVsBot;
+
+  /// No description provided for @matchModeFightVsBotSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Fight the bot — instant match'**
   String get matchModeFightVsBotSubtitle;
+
+  /// No description provided for @matchModeFightVsPlayer.
+  ///
+  /// In en, this message translates to:
+  /// **'vs Player'**
   String get matchModeFightVsPlayer;
+
+  /// No description provided for @matchModeFightVsPlayerSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Find a real opponent online'**
   String get matchModeFightVsPlayerSubtitle;
 
+  /// No description provided for @fightRoundLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'ROUND {round}'**
   String fightRoundLabel(int round);
+
+  /// No description provided for @fightRoundWin.
+  ///
+  /// In en, this message translates to:
+  /// **'ROUND WIN!'**
   String get fightRoundWin;
+
+  /// No description provided for @fightRoundLoss.
+  ///
+  /// In en, this message translates to:
+  /// **'ROUND LOST'**
   String get fightRoundLoss;
+
+  /// No description provided for @fightNextRound.
+  ///
+  /// In en, this message translates to:
+  /// **'NEXT ROUND ({seconds}s)'**
   String fightNextRound(int seconds);
+
+  /// No description provided for @fightKnockout.
+  ///
+  /// In en, this message translates to:
+  /// **'KNOCKOUT!'**
   String get fightKnockout;
+
+  /// No description provided for @fightKnockedOut.
+  ///
+  /// In en, this message translates to:
+  /// **'KO\'d!'**
   String get fightKnockedOut;
+
+  /// No description provided for @fightRoundsPlayed.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} rounds fought'**
   String fightRoundsPlayed(int count);
+
+  /// No description provided for @fightPlayAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'FIGHT AGAIN'**
   String get fightPlayAgain;
+
+  /// No description provided for @fightHpLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'HP'**
   String get fightHpLabel;
+
+  /// No description provided for @fightSpeedLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'SPEED'**
   String get fightSpeedLabel;
 }
 

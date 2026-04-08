@@ -881,10 +881,13 @@ class AppLocalizationsRu extends AppLocalizations {
   String get matchModeFightVsPlayer => 'Против игрока';
 
   @override
-  String get matchModeFightVsPlayerSubtitle => 'Найди реального соперника онлайн';
+  String get matchModeFightVsPlayerSubtitle =>
+      'Найди реального соперника онлайн';
 
   @override
-  String fightRoundLabel(int round) => 'РАУНД $round';
+  String fightRoundLabel(int round) {
+    return 'РАУНД $round';
+  }
 
   @override
   String get fightRoundWin => 'РАУНД ВЫИГРАН!';
@@ -893,7 +896,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get fightRoundLoss => 'РАУНД ПРОИГРАН';
 
   @override
-  String fightNextRound(int seconds) => 'СЛЕДУЮЩИЙ РАУНД (${seconds}с)';
+  String fightNextRound(int seconds) {
+    return 'СЛЕДУЮЩИЙ РАУНД ($secondsс)';
+  }
 
   @override
   String get fightKnockout => 'НОКАУТ!';
@@ -902,7 +907,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get fightKnockedOut => 'НОКАУТ!';
 
   @override
-  String fightRoundsPlayed(int count) => '$count раундов сыграно';
+  String fightRoundsPlayed(int count) {
+    return '$count раундов сыграно';
+  }
 
   @override
   String get fightPlayAgain => 'БОЙ СНОВА';

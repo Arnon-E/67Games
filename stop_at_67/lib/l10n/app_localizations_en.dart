@@ -877,7 +877,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get matchModeFightVsPlayerSubtitle => 'Find a real opponent online';
 
   @override
-  String fightRoundLabel(int round) => 'ROUND $round';
+  String fightRoundLabel(int round) {
+    return 'ROUND $round';
+  }
 
   @override
   String get fightRoundWin => 'ROUND WIN!';
@@ -886,16 +888,20 @@ class AppLocalizationsEn extends AppLocalizations {
   String get fightRoundLoss => 'ROUND LOST';
 
   @override
-  String fightNextRound(int seconds) => 'NEXT ROUND (${seconds}s)';
+  String fightNextRound(int seconds) {
+    return 'NEXT ROUND (${seconds}s)';
+  }
 
   @override
   String get fightKnockout => 'KNOCKOUT!';
 
   @override
-  String get fightKnockedOut => "KO'd!";
+  String get fightKnockedOut => 'KO\'d!';
 
   @override
-  String fightRoundsPlayed(int count) => '$count rounds fought';
+  String fightRoundsPlayed(int count) {
+    return '$count rounds fought';
+  }
 
   @override
   String get fightPlayAgain => 'FIGHT AGAIN';

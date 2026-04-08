@@ -872,7 +872,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get matchModeFightVsPlayerSubtitle => 'מצא יריב אמיתי אונליין';
 
   @override
-  String fightRoundLabel(int round) => 'סיבוב $round';
+  String fightRoundLabel(int round) {
+    return 'סיבוב $round';
+  }
 
   @override
   String get fightRoundWin => 'ניצחת סיבוב!';
@@ -881,7 +883,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get fightRoundLoss => 'הפסדת סיבוב';
 
   @override
-  String fightNextRound(int seconds) => 'סיבוב הבא (${seconds}ש׳)';
+  String fightNextRound(int seconds) {
+    return 'סיבוב הבא ($secondsש׳)';
+  }
 
   @override
   String get fightKnockout => 'נוקאאוט!';
@@ -890,7 +894,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get fightKnockedOut => 'הופלת!';
 
   @override
-  String fightRoundsPlayed(int count) => '$count סיבובים נלחמו';
+  String fightRoundsPlayed(int count) {
+    return '$count סיבובים נלחמו';
+  }
 
   @override
   String get fightPlayAgain => 'לחם שוב';
