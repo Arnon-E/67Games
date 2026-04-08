@@ -289,10 +289,11 @@ Sound is disabled entirely when `_sound.isEnabled == false` (user toggle in Sett
 | `StopButton` | `stop_button.dart` | Big tap target; disabled state |
 | `GameButton` | `game_button.dart` | Primary/secondary CTA button |
 | `ScreenHeader` | `screen_header.dart` | Back arrow + title row |
-| `WrestlerAvatar` | `wrestler_avatar.dart` | CustomPainter fighter character |
+| `WrestlerAvatar` | `wrestler_avatar.dart` | CustomPainter fighter; `punchProgress` animates punch, `isKnocked` shows X-eyes |
+| `_KOFightScene` | `match_results_screen.dart` | 2.2s KO punch animation (Mortal Kombat-style), plays once on fight-over screen |
 | `CoinFlyAnimation` | `coin_fly_animation.dart` | Coin particle animation on earn |
 | `DailyRewardModal` | `daily_reward_modal.dart` | Login reward bottom sheet |
 
 ---
 
-*Last updated: 2026-04-08*
+*Last updated: 2026-04-08 — Wrestler skins in shop; KO punch animation; WrestlerAvatar punch/knocked states.*

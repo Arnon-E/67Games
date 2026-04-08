@@ -133,6 +133,14 @@ bool get isFightOver  // true when any HP ≤ 0
 
 Skins are drawn with `CustomPainter` (no image assets needed). To replace with AI-generated art: place 200×220px PNG at `assets/wrestlers/<id>.png` and switch `WrestlerAvatar` to `Image.asset`.
 
+**WrestlerAvatar params (new):**
+- `punchProgress` (0.0–1.0) — animates right arm into a punch
+- `isKnocked` (bool) — X eyes + open dazed mouth
+
+**KO screen animation (`_KOFightScene` widget, `match_results_screen.dart`):**
+- Mortal Kombat-style: winner steps in → punch extends → white impact flash → loser knocked back with X eyes + stars
+- 2.2s `AnimationController`, plays once on entry then holds final frame
+
 ---
 
 ## Scoring Quick Reference
@@ -233,7 +241,7 @@ stop_at_67_language           ← 'en' | 'he' | 'ru'
 
 - [ ] Replace AdMob test IDs with production IDs (`ads_service.dart` lines 13, 17)
 - [ ] Implement RevenueCat (currently stubbed in `subscription_service.dart`)
-- [ ] Wrestler skins not yet shown in the Shop screen (data ready, UI not wired)
+- [x] Wrestler skins now shown in Shop with WrestlerAvatar preview — buy/equip/unequip live
 - [ ] Fight Mode vs real player: opponent doesn't see fight UI unless they also chose Fight Mode
 - [ ] Bot difficulty in Fight Mode could be tuned (currently 20–150ms random deviation)
 - [ ] Consider adding Fight Mode to the weekly missions system

@@ -160,18 +160,20 @@ Used exclusively in Fight Mode. Drawn with `CustomPainter` in `widgets/wrestler_
 
 ## Shop Screen Integration
 
-The Shop screen (`shop_screen.dart`) currently shows:
+The Shop screen (`shop_screen.dart`) shows these categories:
 - Timer Skins
 - Backgrounds
 - Sound Packs
 - Celebrations
+- **Wrestler Skins** ← added, fully live
 
-**Wrestler skins are NOT yet in the Shop UI** — the data is ready but the UI category hasn't been added. To add:
-1. Add "Wrestler Skins" section to `shop_screen.dart` using `kWrestlerSkins`
-2. Use `purchaseCosmetic(skin.id, skin.priceCoin)` for buying
-3. Use `equipCosmetic('wrestlerSkin', skin.id)` for equipping
-4. Show `WrestlerAvatar` as preview
+### Wrestler Skins in Shop
+`_WrestlerSkinCard` widget (bottom of `shop_screen.dart`):
+- Shows `WrestlerAvatar` (50px) as a live preview
+- Free skins (`priceCoin == 0`) show "Owned" badge and can't be unequipped
+- Paid skins: buy with `purchaseCosmetic(skin.id, skin.priceCoin)`, equip/unequip via `equipCosmetic`/`unequipCosmetic`
+- Equipped skin shown with colored border + "EQUIPPED" badge inline with name
 
 ---
 
-*Last updated: 2026-04-08*
+*Last updated: 2026-04-08 — Wrestler skins added to shop; KO animation added.*
