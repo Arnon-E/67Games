@@ -12,6 +12,8 @@ import '../engine/types.dart';
 /// 4. Match goes through: waiting → countdown → playing → finished.
 /// 5. Each player submits their result; when both are in, match is complete.
 class MatchmakingService {
+  static const _matchStaleDuration = Duration(minutes: 2);
+
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 
   StreamSubscription<DocumentSnapshot>? _matchSub;
@@ -139,18 +141,37 @@ class MatchmakingService {
   }) {
     _queueSub?.cancel();
 
+    // Only react to matches created recently to avoid picking up old finished/cancelled
+    // matches from previous sessions, which would cancel the timeout and prevent the
+    // real new match from ever being detected.
+    final cutoff = DateTime.now().subtract(_matchStaleDuration);
+
     // Listen only to matches that include this user — O(1) reads via arrayContains index.
-    // No status filter: handles the race where the match is already `playing` on first snapshot.
     _queueSub = _db
         .collection('matches')
         .where('playerUids', arrayContains: uid)
-        .limit(1)
         .snapshots()
         .listen((snapshot) {
-      if (snapshot.docs.isNotEmpty) {
+      for (final doc in snapshot.docs) {
+        final data = doc.data() as Map<String, dynamic>;
+        final status = data['status'] as String?;
+        // Only react to active matches (handles the race where the match is already
+        // `playing` by the time the first snapshot arrives).
+        if (status != MatchStatus.countdown.name &&
+            status != MatchStatus.playing.name) {
+          continue;
+        }
+        // Ignore matches created before we started searching (old abandoned matches).
+        // A null createdAt means the server timestamp hasn't been written yet —
+        // that only happens on a brand-new doc, so allow it through.
+        final createdAt = (data['createdAt'] as Timestamp?)?.toDate();
+        if (createdAt != null && createdAt.isBefore(cutoff)) {
+          continue;
+        }
         _queueSub?.cancel();
         _queueSub = null;
-        onMatchFound(snapshot.docs.first.id);
+        onMatchFound(doc.id);
+        return;
       }
     });
   }
