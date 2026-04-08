@@ -12,6 +12,8 @@ import '../engine/types.dart';
 /// 4. Match goes through: waiting → countdown → playing → finished.
 /// 5. Each player submits their result; when both are in, match is complete.
 class MatchmakingService {
+  static const _matchStaleDuration = Duration(minutes: 2);
+
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 
   StreamSubscription<DocumentSnapshot>? _matchSub;
@@ -142,7 +144,7 @@ class MatchmakingService {
     // Only react to matches created recently to avoid picking up old finished/cancelled
     // matches from previous sessions, which would cancel the timeout and prevent the
     // real new match from ever being detected.
-    final cutoff = DateTime.now().subtract(const Duration(minutes: 2));
+    final cutoff = DateTime.now().subtract(_matchStaleDuration);
 
     // Listen only to matches that include this user — O(1) reads via arrayContains index.
     _queueSub = _db
