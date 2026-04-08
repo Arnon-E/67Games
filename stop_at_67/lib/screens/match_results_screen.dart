@@ -323,123 +323,93 @@ class _MatchResultsScreenState extends State<MatchResultsScreen>
       orElse: () => kWrestlerSkins[1],
     );
 
+    final winningSkin = iWon ? mySkin : oppSkin;
+    final losingSkin  = iWon ? oppSkin : mySkin;
+
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: AppGradientBackground(
         child: SafeArea(
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Spacer(),
+          child: Column(
+            children: [
+              const Spacer(),
 
-                Text(
-                  iWon ? '🏆' : '💀',
-                  style: const TextStyle(fontSize: 64),
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  iWon ? l10n.fightKnockout : l10n.fightKnockedOut,
-                  style: TextStyle(
-                    fontSize: 36,
-                    fontWeight: FontWeight.w900,
-                    color: iWon ? const Color(0xFF00FF88) : const Color(0xFFFF4444),
-                    letterSpacing: 2,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  l10n.fightRoundsPlayed(gs.fightRound - 1),
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: AppColors.textDisabled,
-                    letterSpacing: 1,
-                  ),
-                ),
+              // Mortal Kombat-style punch animation
+              _KOFightScene(
+                winningSkin: winningSkin,
+                losingSkin: losingSkin,
+              ),
 
-                const SizedBox(height: 32),
+              const SizedBox(height: 16),
 
-                // Fighter display
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+              // KNOCKOUT text
+              Text(
+                iWon ? l10n.fightKnockout : l10n.fightKnockedOut,
+                style: TextStyle(
+                  fontSize: 36,
+                  fontWeight: FontWeight.w900,
+                  color: iWon ? const Color(0xFF00FF88) : const Color(0xFFFF4444),
+                  letterSpacing: 3,
+                ),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                l10n.fightRoundsPlayed(gs.fightRound - 1),
+                style: const TextStyle(
+                  fontSize: 14,
+                  color: AppColors.textDisabled,
+                  letterSpacing: 1,
+                ),
+              ),
+
+              // HP summary
+              const SizedBox(height: 20),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 48),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    Column(
-                      children: [
-                        WrestlerAvatar(
-                          skin: mySkin,
-                          size: 80,
-                          mirrored: false,
-                        ),
-                        const SizedBox(height: 6),
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: List.generate(GameState.kFightMaxHp, (i) {
-                            return Icon(
-                              i < gs.myFightHp ? Icons.favorite : Icons.favorite_border,
-                              color: i < gs.myFightHp ? Colors.redAccent : AppColors.textHint,
-                              size: 16,
-                            );
-                          }),
-                        ),
-                      ],
+                    _HpSummary(
+                      label: l10n.matchResultsYou,
+                      hp: gs.myFightHp,
+                      maxHp: GameState.kFightMaxHp,
+                      color: AppColors.orange,
                     ),
-                    const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 24),
-                      child: Text(
-                        'VS',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w900,
-                          color: AppColors.gold,
-                        ),
-                      ),
-                    ),
-                    Column(
-                      children: [
-                        WrestlerAvatar(
-                          skin: oppSkin,
-                          size: 80,
-                          mirrored: true,
-                        ),
-                        const SizedBox(height: 6),
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: List.generate(GameState.kFightMaxHp, (i) {
-                            return Icon(
-                              i < gs.opponentFightHp ? Icons.favorite : Icons.favorite_border,
-                              color: i < gs.opponentFightHp ? Colors.redAccent : AppColors.textHint,
-                              size: 16,
-                            );
-                          }),
-                        ),
-                      ],
+                    const Text('VS', style: TextStyle(
+                      fontSize: 16, fontWeight: FontWeight.w900, color: AppColors.gold,
+                    )),
+                    _HpSummary(
+                      label: l10n.matchResultsOpponent,
+                      hp: gs.opponentFightHp,
+                      maxHp: GameState.kFightMaxHp,
+                      color: AppColors.cyan,
                     ),
                   ],
                 ),
+              ),
 
-                const Spacer(),
+              const Spacer(),
 
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 40),
-                  child: GameButton(
-                    label: l10n.fightPlayAgain,
-                    onPressed: () => gs.startFightVsBot(),
-                    width: double.infinity,
-                  ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 40),
+                child: GameButton(
+                  label: l10n.fightPlayAgain,
+                  onPressed: () => gs.startFightVsBot(),
+                  width: double.infinity,
                 ),
-                const SizedBox(height: 12),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 40),
-                  child: GameButton(
-                    label: l10n.commonMenu,
-                    onPressed: () => gs.matchReturnToMenu(),
-                    primary: false,
-                    width: double.infinity,
-                  ),
+              ),
+              const SizedBox(height: 12),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 40),
+                child: GameButton(
+                  label: l10n.commonMenu,
+                  onPressed: () => gs.matchReturnToMenu(),
+                  primary: false,
+                  width: double.infinity,
                 ),
-                const SizedBox(height: 48),
-              ],
-            ),
+              ),
+              const SizedBox(height: 48),
+            ],
           ),
         ),
       ),
@@ -596,6 +566,179 @@ class _FightDamageRow extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+// ── Mortal Kombat-style KO fight animation ────────────────────
+
+class _KOFightScene extends StatefulWidget {
+  final WrestlerSkin winningSkin;
+  final WrestlerSkin losingSkin;
+
+  const _KOFightScene({required this.winningSkin, required this.losingSkin});
+
+  @override
+  State<_KOFightScene> createState() => _KOFightSceneState();
+}
+
+class _KOFightSceneState extends State<_KOFightScene>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _ctrl;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 2200),
+    );
+    // Play once, stay on last frame
+    _ctrl.forward();
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  static double _interval(double t, double from, double to) =>
+      ((t - from) / (to - from)).clamp(0.0, 1.0);
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 200,
+      child: AnimatedBuilder(
+        animation: _ctrl,
+        builder: (_, __) {
+          final t = _ctrl.value;
+
+          // Phase timing:
+          // 0.00–0.30 → winner steps in (slides right)
+          // 0.25–0.60 → punch arm extends
+          // 0.55–0.70 → impact flash
+          // 0.60–0.90 → loser knocked back (slides + tilts)
+          // 0.75–1.00 → loser stays knocked (isKnocked=true)
+
+          final stepIn   = Curves.easeIn.transform(_interval(t, 0.0, 0.30));
+          final punch    = Curves.easeOut.transform(_interval(t, 0.25, 0.60));
+          final flashRaw = _interval(t, 0.55, 0.70);
+          final flash    = flashRaw < 0.5 ? flashRaw * 2 : (1.0 - flashRaw) * 2;
+          final knockRaw = Curves.easeIn.transform(_interval(t, 0.60, 0.90));
+          final isKnocked = t > 0.75;
+
+          return Stack(
+            clipBehavior: Clip.none,
+            children: [
+              // ── Winner (left, steps in toward center) ──
+              Positioned(
+                left: 20.0 + stepIn * 24.0,
+                bottom: 0,
+                child: WrestlerAvatar(
+                  skin: widget.winningSkin,
+                  size: 88,
+                  mirrored: false,
+                  punchProgress: punch,
+                ),
+              ),
+
+              // ── Loser (right, knocked back) ──
+              Positioned(
+                right: 20.0 - knockRaw * 28.0,
+                bottom: knockRaw * (-8.0),
+                child: Transform.rotate(
+                  angle: knockRaw * 0.45,
+                  alignment: Alignment.bottomCenter,
+                  child: WrestlerAvatar(
+                    skin: widget.losingSkin,
+                    size: 88,
+                    mirrored: true,
+                    isKnocked: isKnocked,
+                  ),
+                ),
+              ),
+
+              // ── Impact burst (💥 appears at contact point) ──
+              if (punch > 0.7 && knockRaw < 0.8)
+                Positioned(
+                  right: 80,
+                  bottom: 70,
+                  child: Opacity(
+                    opacity: (1.0 - knockRaw * 1.1).clamp(0.0, 1.0),
+                    child: Text(
+                      '💥',
+                      style: TextStyle(fontSize: 20 + punch * 14),
+                    ),
+                  ),
+                ),
+
+              // ── Stars above knocked fighter ──
+              if (isKnocked)
+                Positioned(
+                  right: 24 - knockRaw * 28,
+                  bottom: 100,
+                  child: Opacity(
+                    opacity: ((t - 0.75) / 0.25).clamp(0.0, 1.0),
+                    child: const Text('✨⭐✨', style: TextStyle(fontSize: 14)),
+                  ),
+                ),
+
+              // ── White flash on impact ──
+              if (flash > 0)
+                Positioned.fill(
+                  child: Opacity(
+                    opacity: (flash * 0.75).clamp(0.0, 1.0),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+}
+
+// ── HP summary row ────────────────────────────────────────────
+
+class _HpSummary extends StatelessWidget {
+  final String label;
+  final int hp;
+  final int maxHp;
+  final Color color;
+
+  const _HpSummary({
+    required this.label,
+    required this.hp,
+    required this.maxHp,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(label, style: TextStyle(
+          fontSize: 10, color: color, fontWeight: FontWeight.w700, letterSpacing: 1.5,
+        )),
+        const SizedBox(height: 4),
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: List.generate(maxHp, (i) => Icon(
+            i < hp ? Icons.favorite : Icons.favorite_border,
+            color: i < hp ? Colors.redAccent : AppColors.textHint,
+            size: 18,
+          )),
+        ),
+      ],
     );
   }
 }

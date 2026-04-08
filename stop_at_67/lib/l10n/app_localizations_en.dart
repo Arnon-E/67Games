@@ -340,6 +340,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get shopCategoryCelebrations => 'Celebrations';
 
   @override
+  String get shopCategoryWrestlerSkins => 'Wrestler Skins';
+
+  @override
   String get shopItemNeonTimerName => 'Neon Timer';
 
   @override

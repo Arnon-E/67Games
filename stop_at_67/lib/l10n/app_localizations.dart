@@ -742,6 +742,12 @@ abstract class AppLocalizations {
   /// **'Celebrations'**
   String get shopCategoryCelebrations;
 
+  /// No description provided for @shopCategoryWrestlerSkins.
+  ///
+  /// In en, this message translates to:
+  /// **'Wrestler Skins'**
+  String get shopCategoryWrestlerSkins;
+
   /// No description provided for @shopItemNeonTimerName.
   ///
   /// In en, this message translates to:

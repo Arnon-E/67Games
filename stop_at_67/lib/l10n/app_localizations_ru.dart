@@ -341,6 +341,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get shopCategoryCelebrations => 'Празднования';
 
   @override
+  String get shopCategoryWrestlerSkins => 'Скины борцов';
+
+  @override
   String get shopItemNeonTimerName => 'Неоновый таймер';
 
   @override

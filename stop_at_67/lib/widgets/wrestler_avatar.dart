@@ -4,16 +4,22 @@ import '../engine/types.dart';
 /// Draws a cartoon wrestler character using CustomPainter.
 /// The character stands in a fighting guard stance.
 /// [mirrored] flips the character horizontally (used for the opponent).
+/// [punchProgress] 0.0–1.0 animates the right arm extending into a punch.
+/// [isKnocked] shows dazed expression (X eyes, open mouth).
 class WrestlerAvatar extends StatelessWidget {
   final WrestlerSkin skin;
   final double size;
   final bool mirrored;
+  final double punchProgress;
+  final bool isKnocked;
 
   const WrestlerAvatar({
     super.key,
     required this.skin,
     this.size = 90,
     this.mirrored = false,
+    this.punchProgress = 0.0,
+    this.isKnocked = false,
   });
 
   @override
@@ -23,7 +29,12 @@ class WrestlerAvatar extends StatelessWidget {
       width: size,
       height: size * 1.1,
       child: CustomPaint(
-        painter: _WrestlerPainter(skin: skin, mirrored: mirrored),
+        painter: _WrestlerPainter(
+          skin: skin,
+          mirrored: mirrored,
+          punchProgress: punchProgress,
+          isKnocked: isKnocked,
+        ),
       ),
     );
   }
@@ -32,8 +43,15 @@ class WrestlerAvatar extends StatelessWidget {
 class _WrestlerPainter extends CustomPainter {
   final WrestlerSkin skin;
   final bool mirrored;
+  final double punchProgress;
+  final bool isKnocked;
 
-  const _WrestlerPainter({required this.skin, this.mirrored = false});
+  const _WrestlerPainter({
+    required this.skin,
+    this.mirrored = false,
+    this.punchProgress = 0.0,
+    this.isKnocked = false,
+  });
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -74,30 +92,62 @@ class _WrestlerPainter extends CustomPainter {
     canvas.drawCircle(Offset(cx - 0.21*h, 0.13*h), 0.075*h,
         Paint()..color = skin.accentColor);
 
-    // ── Right arm ──
-    _line(canvas, Paint()..color = skin.skinColor..strokeWidth = 0.11*h..strokeCap = StrokeCap.round..style = PaintingStyle.stroke,
-      cx + 0.19*h, 0.38*h, cx + 0.29*h, 0.26*h);
-    _line(canvas, Paint()..color = skin.skinColor..strokeWidth = 0.10*h..strokeCap = StrokeCap.round..style = PaintingStyle.stroke,
-      cx + 0.29*h, 0.26*h, cx + 0.21*h, 0.16*h);
-    // Right glove
-    canvas.drawCircle(Offset(cx + 0.21*h, 0.13*h), 0.075*h,
-        Paint()..color = skin.accentColor);
+    // ── Right arm (animated punch if punchProgress > 0) ──
+    if (punchProgress > 0) {
+      final t = punchProgress;
+      // Shoulder stays at (cx+0.19, 0.38)
+      // Elbow: from (cx+0.29, 0.26) → (cx+0.43, 0.33) when fully punching
+      final elbowX = cx + (_lerp(0.29, 0.43, t)) * h;
+      final elbowY = _lerp(0.26, 0.33, t) * h;
+      // Glove: from (cx+0.21, 0.13) → (cx+0.54, 0.28)
+      final gloveX = cx + _lerp(0.21, 0.54, t) * h;
+      final gloveY = _lerp(0.13, 0.28, t) * h;
+
+      _line(canvas, Paint()..color = skin.skinColor..strokeWidth = 0.11*h..strokeCap = StrokeCap.round..style = PaintingStyle.stroke,
+        cx + 0.19*h, 0.38*h, elbowX, elbowY);
+      _line(canvas, Paint()..color = skin.skinColor..strokeWidth = 0.10*h..strokeCap = StrokeCap.round..style = PaintingStyle.stroke,
+        elbowX, elbowY, gloveX, gloveY);
+      canvas.drawCircle(Offset(gloveX, gloveY), 0.075*h,
+          Paint()..color = skin.accentColor);
+    } else {
+      _line(canvas, Paint()..color = skin.skinColor..strokeWidth = 0.11*h..strokeCap = StrokeCap.round..style = PaintingStyle.stroke,
+        cx + 0.19*h, 0.38*h, cx + 0.29*h, 0.26*h);
+      _line(canvas, Paint()..color = skin.skinColor..strokeWidth = 0.10*h..strokeCap = StrokeCap.round..style = PaintingStyle.stroke,
+        cx + 0.29*h, 0.26*h, cx + 0.21*h, 0.16*h);
+      canvas.drawCircle(Offset(cx + 0.21*h, 0.13*h), 0.075*h,
+          Paint()..color = skin.accentColor);
+    }
 
     // ── Head ──
     canvas.drawCircle(Offset(cx, 0.17*h), 0.145*h, skinPaint);
 
-    // Eyes
-    canvas.drawCircle(Offset(cx - 0.055*h, 0.14*h), 0.025*h, darkPaint);
-    canvas.drawCircle(Offset(cx + 0.055*h, 0.14*h), 0.025*h, darkPaint);
-    // Determined mouth (straight line)
-    _line(canvas,
-      Paint()..color = Colors.black.withValues(alpha: 0.45)
-             ..strokeWidth = 1.8
-             ..strokeCap = StrokeCap.round
-             ..style = PaintingStyle.stroke,
-      cx - 0.05*h, 0.215*h,
-      cx + 0.05*h, 0.215*h,
-    );
+    if (isKnocked) {
+      // X eyes (dazed)
+      final xp = Paint()
+        ..color = Colors.black.withValues(alpha: 0.65)
+        ..strokeWidth = 1.8
+        ..strokeCap = StrokeCap.round
+        ..style = PaintingStyle.stroke;
+      _line(canvas, xp, cx-0.085*h, 0.115*h, cx-0.025*h, 0.165*h);
+      _line(canvas, xp, cx-0.025*h, 0.115*h, cx-0.085*h, 0.165*h);
+      _line(canvas, xp, cx+0.025*h, 0.115*h, cx+0.085*h, 0.165*h);
+      _line(canvas, xp, cx+0.085*h, 0.115*h, cx+0.025*h, 0.165*h);
+      // Open dazed mouth
+      _rrect(canvas, darkPaint, cx-0.045*h, 0.205*h, cx+0.045*h, 0.235*h, 4);
+    } else {
+      // Normal eyes
+      canvas.drawCircle(Offset(cx - 0.055*h, 0.14*h), 0.025*h, darkPaint);
+      canvas.drawCircle(Offset(cx + 0.055*h, 0.14*h), 0.025*h, darkPaint);
+      // Determined mouth (straight line)
+      _line(canvas,
+        Paint()..color = Colors.black.withValues(alpha: 0.45)
+               ..strokeWidth = 1.8
+               ..strokeCap = StrokeCap.round
+               ..style = PaintingStyle.stroke,
+        cx - 0.05*h, 0.215*h,
+        cx + 0.05*h, 0.215*h,
+      );
+    }
 
     // ── Accessory ──
     _drawAccessory(canvas, cx, h);
@@ -191,6 +241,8 @@ class _WrestlerPainter extends CustomPainter {
 
   // ── Helpers ──────────────────────────────────────────────────
 
+  static double _lerp(double a, double b, double t) => a + (b - a) * t;
+
   void _rrect(Canvas canvas, Paint paint,
       double l, double t, double r, double b, double radius) {
     canvas.drawRRect(
@@ -205,5 +257,8 @@ class _WrestlerPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(_WrestlerPainter old) =>
-      old.skin.id != skin.id || old.mirrored != mirrored;
+      old.skin.id != skin.id ||
+      old.mirrored != mirrored ||
+      old.punchProgress != punchProgress ||
+      old.isKnocked != isKnocked;
 }
