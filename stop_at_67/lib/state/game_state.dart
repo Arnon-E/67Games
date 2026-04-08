@@ -1275,22 +1275,28 @@ class GameState extends ChangeNotifier {
       }
     });
 
-    final matchId = await _matchmaking.joinQueue(
-      uid: uid,
-      displayName: _authState.userName,
-      modeId: modeId,
-      targetMs: targetMs,
-      preferOpponentUid: preferOpponent,
-      acceptSpeedUp: allowSpeedUp,
-      rematchRound: queuedRematchRound,
-    );
+    String? matchId;
+    try {
+      matchId = await _matchmaking.joinQueue(
+        uid: uid,
+        displayName: _authState.userName,
+        modeId: modeId,
+        targetMs: targetMs,
+        preferOpponentUid: preferOpponent,
+        acceptSpeedUp: allowSpeedUp,
+        rematchRound: queuedRematchRound,
+      );
+    } catch (_) {
+      // joinQueue failed (e.g., transient Firestore error); fall through to
+      // listener-only mode so the timeout retry still has a chance to match.
+    }
 
     if (matchId != null) {
       // Matched immediately — listen to the match doc
       _matchmakingTimeout?.cancel();
       _subscribeToMatch(matchId);
     } else {
-      // Queued — listen for when an opponent creates the match
+      // Queued (or queue write failed) — listen for when an opponent creates the match
       _matchmaking.listenForMatch(
         uid: uid,
         modeId: modeId,

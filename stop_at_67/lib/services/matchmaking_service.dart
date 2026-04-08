@@ -37,32 +37,36 @@ class MatchmakingService {
     // Use a transaction to atomically claim an opponent from the queue.
     // This prevents two players from matching with the same opponent.
     final matchId = await _db.runTransaction<String?>((tx) async {
-      // If we have a preferred opponent (rematch), try them first
-      QuerySnapshot waiting;
+      // Find a waiting opponent.
+      // Use limit(2) + client-side self-filter instead of isNotEqualTo to
+      // avoid requiring a composite Firestore index on (modeId, uid).
+      // Queue entries use the player's uid as document ID, so filtering by
+      // doc ID is equivalent and works with single-field indexes only.
+      QueryDocumentSnapshot? opponentDoc;
+
       if (preferOpponentUid != null) {
-        waiting = await queueRef
+        // Rematch: try the specific preferred opponent first.
+        final preferred = await queueRef
             .where('modeId', isEqualTo: modeId)
             .where('uid', isEqualTo: preferOpponentUid)
             .limit(1)
             .get();
-        // Fall back to any opponent if preferred isn't in queue
-        if (waiting.docs.isEmpty) {
-          waiting = await queueRef
-              .where('modeId', isEqualTo: modeId)
-              .where('uid', isNotEqualTo: uid)
-              .limit(1)
-              .get();
+        if (preferred.docs.isNotEmpty) {
+          opponentDoc = preferred.docs.first;
         }
-      } else {
-        waiting = await queueRef
-            .where('modeId', isEqualTo: modeId)
-            .where('uid', isNotEqualTo: uid)
-            .limit(1)
-            .get();
       }
 
-      if (waiting.docs.isNotEmpty) {
-        final opponentDoc = waiting.docs.first;
+      if (opponentDoc == null) {
+        // General match: fetch up to 2 entries and skip self by document ID.
+        final snap = await queueRef
+            .where('modeId', isEqualTo: modeId)
+            .limit(2)
+            .get();
+        final others = snap.docs.where((d) => d.id != uid).toList();
+        opponentDoc = others.isEmpty ? null : others.first;
+      }
+
+      if (opponentDoc != null) {
         // Re-read the opponent doc inside the transaction to guard against
         // concurrent claims.
         final opponentSnap = await tx.get(opponentDoc.reference);
