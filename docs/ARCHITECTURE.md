@@ -145,15 +145,27 @@ startMatchmaking() / startFightMatchmaking()
     OR timeout (7s) → bot option
   
 _subscribeToMatch() listener:
-  countdown → screen = matchLobby
+  countdown → screen = matchLobby + _startHeartbeat()
   playing   → screen = matchPlaying + startPrecisionTimer()
   finished  → _processFightRound() [fight mode] + screen = matchResults
-  cancelled → _cancelMultiplayer()
+  cancelled → _cancelMultiplayer() + _stopHeartbeat()
 
 stopMatchGame()
   → submit result to Firestore
   OR _completeBotMatch() if isBotMatch
 ```
+
+### Heartbeat / Disconnect Detection
+- Each client calls `sendHeartbeat(matchId, isPlayer1)` every **3 seconds** (`_heartbeatInterval`)
+- `_opponentGone(match, myUid)` returns `true` if opponent's heartbeat timestamp is **> 9 seconds old** (`_heartbeatTimeout`)
+- Grace period: if opponent never sent a heartbeat AND match is < 9s old, they are not considered gone
+- Heartbeat is stopped in `_stopHeartbeat()` called on cancel / return to menu
+
+### Speed Negotiation
+- In the match lobby, either player can request a speed-up
+- A "Speed Challenge" dialog (`matchLobbySpeedNegotiateTitle/Body` l10n) appears on both sides
+- Both must accept for the speed multiplier to increase; one decline keeps it the same
+- `startMatchmaking(acceptSpeedUp: bool)` and `rematchBot(increaseSpeed: bool)` carry the flag forward
 
 ---
 
