@@ -42,6 +42,10 @@ class StopAt67App extends StatelessWidget {
         GlobalCupertinoLocalizations.delegate,
       ],
       theme: AppTheme.darkTheme,
+      builder: (context, child) => MediaQuery(
+        data: MediaQuery.of(context).copyWith(textScaler: TextScaler.noScaling),
+        child: child!,
+      ),
       home: const _ScreenSwitcher(),
     );
   }

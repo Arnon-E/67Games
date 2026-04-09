@@ -782,6 +782,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get matchLobbyGetReady => 'GET READY';
 
   @override
+  String get matchLobbySpeedUp => 'SPEED UP';
+
+  @override
+  String get matchLobbySpeedNegotiateTitle => 'Speed Challenge';
+
+  @override
+  String get matchLobbySpeedNegotiateBody =>
+      'One player wants to speed up. Do you accept?';
+
+  @override
   String get matchPlayingLive1v1 => '⚔️ LIVE 1v1';
 
   @override

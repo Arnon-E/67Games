@@ -789,6 +789,16 @@ class AppLocalizationsRu extends AppLocalizations {
   String get matchLobbyGetReady => 'ПРИГОТОВЬТЕСЬ';
 
   @override
+  String get matchLobbySpeedUp => 'УСКОРЕНИЕ';
+
+  @override
+  String get matchLobbySpeedNegotiateTitle => 'Вызов на скорость';
+
+  @override
+  String get matchLobbySpeedNegotiateBody =>
+      'Один игрок хочет ускориться. Вы принимаете?';
+
+  @override
   String get matchPlayingLive1v1 => '⚔️ ЖИВОЙ 1 на 1';
 
   @override
