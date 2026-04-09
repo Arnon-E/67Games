@@ -1564,6 +1564,24 @@ abstract class AppLocalizations {
   /// **'GET READY'**
   String get matchLobbyGetReady;
 
+  /// No description provided for @matchLobbySpeedUp.
+  ///
+  /// In en, this message translates to:
+  /// **'SPEED UP'**
+  String get matchLobbySpeedUp;
+
+  /// No description provided for @matchLobbySpeedNegotiateTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Speed Challenge'**
+  String get matchLobbySpeedNegotiateTitle;
+
+  /// No description provided for @matchLobbySpeedNegotiateBody.
+  ///
+  /// In en, this message translates to:
+  /// **'One player wants to speed up. Do you accept?'**
+  String get matchLobbySpeedNegotiateBody;
+
   /// No description provided for @matchPlayingLive1v1.
   ///
   /// In en, this message translates to:

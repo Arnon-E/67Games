@@ -39,7 +39,6 @@ class _MatchLobbyScreenState extends State<MatchLobbyScreen> {
         _countdown--;
       } else {
         _timer?.cancel();
-        // Transition match to playing
         context.read<GameState>().matchCountdownComplete();
       }
     });
@@ -61,6 +60,9 @@ class _MatchLobbyScreenState extends State<MatchLobbyScreen> {
 
     final player1Name = match?.player1.displayName ?? 'Player 1';
     final player2Name = match?.player2?.displayName ?? 'Player 2';
+    final speedMultiplier = match?.speedMultiplier ?? 1.0;
+    final hasSpeedUp = speedMultiplier > 1.0;
+    final speedRequested = match?.speedUpRequested ?? false;
 
     // Determine which skin to use for each player
     final myUid = auth.user?.uid;
@@ -143,7 +145,49 @@ class _MatchLobbyScreenState extends State<MatchLobbyScreen> {
                   _PlayerCard(name: player2Name, color: AppColors.cyan),
                 ],
 
-                const SizedBox(height: 48),
+                const SizedBox(height: 28),
+
+                // Speed badge — shown when both agreed to speed up
+                if (hasSpeedUp)
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: AppColors.gold.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: AppColors.gold.withValues(alpha: 0.45)),
+                    ),
+                    child: Text(
+                      '⚡ ${speedMultiplier.toStringAsFixed(2)}×  ${l10n.matchLobbySpeedUp}',
+                      style: const TextStyle(
+                        fontSize: 13,
+                        color: AppColors.gold,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 1,
+                      ),
+                    ),
+                  )
+                else if (speedRequested)
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: AppColors.darkCard,
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: AppColors.textHint.withValues(alpha: 0.45)),
+                    ),
+                    child: Text(
+                      l10n.matchResultsRematchSpeedBody,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: AppColors.textSecondary,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  )
+                else
+                  const SizedBox(height: 20),
+
+                const SizedBox(height: 20),
 
                 // Countdown
                 Text(

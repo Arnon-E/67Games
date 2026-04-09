@@ -126,12 +126,10 @@ class _MatchResultsScreenState extends State<MatchResultsScreen>
       backgroundColor: Colors.transparent,
       body: AppGradientBackground(
         child: SafeArea(
-          child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(vertical: 32),
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Spacer(flex: 2),
-
                 // Outcome
                 AnimatedBuilder(
                   animation: _hitScale,
@@ -219,6 +217,7 @@ class _MatchResultsScreenState extends State<MatchResultsScreen>
                           score: myPlayer.score,
                           deviationMs: myPlayer.deviationMs,
                           isWinner: isWinner,
+                          isTie: isTie,
                           color: AppColors.orange,
                         ),
                       ),
@@ -229,7 +228,8 @@ class _MatchResultsScreenState extends State<MatchResultsScreen>
                           displayName: opponent.displayName,
                           score: opponent.score,
                           deviationMs: opponent.deviationMs,
-                          isWinner: isLoser,
+                          isWinner: isLoser, // opponent is winner if we lost
+                          isTie: isTie,
                           color: AppColors.cyan,
                         ),
                       ),
@@ -237,7 +237,7 @@ class _MatchResultsScreenState extends State<MatchResultsScreen>
                   ),
                 ),
 
-                const Spacer(flex: 3),
+                const SizedBox(height: 48),
 
                 // Action buttons
                 if (match.isComplete) ...[
@@ -271,10 +271,7 @@ class _MatchResultsScreenState extends State<MatchResultsScreen>
                       child: GameButton(
                         label: l10n.matchResultsPlayAgain,
                         onPressed: () async {
-                          final acceptSpeedUp = await _showRematchSpeedDialog(
-                            context,
-                            isBotMatch: gs.isBotMatch,
-                          );
+                          final acceptSpeedUp = await _showRematchSpeedDialog(context);
                           if (!context.mounted || acceptSpeedUp == null) return;
                           if (gs.isBotMatch) {
                             await gs.rematchBot(increaseSpeed: acceptSpeedUp);
@@ -298,7 +295,7 @@ class _MatchResultsScreenState extends State<MatchResultsScreen>
                   ],
                 ],
 
-                const SizedBox(height: 48),
+                const SizedBox(height: 16),
               ],
             ),
           ),
@@ -416,10 +413,8 @@ class _MatchResultsScreenState extends State<MatchResultsScreen>
     );
   }
 
-  Future<bool?> _showRematchSpeedDialog(
-    BuildContext context, {
-    required bool isBotMatch,
-  }) {
+  Future<bool?> _showRematchSpeedDialog(BuildContext context) {
+    final gs = context.read<GameState>();
     final l10n = AppLocalizations.of(context);
     return showDialog<bool>(
       context: context,
@@ -431,7 +426,7 @@ class _MatchResultsScreenState extends State<MatchResultsScreen>
             style: const TextStyle(color: AppColors.textPrimary),
           ),
           content: Text(
-            isBotMatch
+            gs.isBotMatch
                 ? l10n.matchResultsRematchSpeedBodyBot
                 : l10n.matchResultsRematchSpeedBody,
             style: const TextStyle(color: AppColors.textSecondary),
@@ -749,6 +744,7 @@ class _PlayerResultCard extends StatelessWidget {
   final int? score;
   final int? deviationMs;
   final bool isWinner;
+  final bool isTie;
   final Color color;
 
   const _PlayerResultCard({
@@ -757,6 +753,7 @@ class _PlayerResultCard extends StatelessWidget {
     required this.score,
     required this.deviationMs,
     required this.isWinner,
+    required this.isTie,
     required this.color,
   });
 
@@ -768,7 +765,7 @@ class _PlayerResultCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.darkCard,
         borderRadius: BorderRadius.circular(16),
-        border: isWinner
+        border: (isWinner || isTie)
             ? Border.all(color: AppColors.gold, width: 2)
             : Border.all(color: AppColors.textHint, width: 1),
       ),
@@ -800,7 +797,7 @@ class _PlayerResultCard extends StatelessWidget {
             style: TextStyle(
               fontSize: 36,
               fontWeight: FontWeight.w300,
-              color: isWinner ? AppColors.gold : AppColors.textPrimary,
+              color: (isWinner || isTie) ? AppColors.gold : AppColors.textPrimary,
             ),
           ),
           const SizedBox(height: 4),
@@ -827,9 +824,9 @@ class _PlayerResultCard extends StatelessWidget {
               color: AppColors.textDisabled,
             ),
           ),
-          if (isWinner) ...[
+          if (isWinner || isTie) ...[
             const SizedBox(height: 8),
-            const Text('👑', style: TextStyle(fontSize: 20)),
+            Text(isTie ? '🤝' : '👑', style: const TextStyle(fontSize: 20)),
           ],
         ],
       ),

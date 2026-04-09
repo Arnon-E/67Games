@@ -780,6 +780,16 @@ class AppLocalizationsHe extends AppLocalizations {
   String get matchLobbyGetReady => 'התכוננו';
 
   @override
+  String get matchLobbySpeedUp => 'האצה';
+
+  @override
+  String get matchLobbySpeedNegotiateTitle => 'אתגר מהירות';
+
+  @override
+  String get matchLobbySpeedNegotiateBody =>
+      'שחקן אחד רוצה להאיץ. האם אתה מסכים?';
+
+  @override
   String get matchPlayingLive1v1 => '⚔️ 1 נגד 1 חי';
 
   @override

@@ -153,14 +153,7 @@ class _MenuScreenState extends State<MenuScreen>
       body: AppGradientBackground(
         child: SafeArea(
           child: SingleChildScrollView(
-            child: ConstrainedBox(
-              constraints: BoxConstraints(
-                minHeight: MediaQuery.of(context).size.height -
-                    MediaQuery.of(context).padding.top -
-                    MediaQuery.of(context).padding.bottom,
-              ),
-              child: IntrinsicHeight(
-                child: Column(
+            child: Column(
                   children: [
               // Top bar
               Padding(
@@ -441,7 +434,7 @@ class _MenuScreenState extends State<MenuScreen>
               // Weekly missions card
               const _WeeklyMissionsCard(),
 
-              const Spacer(),
+              const SizedBox(height: 16),
 
               // Daily reward button (if available)
               if (gs.dailyRewards.canClaim)
@@ -477,8 +470,6 @@ class _MenuScreenState extends State<MenuScreen>
                   ),
                 ),
             ],
-                ),
-              ),
             ),
           ),
         ),

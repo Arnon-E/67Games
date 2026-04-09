@@ -13,6 +13,8 @@ import '../engine/types.dart';
 /// 5. Each player submits their result; when both are in, match is complete.
 class MatchmakingService {
   static const _matchStaleDuration = Duration(minutes: 2);
+  static const _activeAttachMaxAge = Duration(seconds: 30);
+  static const _heartbeatTimeout = Duration(seconds: 9);
 
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 
@@ -37,32 +39,36 @@ class MatchmakingService {
     // Use a transaction to atomically claim an opponent from the queue.
     // This prevents two players from matching with the same opponent.
     final matchId = await _db.runTransaction<String?>((tx) async {
-      // If we have a preferred opponent (rematch), try them first
-      QuerySnapshot waiting;
+      // Find a waiting opponent.
+      // Use limit(2) + client-side self-filter instead of isNotEqualTo to
+      // avoid requiring a composite Firestore index on (modeId, uid).
+      // Queue entries use the player's uid as document ID, so filtering by
+      // doc ID is equivalent and works with single-field indexes only.
+      QueryDocumentSnapshot? opponentDoc;
+
       if (preferOpponentUid != null) {
-        waiting = await queueRef
+        // Rematch: try the specific preferred opponent first.
+        final preferred = await queueRef
             .where('modeId', isEqualTo: modeId)
             .where('uid', isEqualTo: preferOpponentUid)
             .limit(1)
             .get();
-        // Fall back to any opponent if preferred isn't in queue
-        if (waiting.docs.isEmpty) {
-          waiting = await queueRef
-              .where('modeId', isEqualTo: modeId)
-              .where('uid', isNotEqualTo: uid)
-              .limit(1)
-              .get();
+        if (preferred.docs.isNotEmpty) {
+          opponentDoc = preferred.docs.first;
         }
-      } else {
-        waiting = await queueRef
-            .where('modeId', isEqualTo: modeId)
-            .where('uid', isNotEqualTo: uid)
-            .limit(1)
-            .get();
       }
 
-      if (waiting.docs.isNotEmpty) {
-        final opponentDoc = waiting.docs.first;
+      if (opponentDoc == null) {
+        // General match: fetch up to 2 entries and skip self by document ID.
+        final snap = await queueRef
+            .where('modeId', isEqualTo: modeId)
+            .limit(2)
+            .get();
+        final others = snap.docs.where((d) => d.id != uid).toList();
+        opponentDoc = others.isEmpty ? null : others.first;
+      }
+
+      if (opponentDoc != null) {
         // Re-read the opponent doc inside the transaction to guard against
         // concurrent claims.
         final opponentSnap = await tx.get(opponentDoc.reference);
@@ -74,11 +80,13 @@ class MatchmakingService {
         final opponentAcceptSpeedUp = opponentData['acceptSpeedUp'] == true;
         final opponentRematchRound =
             (opponentData['rematchRound'] as num?)?.toInt() ?? 1;
+        final speedUpRequested = acceptSpeedUp || opponentAcceptSpeedUp;
+        final speedUpAgreed = acceptSpeedUp && opponentAcceptSpeedUp;
         final agreedRematchRound = rematchRound < opponentRematchRound
             ? rematchRound
             : opponentRematchRound;
-        final speedMultiplier = (acceptSpeedUp && opponentAcceptSpeedUp)
-            ? ((1.0 + (agreedRematchRound - 1) * 0.2).clamp(1.0, 3.0) as num)
+        final speedMultiplier = speedUpAgreed
+            ? ((1.0 + (agreedRematchRound - 1) * 0.2).clamp(1.0, 3.0))
                 .toDouble()
             : 1.0;
 
@@ -86,15 +94,19 @@ class MatchmakingService {
           'modeId': modeId,
           'targetMs': targetMs,
           'speedMultiplier': speedMultiplier,
+          'speedUpRequested': speedUpRequested,
+          'speedUpAgreed': speedUpAgreed,
           'status': MatchStatus.countdown.name,
           'playerUids': [opponentData['uid'], uid],
           'player1': {
             'uid': opponentData['uid'],
             'displayName': opponentData['displayName'],
+            'acceptSpeedUp': opponentAcceptSpeedUp,
           },
           'player2': {
             'uid': uid,
             'displayName': displayName,
+            'acceptSpeedUp': acceptSpeedUp,
           },
           'createdAt': FieldValue.serverTimestamp(),
         });
@@ -161,6 +173,11 @@ class MatchmakingService {
             status != MatchStatus.playing.name) {
           continue;
         }
+        // Ignore old abandoned "active" matches from previous sessions.
+        // These docs may still be countdown/playing when a player force-kills the app.
+        if (_isAbandonedActiveMatch(data)) {
+          continue;
+        }
         // Ignore matches created before we started searching (old abandoned matches).
         // A null createdAt means the server timestamp hasn't been written yet —
         // that only happens on a brand-new doc, so allow it through.
@@ -174,6 +191,31 @@ class MatchmakingService {
         return;
       }
     });
+  }
+
+  bool _isAbandonedActiveMatch(Map<String, dynamic> data) {
+    final createdAt = (data['createdAt'] as Timestamp?)?.toDate();
+    if (createdAt == null) return false;
+    final now = DateTime.now();
+
+    // Fresh matches should always be considered valid attach candidates.
+    if (now.difference(createdAt) <= _activeAttachMaxAge) {
+      return false;
+    }
+
+    final p1Heartbeat = (data['player1Heartbeat'] as dynamic)?.toDate() as DateTime?;
+    final p2Heartbeat = (data['player2Heartbeat'] as dynamic)?.toDate() as DateTime?;
+
+    // If no one has heartbeated for a while, this is almost certainly an orphaned doc.
+    if (p1Heartbeat == null && p2Heartbeat == null) {
+      return true;
+    }
+
+    final p1Stale =
+        p1Heartbeat == null || now.difference(p1Heartbeat) > _heartbeatTimeout;
+    final p2Stale =
+        p2Heartbeat == null || now.difference(p2Heartbeat) > _heartbeatTimeout;
+    return p1Stale && p2Stale;
   }
 
   // ── Match lifecycle ────────────────────────────────────────
@@ -192,6 +234,19 @@ class MatchmakingService {
     await _db.collection('matches').doc(matchId).update({
       'status': MatchStatus.playing.name,
     });
+  }
+
+  /// Write a heartbeat timestamp for this player so the opponent can detect disconnects.
+  Future<void> sendHeartbeat({
+    required String matchId,
+    required bool isPlayer1,
+  }) async {
+    try {
+      final field = isPlayer1 ? 'player1Heartbeat' : 'player2Heartbeat';
+      await _db.collection('matches').doc(matchId).update({
+        field: FieldValue.serverTimestamp(),
+      });
+    } catch (_) {}
   }
 
   /// Submit this player's result to the match.
