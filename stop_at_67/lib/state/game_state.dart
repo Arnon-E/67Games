@@ -198,11 +198,14 @@ class GameState extends ChangeNotifier {
   bool _matchPlayerStopped = false;
   bool get matchPlayerStopped => _matchPlayerStopped;
   Timer? _matchmakingTimeout;
+  Timer? _matchAutoStopTimer;
+  Timer? _matchHeartbeatTimer;
   bool _matchTimedOut = false;
   bool get matchTimedOut => _matchTimedOut;
   /// True when the current match is against a local bot (no Firestore writes).
   bool _isBotMatch = false;
   bool get isBotMatch => _isBotMatch;
+
   /// Opponent UID to rematch with (set after a real match, cleared on menu return).
   String? _rematchOpponentUid;
   /// Round number within the current rematch streak (1 = first game, 2 = second, etc.)
@@ -408,6 +411,16 @@ class GameState extends ChangeNotifier {
       _precisionTimer!.setSpeedMultiplier(_matchSpeedMultiplier);
     }
     _precisionTimer!.start();
+
+    // Auto-stop for multiplayer: if the player hasn't stopped 15s after the
+    // target, submit automatically so the opponent isn't stuck waiting.
+    if (_currentMatch != null && !_isBotMatch) {
+      _matchAutoStopTimer?.cancel();
+      final autoStopDelay = Duration(
+        milliseconds: _currentMatch!.targetMs + 15000,
+      );
+      _matchAutoStopTimer = Timer(autoStopDelay, () => stopMatchGame());
+    }
   }
 
   double _computeSurgeMultiplier() =>
@@ -1308,6 +1321,39 @@ class GameState extends ChangeNotifier {
     }
   }
 
+  static const _heartbeatInterval = Duration(seconds: 3);
+  static const _heartbeatTimeout = Duration(seconds: 9);
+
+  void _startHeartbeat(String matchId, bool isPlayer1) {
+    _matchHeartbeatTimer?.cancel();
+    // Send immediately, then every 3s
+    _matchmaking.sendHeartbeat(matchId: matchId, isPlayer1: isPlayer1);
+    _matchHeartbeatTimer = Timer.periodic(_heartbeatInterval, (_) {
+      _matchmaking.sendHeartbeat(matchId: matchId, isPlayer1: isPlayer1);
+    });
+  }
+
+  void _stopHeartbeat() {
+    _matchHeartbeatTimer?.cancel();
+    _matchHeartbeatTimer = null;
+  }
+
+  /// Returns true if the opponent's heartbeat has gone stale (they disconnected).
+  bool _opponentGone(MatchData match, String myUid) {
+    final isPlayer1 = match.player1.uid == myUid;
+    final myHeartbeat = isPlayer1 ? match.player1Heartbeat : match.player2Heartbeat;
+    final oppHeartbeat = isPlayer1 ? match.player2Heartbeat : match.player1Heartbeat;
+    final now = DateTime.now();
+    if (oppHeartbeat != null) {
+      return now.difference(oppHeartbeat) > _heartbeatTimeout;
+    }
+
+    // Opponent never heartbeated: allow a grace window after match creation,
+    // then treat as disconnected once our own heartbeat is active.
+    if (now.difference(match.createdAt) <= _heartbeatTimeout) return false;
+    return myHeartbeat != null;
+  }
+
   void _subscribeToMatch(String matchId) {
     _matchStreamSub?.cancel();
     _matchStreamSub = _matchmaking.watchMatch(matchId).listen((match) {
@@ -1316,14 +1362,35 @@ class GameState extends ChangeNotifier {
       _matchSpeedMultiplier = match.speedMultiplier;
       _matchSearching = false;
 
+      // Detect opponent disconnect via stale heartbeat (only in lobby/playing)
+      final myUid = _authState.user?.uid ?? '';
+      if (!_isBotMatch &&
+          (_screen == AppScreen.matchLobby ||
+            _screen == AppScreen.matchPlaying ||
+            _screen == AppScreen.matchmaking) &&
+          match.status != MatchStatus.finished &&
+          match.status != MatchStatus.cancelled &&
+          _opponentGone(match, myUid)) {
+        _matchmaking.cancelMatch(matchId);
+        _cancelMultiplayer();
+        return;
+      }
+
       if (match.status == MatchStatus.countdown &&
           _screen == AppScreen.matchmaking) {
+        final isPlayer1 = match.player1.uid == myUid;
+        _startHeartbeat(matchId, isPlayer1);
         _screen = AppScreen.matchLobby;
         notifyListeners();
       } else if (match.status == MatchStatus.playing &&
           (_screen == AppScreen.matchLobby ||
               _screen == AppScreen.matchmaking)) {
-        // Countdown finished — also handles first snapshot arriving as playing
+        // Countdown finished — also handles first snapshot arriving as playing.
+        // If we came from matchmaking (skipped lobby), start heartbeat now.
+        if (_screen == AppScreen.matchmaking) {
+          final isPlayer1 = match.player1.uid == myUid;
+          _startHeartbeat(matchId, isPlayer1);
+        }
         _currentMode = kGameModes[match.modeId] ?? kGameModes['classic']!;
         _screen = AppScreen.matchPlaying;
         _timerState = TimerState.initial();
@@ -1331,6 +1398,7 @@ class GameState extends ChangeNotifier {
         notifyListeners();
         _startPrecisionTimer();
       } else if (match.status == MatchStatus.finished) {
+        _stopHeartbeat();
         // Remember opponent for rematch and bump speed for next round
         final myUid = _authState.user?.uid;
         _rematchOpponentUid = myUid == match.player1.uid
@@ -1345,7 +1413,7 @@ class GameState extends ChangeNotifier {
         final oppScore = oppPlayer?.score ?? 0;
         _updateMatchSeriesRecord(myScore: myScore, oppScore: oppScore);
         if (myScore == oppScore) {
-          _sound.play('great');
+          _sound.play('tie');
         } else {
           _sound.play(myScore > oppScore ? 'winner' : 'loser');
         }
@@ -1362,6 +1430,9 @@ class GameState extends ChangeNotifier {
   /// Cancel matchmaking or leave a match.
   Future<void> _cancelMultiplayer() async {
     _matchmakingTimeout?.cancel();
+    _matchAutoStopTimer?.cancel();
+    _matchAutoStopTimer = null;
+    _stopHeartbeat();
     _matchStreamSub?.cancel();
     _matchStreamSub = null;
     _matchSearching = false;
@@ -1494,6 +1565,8 @@ class GameState extends ChangeNotifier {
   Future<void> stopMatchGame() async {
     final timer = _precisionTimer;
     if (timer == null || _matchPlayerStopped) return;
+    _matchAutoStopTimer?.cancel();
+    _matchAutoStopTimer = null;
     _matchPlayerStopped = true;
 
     final elapsedMs = timer.stop();
@@ -1586,7 +1659,7 @@ class GameState extends ChangeNotifier {
     final didWin = playerScore > botScore;
     final isTie = playerScore == botScore;
     _updateMatchSeriesRecord(myScore: playerScore, oppScore: botScore);
-    _sound.play(isTie ? 'great' : (didWin ? 'winner' : 'loser'));
+    _sound.play(isTie ? 'tie' : (didWin ? 'winner' : 'loser'));
 
     _screen = AppScreen.matchResults;
     notifyListeners();
@@ -1596,6 +1669,7 @@ class GameState extends ChangeNotifier {
   Future<void> matchReturnToMenu() async {
     await _sound.cleanup();
     _matchmakingTimeout?.cancel();
+    _stopHeartbeat();
     _matchStreamSub?.cancel();
     _matchStreamSub = null;
     _currentMatch = null;
@@ -1617,6 +1691,8 @@ class GameState extends ChangeNotifier {
   void dispose() {
     _precisionTimer?.dispose();
     _matchmakingTimeout?.cancel();
+    _matchHeartbeatTimer?.cancel();
+    _matchAutoStopTimer?.cancel();
     _matchStreamSub?.cancel();
     _matchmaking.dispose();
     super.dispose();

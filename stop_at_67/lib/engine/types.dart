@@ -521,20 +521,28 @@ class MatchData {
   final String modeId;
   final int targetMs;
   final double speedMultiplier;
+  final bool speedUpRequested;
+  final bool speedUpAgreed;
   final MatchStatus status;
   final MatchPlayer player1;
   final MatchPlayer? player2;
   final DateTime createdAt;
+  final DateTime? player1Heartbeat;
+  final DateTime? player2Heartbeat;
 
   const MatchData({
     required this.matchId,
     required this.modeId,
     required this.targetMs,
     this.speedMultiplier = 1.0,
+    this.speedUpRequested = false,
+    this.speedUpAgreed = false,
     required this.status,
     required this.player1,
     this.player2,
     required this.createdAt,
+    this.player1Heartbeat,
+    this.player2Heartbeat,
   });
 
   /// Whether both players have submitted their results.
@@ -554,6 +562,8 @@ class MatchData {
     modeId: json['modeId'] as String? ?? 'classic',
     targetMs: (json['targetMs'] as num?)?.toInt() ?? 6700,
     speedMultiplier: (json['speedMultiplier'] as num?)?.toDouble() ?? 1.0,
+    speedUpRequested: json['speedUpRequested'] as bool? ?? false,
+    speedUpAgreed: json['speedUpAgreed'] as bool? ?? false,
     status: MatchStatus.values.firstWhere(
       (s) => s.name == (json['status'] as String? ?? 'waiting'),
       orElse: () => MatchStatus.waiting,
@@ -567,5 +577,7 @@ class MatchData {
     createdAt: json['createdAt'] != null
         ? (json['createdAt'] as dynamic).toDate()
         : DateTime.now(),
+    player1Heartbeat: (json['player1Heartbeat'] as dynamic)?.toDate(),
+    player2Heartbeat: (json['player2Heartbeat'] as dynamic)?.toDate(),
   );
 }

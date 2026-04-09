@@ -49,6 +49,11 @@ class SoundService {
           await _tts.setPitch(0.8);
           await _tts.setSpeechRate(1.0);
           await _tts.speak('Miss');
+        case 'tie':
+          await _tts.stop();
+          await _tts.setPitch(1.0);
+          await _tts.setSpeechRate(0.8);
+          await _tts.speak("It's a tie!");
         case 'winner':
           await _tts.stop();
           await _player.stop();

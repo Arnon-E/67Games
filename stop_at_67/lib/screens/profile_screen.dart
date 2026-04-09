@@ -110,7 +110,7 @@ class ProfileScreen extends StatelessWidget {
                       physics: const NeverScrollableScrollPhysics(),
                       crossAxisSpacing: 12,
                       mainAxisSpacing: 12,
-                      childAspectRatio: 2.5,
+                      childAspectRatio: 2.2,
                       children: [
                         _statTile(l10n.profileGames, '${stats.totalGames}'),
                         _statTile(l10n.profileBestStreak, '${stats.bestStreak}'),
