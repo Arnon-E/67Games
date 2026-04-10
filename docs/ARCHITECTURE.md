@@ -155,6 +155,14 @@ stopMatchGame()
   OR _completeBotMatch() if isBotMatch
 ```
 
+### Lobby Countdown & Game-Start Latency
+
+- Match lobby countdown tick interval: **600 ms** (3 ticks = 1.8 s total)
+- Fight rematches (round 2+): countdown starts at **1** → game starts after a single 600 ms tick
+- `matchCountdownComplete()` transitions to `matchPlaying` **immediately** (no Firestore round-trip);
+  `startMatch()` is called fire-and-forget in the background so the opponent still picks up the
+  `playing` status if their own countdown hasn't fired yet
+
 ### Heartbeat / Disconnect Detection
 - Each client calls `sendHeartbeat(matchId, isPlayer1)` every **10 seconds** (`_heartbeatInterval`)
 - `_opponentGone(match, myUid)` returns `true` if opponent's heartbeat timestamp is **> 30 seconds old** (`_heartbeatTimeout`)
