@@ -8,6 +8,7 @@ import '../engine/constants.dart';
 import '../engine/types.dart';
 import '../theme/app_colors.dart';
 import '../widgets/app_gradient_background.dart';
+import '../widgets/wrestler_avatar.dart' show precacheWrestlerImages;
 import '../widgets/coin_fly_animation.dart';
 import '../widgets/daily_reward_modal.dart';
 import '../widgets/update_dialog.dart';
@@ -531,6 +532,9 @@ class _MenuScreenState extends State<MenuScreen>
                 color: AppColors.orange,
                 onTap: () {
                   Navigator.pop(context);
+                  // Start decoding all wrestler PNGs in background so the
+                  // lobby and results screens don't stall on first render.
+                  precacheWrestlerImages(context);
                   _showFightModeSheet(context, gs, l10n);
                 },
               ),

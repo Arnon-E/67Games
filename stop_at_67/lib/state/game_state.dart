@@ -1426,8 +1426,8 @@ class GameState extends ChangeNotifier {
 
   // ── Heartbeat ─────────────────────────────────────────────────
 
-  static const _heartbeatInterval = Duration(seconds: 3);
-  static const _heartbeatTimeout = Duration(seconds: 9);
+  static const _heartbeatInterval = Duration(seconds: 10);
+  static const _heartbeatTimeout = Duration(seconds: 30);
 
   void _startHeartbeat(String matchId, bool isPlayer1) {
     _matchHeartbeatTimer?.cancel();
@@ -1551,6 +1551,12 @@ class GameState extends ChangeNotifier {
     _stopHeartbeat();
     _matchStreamSub?.cancel();
     _matchStreamSub = null;
+    // Delete cancelled match docs to keep Firestore clean.
+    final cancelledMatch = _currentMatch;
+    if (cancelledMatch != null && !_isBotMatch &&
+        cancelledMatch.status == MatchStatus.cancelled) {
+      unawaited(_matchmaking.deleteMatch(cancelledMatch.matchId));
+    }
     _matchSearching = false;
     _matchTimedOut = false;
     _isBotMatch = false;
@@ -1803,6 +1809,12 @@ class GameState extends ChangeNotifier {
     _stopHeartbeat();
     _matchStreamSub?.cancel();
     _matchStreamSub = null;
+    // Delete the finished match document so it doesn't accumulate in Firestore
+    // and pollute future listenForMatch queries. Both players delete; safe.
+    final finishedMatch = _currentMatch;
+    if (finishedMatch != null && !_isBotMatch) {
+      unawaited(_matchmaking.deleteMatch(finishedMatch.matchId));
+    }
     _currentMatch = null;
     _matchPlayerStopped = false;
     _isBotMatch = false;

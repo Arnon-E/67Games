@@ -14,7 +14,7 @@ import '../engine/types.dart';
 class MatchmakingService {
   static const _matchStaleDuration = Duration(minutes: 2);
   static const _activeAttachMaxAge = Duration(seconds: 30);
-  static const _heartbeatTimeout = Duration(seconds: 9);
+  static const _heartbeatTimeout = Duration(seconds: 30);
 
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 
@@ -308,6 +308,15 @@ class MatchmakingService {
     } catch (_) {
       // Match may already be deleted or cancelled
     }
+  }
+
+  /// Delete a finished/cancelled match document from Firestore.
+  /// Called by both players when they return to menu — idempotent,
+  /// so concurrent deletes are safe.
+  Future<void> deleteMatch(String matchId) async {
+    try {
+      await _db.collection('matches').doc(matchId).delete();
+    } catch (_) {}
   }
 
   /// Clean up listeners.

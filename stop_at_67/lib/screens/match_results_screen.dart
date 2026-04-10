@@ -397,7 +397,9 @@ class _MatchResultsScreenState extends State<MatchResultsScreen>
                 padding: const EdgeInsets.symmetric(horizontal: 40),
                 child: GameButton(
                   label: l10n.fightPlayAgain,
-                  onPressed: () => gs.startFightVsBot(),
+                  onPressed: () => gs.isBotMatch
+                      ? gs.startFightVsBot()
+                      : gs.startFightMatchmaking(),
                   width: double.infinity,
                 ),
               ),

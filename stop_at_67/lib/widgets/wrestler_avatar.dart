@@ -1,6 +1,23 @@
 import 'package:flutter/material.dart';
 import '../engine/types.dart';
 
+/// Precache all 18 wrestler PNGs (6 skins × idle/punch/knocked).
+/// Call this once when entering fight mode so images are decoded before
+/// the lobby appears and there is no visible stall.
+Future<void> precacheWrestlerImages(BuildContext context) async {
+  const prefixes = ['classic', 'ROBOT', 'Ninja', 'INFERNO', 'GLACIER', 'Champion'];
+  final futures = <Future<void>>[];
+  for (final p in prefixes) {
+    final idle    = p == 'classic' ? 'assets/wrestlers/classic_Idle.png'        : 'assets/wrestlers/${p}_Idle.png';
+    final punch   = p == 'classic' ? 'assets/wrestlers/classic_Punching.png'    : 'assets/wrestlers/${p}_Punching.png';
+    final knocked = p == 'classic' ? 'assets/wrestlers/classic_knocked_out.png' : 'assets/wrestlers/${p}_Knocked_out.png';
+    futures.add(precacheImage(AssetImage(idle),    context));
+    futures.add(precacheImage(AssetImage(punch),   context));
+    futures.add(precacheImage(AssetImage(knocked), context));
+  }
+  await Future.wait(futures, eagerError: false);
+}
+
 /// Maps skin ID → asset filename prefix.
 const _kSkinPrefix = {
   'wrestler_default': 'classic',
