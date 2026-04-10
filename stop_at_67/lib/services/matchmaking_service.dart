@@ -165,7 +165,7 @@ class MatchmakingService {
         .snapshots()
         .listen((snapshot) {
       for (final doc in snapshot.docs) {
-        final data = doc.data() as Map<String, dynamic>;
+        final data = doc.data();
         final status = data['status'] as String?;
         // Only react to active matches (handles the race where the match is already
         // `playing` by the time the first snapshot arrives).

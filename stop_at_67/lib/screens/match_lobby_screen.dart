@@ -256,10 +256,10 @@ class _FightLobbyRow extends StatelessWidget {
           ),
 
           // VS
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12),
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 12),
             child: Column(
-              children: const [
+              children: [
                 Text(
                   'VS',
                   style: TextStyle(
