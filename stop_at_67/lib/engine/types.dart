@@ -523,6 +523,7 @@ enum MatchStatus { waiting, countdown, playing, finished, cancelled }
 class MatchPlayer {
   final String uid;
   final String displayName;
+  final String? wrestlerSkin;
   final int? stoppedAtMs;
   final int? deviationMs;
   final int? score;
@@ -530,6 +531,7 @@ class MatchPlayer {
   const MatchPlayer({
     required this.uid,
     required this.displayName,
+    this.wrestlerSkin,
     this.stoppedAtMs,
     this.deviationMs,
     this.score,
@@ -538,6 +540,7 @@ class MatchPlayer {
   Map<String, dynamic> toJson() => {
     'uid': uid,
     'displayName': displayName,
+    if (wrestlerSkin != null) 'wrestlerSkin': wrestlerSkin,
     if (stoppedAtMs != null) 'stoppedAtMs': stoppedAtMs,
     if (deviationMs != null) 'deviationMs': deviationMs,
     if (score != null) 'score': score,
@@ -546,6 +549,7 @@ class MatchPlayer {
   factory MatchPlayer.fromJson(Map<String, dynamic> json) => MatchPlayer(
     uid: json['uid'] as String? ?? '',
     displayName: json['displayName'] as String? ?? 'Player',
+    wrestlerSkin: json['wrestlerSkin'] as String?,
     stoppedAtMs: (json['stoppedAtMs'] as num?)?.toInt(),
     deviationMs: (json['deviationMs'] as num?)?.toInt(),
     score: (json['score'] as num?)?.toInt(),

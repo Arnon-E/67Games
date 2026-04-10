@@ -30,6 +30,7 @@ class MatchmakingService {
     required String displayName,
     required String modeId,
     required int targetMs,
+    String? wrestlerSkin,
     String? preferOpponentUid,
     bool acceptSpeedUp = false,
     int rematchRound = 1,
@@ -102,11 +103,14 @@ class MatchmakingService {
             'uid': opponentData['uid'],
             'displayName': opponentData['displayName'],
             'acceptSpeedUp': opponentAcceptSpeedUp,
+            if (opponentData['wrestlerSkin'] != null)
+              'wrestlerSkin': opponentData['wrestlerSkin'],
           },
           'player2': {
             'uid': uid,
             'displayName': displayName,
             'acceptSpeedUp': acceptSpeedUp,
+            if (wrestlerSkin != null) 'wrestlerSkin': wrestlerSkin,
           },
           'createdAt': FieldValue.serverTimestamp(),
         });
@@ -131,6 +135,7 @@ class MatchmakingService {
       'targetMs': targetMs,
       'acceptSpeedUp': acceptSpeedUp,
       'rematchRound': rematchRound,
+      if (wrestlerSkin != null) 'wrestlerSkin': wrestlerSkin,
       'createdAt': FieldValue.serverTimestamp(),
     });
 

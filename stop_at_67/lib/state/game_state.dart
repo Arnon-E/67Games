@@ -1294,6 +1294,7 @@ class GameState extends ChangeNotifier {
           displayName: _authState.userName,
           modeId: modeId,
           targetMs: targetMs,
+          wrestlerSkin: _loadout.wrestlerSkin,
           preferOpponentUid: preferOpponent,
           acceptSpeedUp: allowSpeedUp,
           rematchRound: queuedRematchRound,
@@ -1317,6 +1318,7 @@ class GameState extends ChangeNotifier {
         displayName: _authState.userName,
         modeId: modeId,
         targetMs: targetMs,
+        wrestlerSkin: _loadout.wrestlerSkin,
         preferOpponentUid: preferOpponent,
         acceptSpeedUp: allowSpeedUp,
         rematchRound: queuedRematchRound,
@@ -1523,10 +1525,13 @@ class GameState extends ChangeNotifier {
           myDeviationMs: myDev,
           oppDeviationMs: oppDev,
         );
-        if (myScore == oppScore) {
-          _sound.play('tie');
-        } else {
-          _sound.play(myScore > oppScore ? 'winner' : 'loser');
+        // Only play win/lose sound on the final round (fight over)
+        if (isFightOver) {
+          if (myScore == oppScore) {
+            _sound.play('tie');
+          } else {
+            _sound.play(myScore > oppScore ? 'winner' : 'loser');
+          }
         }
         _screen = AppScreen.matchResults;
         notifyListeners();
@@ -1782,7 +1787,10 @@ class GameState extends ChangeNotifier {
       myDeviationMs: playerDeviationMs,
       oppDeviationMs: botDeviationMs,
     );
-    _sound.play(isTie ? 'tie' : (didWin ? 'winner' : 'loser'));
+    // Only play win/lose sound on the final round (fight over)
+    if (isFightOver) {
+      _sound.play(isTie ? 'tie' : (didWin ? 'winner' : 'loser'));
+    }
 
     _screen = AppScreen.matchResults;
     notifyListeners();

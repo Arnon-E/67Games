@@ -1,8 +1,31 @@
 import 'package:flutter/material.dart';
 import '../engine/types.dart';
 
-/// Draws a cartoon wrestler character using CustomPainter.
-/// The character stands in a fighting guard stance.
+/// Maps skin ID → asset filename prefix.
+const _kSkinPrefix = {
+  'wrestler_default': 'classic',
+  'wrestler_robot':   'ROBOT',
+  'wrestler_ninja':   'Ninja',
+  'wrestler_fire':    'INFERNO',
+  'wrestler_ice':     'GLACIER',
+  'wrestler_gold':    'Champion',
+};
+
+String? _assetPath(String skinId, {required bool isKnocked, required bool isPunching}) {
+  final prefix = _kSkinPrefix[skinId];
+  if (prefix == null) return null;
+  if (isKnocked) {
+    return prefix == 'classic'
+        ? 'assets/wrestlers/classic_knocked_out.png'
+        : 'assets/wrestlers/${prefix}_Knocked_out.png';
+  }
+  if (isPunching)  return 'assets/wrestlers/${prefix}_Punching.png';
+  return 'assets/wrestlers/${prefix}_Idle.png';
+}
+
+/// Displays a wrestler character.
+/// For skins with image assets (classic, robot) uses PNG/JPG files.
+/// For all other skins falls back to the CustomPainter implementation.
 /// [mirrored] flips the character horizontally (used for the opponent).
 /// [punchProgress] 0.0–1.0 animates the right arm extending into a punch.
 /// [isKnocked] shows dazed expression (X eyes, open mouth).
@@ -24,7 +47,26 @@ class WrestlerAvatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Extra vertical space for accessories like flares / crown that extend above head
+    final path = _assetPath(
+      skin.id,
+      isKnocked: isKnocked,
+      isPunching: punchProgress > 0.5,
+    );
+
+    if (path != null) {
+      Widget image = Image.asset(
+        path,
+        width: size,
+        height: size * 1.1,
+        fit: BoxFit.contain,
+      );
+      if (mirrored) {
+        image = Transform.scale(scaleX: -1, child: image);
+      }
+      return image;
+    }
+
+    // Fallback: CustomPainter for skins without image assets
     return SizedBox(
       width: size,
       height: size * 1.1,

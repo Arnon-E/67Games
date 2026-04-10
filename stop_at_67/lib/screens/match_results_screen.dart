@@ -119,6 +119,7 @@ class _MatchResultsScreenState extends State<MatchResultsScreen>
         gs: gs,
         l10n: l10n,
         iWon: iKO,
+        myUid: auth.user?.uid ?? '',
       );
     }
 
@@ -311,14 +312,19 @@ class _MatchResultsScreenState extends State<MatchResultsScreen>
     required GameState gs,
     required AppLocalizations l10n,
     required bool iWon,
+    required String myUid,
   }) {
     final mySkinId = gs.loadout.wrestlerSkin;
     final mySkin = wrestlerSkinById(mySkinId);
-    // Use a contrasting skin for opponent display
-    final oppSkin = kWrestlerSkins.firstWhere(
-      (s) => s.id != mySkinId,
-      orElse: () => kWrestlerSkins[1],
-    );
+
+    // Resolve opponent's skin from match data, falling back to classic.
+    final match = gs.currentMatch;
+    String oppSkinId = 'wrestler_default';
+    if (match != null) {
+      final oppPlayer = match.player1.uid == myUid ? match.player2 : match.player1;
+      oppSkinId = oppPlayer?.wrestlerSkin ?? 'wrestler_default';
+    }
+    final oppSkin = wrestlerSkinById(oppSkinId);
 
     final winningSkin = iWon ? mySkin : oppSkin;
     final losingSkin  = iWon ? oppSkin : mySkin;
@@ -639,12 +645,12 @@ class _KOFightSceneState extends State<_KOFightScene>
                 ),
               ),
 
-              // ── Loser (right, knocked back) ──
+              // ── Loser (right, knocked back but stays visible) ──
               Positioned(
-                right: 20.0 - knockRaw * 28.0,
-                bottom: knockRaw * (-8.0),
+                right: 20.0 - knockRaw * 12.0,
+                bottom: knockRaw * 4.0,
                 child: Transform.rotate(
-                  angle: knockRaw * 0.45,
+                  angle: knockRaw * 0.3,
                   alignment: Alignment.bottomCenter,
                   child: WrestlerAvatar(
                     skin: widget.losingSkin,
