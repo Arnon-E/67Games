@@ -30,7 +30,6 @@ class _WheelPainter extends CustomPainter {
     for (int i = 0; i < n; i++) {
       final seg = kFortuneSegments[i];
       final startA = angle + i * segAngle - math.pi / 2;
-      final endA = startA + segAngle;
       final midA = startA + segAngle / 2;
 
       // Segment fill
