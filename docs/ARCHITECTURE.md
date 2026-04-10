@@ -156,10 +156,22 @@ stopMatchGame()
 ```
 
 ### Heartbeat / Disconnect Detection
-- Each client calls `sendHeartbeat(matchId, isPlayer1)` every **3 seconds** (`_heartbeatInterval`)
-- `_opponentGone(match, myUid)` returns `true` if opponent's heartbeat timestamp is **> 9 seconds old** (`_heartbeatTimeout`)
-- Grace period: if opponent never sent a heartbeat AND match is < 9s old, they are not considered gone
+- Each client calls `sendHeartbeat(matchId, isPlayer1)` every **10 seconds** (`_heartbeatInterval`)
+- `_opponentGone(match, myUid)` returns `true` if opponent's heartbeat timestamp is **> 30 seconds old** (`_heartbeatTimeout`)
+- Grace period: if opponent never sent a heartbeat AND match is < 30s old, they are not considered gone
 - Heartbeat is stopped in `_stopHeartbeat()` called on cancel / return to menu
+- Constants defined in both `game_state.dart` and `matchmaking_service.dart` — keep in sync if changing
+
+### Match Document Lifecycle & Cleanup
+- Match docs are created on match and deleted when either player calls `matchReturnToMenu()` or `_cancelMultiplayer()`
+- `MatchmakingService.deleteMatch(matchId)` — idempotent, both players can call it safely
+- Bot matches (`isBotMatch = true`) are purely local and never written to Firestore
+- Rationale: deleting docs keeps `listenForMatch` queries small and avoids Firestore cost accumulation
+
+### Wrestler Image Precaching
+- All 18 wrestler PNGs (6 skins × idle/punch/knocked) are decoded in the background via `precacheWrestlerImages(context)` in `wrestler_avatar.dart`
+- Called when the user taps "Fight Mode" in the menu, before the lobby loads
+- Without this, first render of match lobby/results would stall while Flutter decodes ~5MB of images
 
 ### Speed Negotiation
 - In the match lobby, either player can request a speed-up

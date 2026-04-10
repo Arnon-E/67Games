@@ -172,8 +172,8 @@ Match lifecycle: waiting → countdown → playing → finished/cancelled
 Bot fallback: if no opponent in 7s → bot option appears
               bot results generated locally (20-150ms random deviation)
 
-Heartbeat: each client writes a timestamp every 3s via sendHeartbeat()
-           _opponentGone() returns true if opponent heartbeat > 9s stale
+Heartbeat: each client writes a timestamp every 10s via sendHeartbeat()
+           _opponentGone() returns true if opponent heartbeat > 30s stale
            handles disconnect detection without Firestore presence feature
 
 Speed negotiation: lobby shows "Speed Challenge" dialog if one player
