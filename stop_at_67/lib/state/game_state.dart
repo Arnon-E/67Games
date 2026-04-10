@@ -1666,26 +1666,20 @@ class GameState extends ChangeNotifier {
     final match = _currentMatch;
     if (match == null) return;
 
-    if (_isBotMatch) {
-      // Local bot match — skip Firestore, just transition screens
-      _currentMatch = MatchData(
-        matchId: match.matchId,
-        modeId: match.modeId,
-        targetMs: match.targetMs,
-        speedMultiplier: match.speedMultiplier,
-        status: MatchStatus.playing,
-        player1: match.player1,
-        player2: match.player2,
-        createdAt: match.createdAt,
-      );
-      _currentMode = kGameModes[match.modeId] ?? kGameModes['classic']!;
-      _screen = AppScreen.matchPlaying;
-      _timerState = TimerState.initial();
-      _matchPlayerStopped = false;
-      notifyListeners();
-      _startPrecisionTimer();
-    } else {
-      await _matchmaking.startMatch(match.matchId);
+    // Transition to playing immediately — no Firestore round-trip needed.
+    // For real matches, we write `playing` status in the background so the
+    // other client also transitions; but we don't block our own start on it.
+    _currentMode = kGameModes[match.modeId] ?? kGameModes['classic']!;
+    _screen = AppScreen.matchPlaying;
+    _timerState = TimerState.initial();
+    _matchPlayerStopped = false;
+    notifyListeners();
+    _startPrecisionTimer();
+
+    if (!_isBotMatch) {
+      // Fire-and-forget — opponent will transition via their own countdown
+      // or pick up the `playing` status from Firestore if they lag.
+      unawaited(_matchmaking.startMatch(match.matchId));
     }
   }
 

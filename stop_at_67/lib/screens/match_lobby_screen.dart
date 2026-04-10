@@ -21,13 +21,19 @@ class MatchLobbyScreen extends StatefulWidget {
 }
 
 class _MatchLobbyScreenState extends State<MatchLobbyScreen> {
-  static const _kCountdownIntervalMs = 800;
+  static const _kCountdownIntervalMs = 600;
   int _countdown = 3;
   Timer? _timer;
 
   @override
   void initState() {
     super.initState();
+    // For fight rematches (round 2+) skip the full 3-count — just show
+    // the lobby briefly for 600 ms then jump straight into the round.
+    final gs = context.read<GameState>();
+    if (gs.fightModeActive && gs.fightRound > 1) {
+      _countdown = 1;
+    }
     _timer = Timer.periodic(const Duration(milliseconds: _kCountdownIntervalMs), _tick);
   }
 
