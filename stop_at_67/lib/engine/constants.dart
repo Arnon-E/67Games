@@ -478,6 +478,77 @@ const List<WeeklyMissionDef> kWeeklyMissions = [
   ),
 ];
 
+// ============================================================
+// WRESTLER SKINS
+// ============================================================
+
+const List<WrestlerSkin> kWrestlerSkins = [
+  WrestlerSkin(
+    id: 'wrestler_default',
+    name: 'Classic',
+    description: 'The original champion',
+    bodyColor: Color(0xFFFF6B35),
+    accentColor: Colors.white,
+    skinColor: Color(0xFFFFD5B0),
+    accessoryType: 'headband',
+    priceCoin: 0,
+  ),
+  WrestlerSkin(
+    id: 'wrestler_ninja',
+    name: 'Ninja',
+    description: 'Silent and deadly',
+    bodyColor: Color(0xFF2D0A5E),
+    accentColor: Color(0xFF00DDFF),
+    skinColor: Color(0xFF1A1A2E),
+    accessoryType: 'mask',
+    priceCoin: 500,
+  ),
+  WrestlerSkin(
+    id: 'wrestler_robot',
+    name: 'Robot',
+    description: 'Mechanical precision',
+    bodyColor: Color(0xFF4A90D9),
+    accentColor: Color(0xFFB0C4DE),
+    skinColor: Color(0xFF708090),
+    accessoryType: 'visor',
+    priceCoin: 800,
+  ),
+  WrestlerSkin(
+    id: 'wrestler_fire',
+    name: 'Inferno',
+    description: 'Burns with intensity',
+    bodyColor: Color(0xFFCC2200),
+    accentColor: Color(0xFFFF6B00),
+    skinColor: Color(0xFFFFD5B0),
+    accessoryType: 'flare',
+    priceCoin: 600,
+  ),
+  WrestlerSkin(
+    id: 'wrestler_ice',
+    name: 'Glacier',
+    description: 'Cold as ice',
+    bodyColor: Color(0xFF00B4D8),
+    accentColor: Color(0xFFCAF0F8),
+    skinColor: Color(0xFFE0F7FF),
+    accessoryType: 'crown',
+    priceCoin: 600,
+  ),
+  WrestlerSkin(
+    id: 'wrestler_gold',
+    name: 'Champion',
+    description: 'The ultimate fighter',
+    bodyColor: Color(0xFFFFD700),
+    accentColor: Color(0xFFF5B841),
+    skinColor: Color(0xFFFFD5B0),
+    accessoryType: 'belt',
+    priceCoin: 1200,
+  ),
+];
+
+/// Returns the WrestlerSkin for a given id, defaulting to Classic.
+WrestlerSkin wrestlerSkinById(String id) =>
+    kWrestlerSkins.firstWhere((s) => s.id == id, orElse: () => kWrestlerSkins.first);
+
 /// Returns the ISO week ID string for a given date, e.g. '2026-W11'.
 String weekIdForDate(DateTime date) {
   // ISO week number: Jan 4 is always in week 1

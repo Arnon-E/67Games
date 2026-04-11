@@ -89,6 +89,7 @@ class GameState extends ChangeNotifier {
     'bg_default',
     'sound_default',
     'celebration_default',
+    'wrestler_default',
   ];
   List<String> get ownedCosmetics => _ownedCosmetics;
 
@@ -220,6 +221,28 @@ class GameState extends ChangeNotifier {
   int get matchSeriesLosses => _matchSeriesLosses;
   int _matchSeriesTies = 0;
   int get matchSeriesTies => _matchSeriesTies;
+
+  // ── Fight mode ───────────────────────────────────────────────
+  static const int kFightMaxHp = 3;
+  bool _fightModeActive = false;
+  bool get fightModeActive => _fightModeActive;
+  /// True while silently rejoining queue for a fight rematch (no matchmaking screen).
+  bool _fightRematchSearching = false;
+  bool get fightRematchSearching => _fightRematchSearching;
+  int _myFightHp = kFightMaxHp;
+  int get myFightHp => _myFightHp;
+  int _opponentFightHp = kFightMaxHp;
+  int get opponentFightHp => _opponentFightHp;
+  int _fightRound = 1;
+  int get fightRound => _fightRound;
+  /// Damage dealt to opponent this round (0 if opponent won or tie).
+  int _lastRoundMyDamage = 0;
+  int get lastRoundMyDamage => _lastRoundMyDamage;
+  /// Damage taken this round (0 if I won or tie).
+  int _lastRoundOpponentDamage = 0;
+  int get lastRoundOpponentDamage => _lastRoundOpponentDamage;
+  bool get isFightOver =>
+      _fightModeActive && (_myFightHp <= 0 || _opponentFightHp <= 0);
 
   GameState({
     required StorageService storage,
@@ -1090,10 +1113,11 @@ class GameState extends ChangeNotifier {
   void equipCosmetic(String type, String cosmeticId) {
     if (!_ownedCosmetics.contains(cosmeticId)) return;
     _loadout = switch (type) {
-      'timerSkin' => _loadout.copyWith(timerSkin: cosmeticId),
-      'background' => _loadout.copyWith(background: cosmeticId),
-      'soundPack' => _loadout.copyWith(soundPack: cosmeticId),
-      'celebration' => _loadout.copyWith(celebration: cosmeticId),
+      'timerSkin'    => _loadout.copyWith(timerSkin: cosmeticId),
+      'background'   => _loadout.copyWith(background: cosmeticId),
+      'soundPack'    => _loadout.copyWith(soundPack: cosmeticId),
+      'celebration'  => _loadout.copyWith(celebration: cosmeticId),
+      'wrestlerSkin' => _loadout.copyWith(wrestlerSkin: cosmeticId),
       _ => _loadout,
     };
     _storage.saveLoadout(_loadout);
@@ -1102,10 +1126,11 @@ class GameState extends ChangeNotifier {
 
   void unequipCosmetic(String type) {
     _loadout = switch (type) {
-      'timerSkin' => _loadout.copyWith(timerSkin: 'timer_skin_default'),
-      'background' => _loadout.copyWith(background: 'bg_default'),
-      'soundPack' => _loadout.copyWith(soundPack: 'sound_default'),
-      'celebration' => _loadout.copyWith(celebration: 'celebration_default'),
+      'timerSkin'    => _loadout.copyWith(timerSkin: 'timer_skin_default'),
+      'background'   => _loadout.copyWith(background: 'bg_default'),
+      'soundPack'    => _loadout.copyWith(soundPack: 'sound_default'),
+      'celebration'  => _loadout.copyWith(celebration: 'celebration_default'),
+      'wrestlerSkin' => _loadout.copyWith(wrestlerSkin: 'wrestler_default'),
       _ => _loadout,
     };
     _storage.saveLoadout(_loadout);
@@ -1237,6 +1262,14 @@ class GameState extends ChangeNotifier {
     }
     await _sound.cleanup();
 
+    // Kill the previous match stream before starting a new search.
+    // Without this, a late-arriving Firestore write (e.g. the fire-and-forget
+    // startMatch() call) can fire on the old subscription while _screen is
+    // already `matchmaking` and trip the "playing" transition handler,
+    // sending the player into a ghost game against the previous opponent.
+    _matchStreamSub?.cancel();
+    _matchStreamSub = null;
+
     // Fresh matchmaking resets rematch state; coming from results keeps it
     final isRematch = _rematchOpponentUid != null;
     if (!isRematch) {
@@ -1258,7 +1291,10 @@ class GameState extends ChangeNotifier {
     notifyListeners();
 
     final uid = _authState.user!.uid;
-    const modeId = 'classic';
+    // Fight mode players use a separate queue bucket so they never match
+    // against Quick Match players (both play 'classic' rules but HP tracking
+    // only works when both sides are in fight mode).
+    final queueModeId = _fightModeActive ? 'classic_fight' : 'classic';
     const targetMs = 6700;
 
     // Start a 7-second timeout — if no opponent found, try once more then show bot option
@@ -1270,8 +1306,9 @@ class GameState extends ChangeNotifier {
         final lateMatchId = await _matchmaking.joinQueue(
           uid: uid,
           displayName: _authState.userName,
-          modeId: modeId,
+          modeId: queueModeId,
           targetMs: targetMs,
+          wrestlerSkin: _loadout.wrestlerSkin,
           preferOpponentUid: preferOpponent,
           acceptSpeedUp: allowSpeedUp,
           rematchRound: queuedRematchRound,
@@ -1293,8 +1330,9 @@ class GameState extends ChangeNotifier {
       matchId = await _matchmaking.joinQueue(
         uid: uid,
         displayName: _authState.userName,
-        modeId: modeId,
+        modeId: queueModeId,
         targetMs: targetMs,
+        wrestlerSkin: _loadout.wrestlerSkin,
         preferOpponentUid: preferOpponent,
         acceptSpeedUp: allowSpeedUp,
         rematchRound: queuedRematchRound,
@@ -1312,7 +1350,7 @@ class GameState extends ChangeNotifier {
       // Queued (or queue write failed) — listen for when an opponent creates the match
       _matchmaking.listenForMatch(
         uid: uid,
-        modeId: modeId,
+        modeId: queueModeId,
         onMatchFound: (id) {
           _matchmakingTimeout?.cancel();
           _subscribeToMatch(id);
@@ -1321,8 +1359,125 @@ class GameState extends ChangeNotifier {
     }
   }
 
-  static const _heartbeatInterval = Duration(seconds: 3);
-  static const _heartbeatTimeout = Duration(seconds: 9);
+  // ── Fight mode helpers ───────────────────────────────────────
+
+  /// Start a fight-mode session against the bot.
+  Future<void> startFightVsBot() async {
+    _fightModeActive = true;
+    _myFightHp = kFightMaxHp;
+    _opponentFightHp = kFightMaxHp;
+    _fightRound = 1;
+    _lastRoundMyDamage = 0;
+    _lastRoundOpponentDamage = 0;
+    _rematchRound = 1;
+    _matchSpeedMultiplier = 1.0;
+    await playAgainstBot();
+  }
+
+  /// Start fight-mode matchmaking against a real opponent.
+  Future<void> startFightMatchmaking() async {
+    _fightModeActive = true;
+    _myFightHp = kFightMaxHp;
+    _opponentFightHp = kFightMaxHp;
+    _fightRound = 1;
+    _lastRoundMyDamage = 0;
+    _lastRoundOpponentDamage = 0;
+    await startMatchmaking(acceptSpeedUp: false);
+  }
+
+  /// Continue the fight to the next round (called from results screen).
+  /// Speed increases automatically each round in fight mode.
+  Future<void> fightNextRound() async {
+    if (_isBotMatch) {
+      await rematchBot(increaseSpeed: true);
+    } else {
+      await _startFightRematch();
+    }
+  }
+
+  /// Advance to the next fight round without touching the queue.
+  ///
+  /// Player 1 updates the *existing* match document back to `countdown`
+  /// with the new speed.  Both clients already have an active `_matchStreamSub`
+  /// on that document, so they pick up the status change instantly — no
+  /// queue, no searching, no race conditions.
+  ///
+  /// Player 2 just sets the connecting flag and waits; their stream fires
+  /// when player 1 writes the reset.
+  Future<void> _startFightRematch() async {
+    if (!_authState.isSignedIn) return;
+    final match = _currentMatch;
+    if (match == null) return;
+
+    final myUid = _authState.user!.uid;
+    final isPlayer1 = match.player1.uid == myUid;
+    // _rematchRound was already incremented when the previous match finished.
+    final newSpeed =
+        (1.0 + (_rematchRound - 1) * 0.2).clamp(1.0, 3.0).toDouble();
+
+    _fightRematchSearching = true;
+    _matchPlayerStopped = false;
+    notifyListeners();
+
+    if (!isPlayer1) return; // Player 2 waits — stream will fire when P1 resets.
+
+    try {
+      await _matchmaking.resetMatchForNextRound(match.matchId, newSpeed);
+    } catch (_) {
+      // Firestore write failed (e.g. doc deleted) — fall back to fresh matchmaking.
+      _fightRematchSearching = false;
+      notifyListeners();
+      unawaited(startMatchmaking(acceptSpeedUp: true));
+    }
+  }
+
+  /// Calculate damage dealt by the round winner.
+  int _computeFightDamage({
+    required int winnerDeviationMs,
+    required double speedMultiplier,
+  }) {
+    int damage = 1;
+    // Perfect stop = critical hit
+    if (winnerDeviationMs == 0) damage++;
+    // Speed ≥ 2.0× makes hits harder
+    if (speedMultiplier >= 2.0) damage++;
+    return damage.clamp(1, 2); // cap so 3 HP fights last ≥ 2 rounds
+  }
+
+  /// Process fight-round HP changes after a match finishes.
+  void _processFightRound({
+    required int myScore,
+    required int oppScore,
+    required int myDeviationMs,
+    required int oppDeviationMs,
+  }) {
+    if (!_fightModeActive) return;
+    _lastRoundMyDamage = 0;
+    _lastRoundOpponentDamage = 0;
+
+    if (myScore > oppScore) {
+      final dmg = _computeFightDamage(
+        winnerDeviationMs: myDeviationMs,
+        speedMultiplier: _matchSpeedMultiplier,
+      );
+      _lastRoundOpponentDamage = dmg;
+      _opponentFightHp = (_opponentFightHp - dmg).clamp(0, kFightMaxHp);
+    } else if (oppScore > myScore) {
+      final dmg = _computeFightDamage(
+        winnerDeviationMs: oppDeviationMs,
+        speedMultiplier: _matchSpeedMultiplier,
+      );
+      _lastRoundMyDamage = dmg;
+      _myFightHp = (_myFightHp - dmg).clamp(0, kFightMaxHp);
+    }
+    // Tie = no damage
+    _fightRound++;
+  }
+
+  // ── Heartbeat ─────────────────────────────────────────────────
+
+  static const _heartbeatInterval = Duration(seconds: 10);
+  static const _heartbeatTimeout = Duration(seconds: 30);
 
   void _startHeartbeat(String matchId, bool isPlayer1) {
     _matchHeartbeatTimer?.cancel();
@@ -1357,7 +1512,22 @@ class GameState extends ChangeNotifier {
   void _subscribeToMatch(String matchId) {
     _matchStreamSub?.cancel();
     _matchStreamSub = _matchmaking.watchMatch(matchId).listen((match) {
-      if (match == null) return;
+      if (match == null) {
+        // Match document was deleted (opponent called matchReturnToMenu).
+        if (_screen == AppScreen.matchLobby ||
+            _screen == AppScreen.matchPlaying) {
+          // We're mid-game — opponent left. Cancel and return to menu.
+          _cancelMultiplayer();
+        } else if (_fightRematchSearching) {
+          // We were waiting for the next fight round to start (player-2 case:
+          // we returned early in _startFightRematch and were watching the stream).
+          // The opponent deleted the match instead of resetting it → unlock the
+          // Menu button so the player is not stuck.
+          _fightRematchSearching = false;
+          notifyListeners();
+        }
+        return;
+      }
       _currentMatch = match;
       _matchSpeedMultiplier = match.speedMultiplier;
       _matchSearching = false;
@@ -1377,7 +1547,11 @@ class GameState extends ChangeNotifier {
       }
 
       if (match.status == MatchStatus.countdown &&
-          _screen == AppScreen.matchmaking) {
+          (_screen == AppScreen.matchmaking ||
+              _screen == AppScreen.matchResults)) {
+        // matchResults → fight rematch reset: existing stream picked up the
+        // countdown status written by resetMatchForNextRound.
+        _fightRematchSearching = false;
         final isPlayer1 = match.player1.uid == myUid;
         _startHeartbeat(matchId, isPlayer1);
         _screen = AppScreen.matchLobby;
@@ -1388,6 +1562,7 @@ class GameState extends ChangeNotifier {
         // Countdown finished — also handles first snapshot arriving as playing.
         // If we came from matchmaking (skipped lobby), start heartbeat now.
         if (_screen == AppScreen.matchmaking) {
+          _fightRematchSearching = false;
           final isPlayer1 = match.player1.uid == myUid;
           _startHeartbeat(matchId, isPlayer1);
         }
@@ -1411,11 +1586,22 @@ class GameState extends ChangeNotifier {
         final oppPlayer = myUid == match.player1.uid ? match.player2 : match.player1;
         final myScore = myPlayer?.score ?? 0;
         final oppScore = oppPlayer?.score ?? 0;
+        final myDev = myPlayer?.deviationMs ?? 999;
+        final oppDev = oppPlayer?.deviationMs ?? 999;
         _updateMatchSeriesRecord(myScore: myScore, oppScore: oppScore);
-        if (myScore == oppScore) {
-          _sound.play('tie');
-        } else {
-          _sound.play(myScore > oppScore ? 'winner' : 'loser');
+        _processFightRound(
+          myScore: myScore,
+          oppScore: oppScore,
+          myDeviationMs: myDev,
+          oppDeviationMs: oppDev,
+        );
+        // Only play win/lose sound on the final round (fight over)
+        if (isFightOver) {
+          if (myScore == oppScore) {
+            _sound.play('tie');
+          } else {
+            _sound.play(myScore > oppScore ? 'winner' : 'loser');
+          }
         }
         _screen = AppScreen.matchResults;
         notifyListeners();
@@ -1435,12 +1621,25 @@ class GameState extends ChangeNotifier {
     _stopHeartbeat();
     _matchStreamSub?.cancel();
     _matchStreamSub = null;
+    // Delete cancelled match docs to keep Firestore clean.
+    final cancelledMatch = _currentMatch;
+    if (cancelledMatch != null && !_isBotMatch &&
+        cancelledMatch.status == MatchStatus.cancelled) {
+      unawaited(_matchmaking.deleteMatch(cancelledMatch.matchId));
+    }
     _matchSearching = false;
+    _fightRematchSearching = false;
     _matchTimedOut = false;
     _isBotMatch = false;
     _currentMatch = null;
     _matchPlayerStopped = false;
     _resetMatchSeriesRecord();
+    _fightModeActive = false;
+    _myFightHp = kFightMaxHp;
+    _opponentFightHp = kFightMaxHp;
+    _fightRound = 1;
+    _lastRoundMyDamage = 0;
+    _lastRoundOpponentDamage = 0;
     _precisionTimer?.dispose();
     _precisionTimer = null;
     _timerState = TimerState.initial();
@@ -1538,26 +1737,20 @@ class GameState extends ChangeNotifier {
     final match = _currentMatch;
     if (match == null) return;
 
-    if (_isBotMatch) {
-      // Local bot match — skip Firestore, just transition screens
-      _currentMatch = MatchData(
-        matchId: match.matchId,
-        modeId: match.modeId,
-        targetMs: match.targetMs,
-        speedMultiplier: match.speedMultiplier,
-        status: MatchStatus.playing,
-        player1: match.player1,
-        player2: match.player2,
-        createdAt: match.createdAt,
-      );
-      _currentMode = kGameModes[match.modeId] ?? kGameModes['classic']!;
-      _screen = AppScreen.matchPlaying;
-      _timerState = TimerState.initial();
-      _matchPlayerStopped = false;
-      notifyListeners();
-      _startPrecisionTimer();
-    } else {
-      await _matchmaking.startMatch(match.matchId);
+    // Transition to playing immediately — no Firestore round-trip needed.
+    // For real matches, we write `playing` status in the background so the
+    // other client also transitions; but we don't block our own start on it.
+    _currentMode = kGameModes[match.modeId] ?? kGameModes['classic']!;
+    _screen = AppScreen.matchPlaying;
+    _timerState = TimerState.initial();
+    _matchPlayerStopped = false;
+    notifyListeners();
+    _startPrecisionTimer();
+
+    if (!_isBotMatch) {
+      // Fire-and-forget — opponent will transition via their own countdown
+      // or pick up the `playing` status from Firestore if they lag.
+      unawaited(_matchmaking.startMatch(match.matchId));
     }
   }
 
@@ -1659,7 +1852,16 @@ class GameState extends ChangeNotifier {
     final didWin = playerScore > botScore;
     final isTie = playerScore == botScore;
     _updateMatchSeriesRecord(myScore: playerScore, oppScore: botScore);
-    _sound.play(isTie ? 'tie' : (didWin ? 'winner' : 'loser'));
+    _processFightRound(
+      myScore: playerScore,
+      oppScore: botScore,
+      myDeviationMs: playerDeviationMs,
+      oppDeviationMs: botDeviationMs,
+    );
+    // Only play win/lose sound on the final round (fight over)
+    if (isFightOver) {
+      _sound.play(isTie ? 'tie' : (didWin ? 'winner' : 'loser'));
+    }
 
     _screen = AppScreen.matchResults;
     notifyListeners();
@@ -1669,17 +1871,35 @@ class GameState extends ChangeNotifier {
   Future<void> matchReturnToMenu() async {
     await _sound.cleanup();
     _matchmakingTimeout?.cancel();
+    // If we were silently re-queuing for a fight rematch, leave the queue.
+    if (_fightRematchSearching && _authState.isSignedIn) {
+      unawaited(_matchmaking.leaveQueue(_authState.user!.uid));
+    }
     _stopHeartbeat();
     _matchStreamSub?.cancel();
     _matchStreamSub = null;
+    // Delete the finished match document so it doesn't accumulate in Firestore
+    // and pollute future listenForMatch queries. Both players delete; safe.
+    final finishedMatch = _currentMatch;
+    if (finishedMatch != null && !_isBotMatch) {
+      unawaited(_matchmaking.deleteMatch(finishedMatch.matchId));
+    }
     _currentMatch = null;
     _matchPlayerStopped = false;
     _isBotMatch = false;
     _matchTimedOut = false;
+    _fightRematchSearching = false;
     _rematchOpponentUid = null;
     _rematchRound = 1;
     _matchSpeedMultiplier = 1.0;
     _resetMatchSeriesRecord();
+    // Reset fight mode
+    _fightModeActive = false;
+    _myFightHp = kFightMaxHp;
+    _opponentFightHp = kFightMaxHp;
+    _fightRound = 1;
+    _lastRoundMyDamage = 0;
+    _lastRoundOpponentDamage = 0;
     _precisionTimer?.dispose();
     _precisionTimer = null;
     _timerState = TimerState.initial();

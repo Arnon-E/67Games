@@ -145,6 +145,7 @@
   "shopCategoryBackgrounds": "Backgrounds",
   "shopCategorySoundPacks": "Sound Packs",
   "shopCategoryCelebrations": "Celebrations",
+  "shopCategoryWrestlerSkins": "Wrestler Skins",
   "shopItemNeonTimerName": "Neon Timer",
   "shopItemNeonTimerDesc": "Glowing neon display",
   "shopItemGoldTimerName": "Gold Timer",
@@ -355,5 +356,42 @@
   "matchResultsRematchSpeedUp": "Speed Up",
   "matchSeriesWinsShort": "W",
   "matchSeriesLossesShort": "L",
-  "matchSeriesTiesShort": "T"
+  "matchSeriesTiesShort": "T",
+
+  "matchModeSheetTitle": "Choose Match Type",
+  "matchModeQuickTitle": "Quick Match",
+  "matchModeQuickSubtitle": "One round — highest score wins",
+  "matchModeFightTitle": "Fight Mode",
+  "matchModeFightSubtitle": "3 HP each — deal damage until KO",
+  "matchModeFightDescription": "Each player has 3 HP. Win a round to hit your opponent. Perfect stop = 2 damage. First to 0 HP loses!",
+  "matchModeFightVsBot": "vs Bot",
+  "matchModeFightVsBotSubtitle": "Fight the bot — instant match",
+  "matchModeFightVsPlayer": "vs Player",
+  "matchModeFightVsPlayerSubtitle": "Find a real opponent online",
+
+  "fightRoundLabel": "ROUND {round}",
+  "@fightRoundLabel": {
+    "placeholders": {
+      "round": { "type": "int" }
+    }
+  },
+  "fightRoundWin": "ROUND WIN!",
+  "fightRoundLoss": "ROUND LOST",
+  "fightNextRound": "NEXT ROUND ({seconds}s)",
+  "@fightNextRound": {
+    "placeholders": {
+      "seconds": { "type": "int" }
+    }
+  },
+  "fightKnockout": "KNOCKOUT!",
+  "fightKnockedOut": "KO'd!",
+  "fightRoundsPlayed": "{count} rounds fought",
+  "@fightRoundsPlayed": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "fightPlayAgain": "FIGHT AGAIN",
+  "fightHpLabel": "HP",
+  "fightSpeedLabel": "SPEED"
 }

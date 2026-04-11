@@ -14,7 +14,7 @@ import '../engine/types.dart';
 class MatchmakingService {
   static const _matchStaleDuration = Duration(minutes: 2);
   static const _activeAttachMaxAge = Duration(seconds: 30);
-  static const _heartbeatTimeout = Duration(seconds: 9);
+  static const _heartbeatTimeout = Duration(seconds: 30);
 
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 
@@ -30,6 +30,7 @@ class MatchmakingService {
     required String displayName,
     required String modeId,
     required int targetMs,
+    String? wrestlerSkin,
     String? preferOpponentUid,
     bool acceptSpeedUp = false,
     int rematchRound = 1,
@@ -102,11 +103,14 @@ class MatchmakingService {
             'uid': opponentData['uid'],
             'displayName': opponentData['displayName'],
             'acceptSpeedUp': opponentAcceptSpeedUp,
+            if (opponentData['wrestlerSkin'] != null)
+              'wrestlerSkin': opponentData['wrestlerSkin'],
           },
           'player2': {
             'uid': uid,
             'displayName': displayName,
             'acceptSpeedUp': acceptSpeedUp,
+            if (wrestlerSkin != null) 'wrestlerSkin': wrestlerSkin,
           },
           'createdAt': FieldValue.serverTimestamp(),
         });
@@ -131,6 +135,7 @@ class MatchmakingService {
       'targetMs': targetMs,
       'acceptSpeedUp': acceptSpeedUp,
       'rematchRound': rematchRound,
+      if (wrestlerSkin != null) 'wrestlerSkin': wrestlerSkin,
       'createdAt': FieldValue.serverTimestamp(),
     });
 
@@ -165,7 +170,7 @@ class MatchmakingService {
         .snapshots()
         .listen((snapshot) {
       for (final doc in snapshot.docs) {
-        final data = doc.data() as Map<String, dynamic>;
+        final data = doc.data();
         final status = data['status'] as String?;
         // Only react to active matches (handles the race where the match is already
         // `playing` by the time the first snapshot arrives).
@@ -303,6 +308,35 @@ class MatchmakingService {
     } catch (_) {
       // Match may already be deleted or cancelled
     }
+  }
+
+  /// Delete a finished/cancelled match document from Firestore.
+  /// Called by both players when they return to menu — idempotent,
+  /// so concurrent deletes are safe.
+  Future<void> deleteMatch(String matchId) async {
+    try {
+      await _db.collection('matches').doc(matchId).delete();
+    } catch (_) {}
+  }
+
+  /// Reset an existing match document for the next fight round.
+  /// Clears player results and sets status back to `countdown` with
+  /// the new speed multiplier. Both clients are already watching this
+  /// document, so they transition automatically — no queue needed.
+  Future<void> resetMatchForNextRound(
+      String matchId, double speedMultiplier) async {
+    await _db.collection('matches').doc(matchId).update({
+      'status': MatchStatus.countdown.name,
+      'speedMultiplier': speedMultiplier,
+      'speedUpAgreed': speedMultiplier > 1.0,
+      'speedUpRequested': speedMultiplier > 1.0,
+      'player1.stoppedAtMs': null,
+      'player1.deviationMs': null,
+      'player1.score': null,
+      'player2.stoppedAtMs': null,
+      'player2.deviationMs': null,
+      'player2.score': null,
+    });
   }
 
   /// Clean up listeners.

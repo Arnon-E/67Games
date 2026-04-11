@@ -146,6 +146,7 @@
   "shopCategoryBackgrounds": "רקעים",
   "shopCategorySoundPacks": "חבילות צליל",
   "shopCategoryCelebrations": "חגיגות",
+  "shopCategoryWrestlerSkins": "עורות מתאבקים",
   "shopItemNeonTimerName": "טיימר ניאון",
   "shopItemNeonTimerDesc": "תצוגת ניאון זוהרת",
   "shopItemGoldTimerName": "טיימר זהב",
@@ -356,5 +357,42 @@
   "matchResultsRematchSpeedUp": "להאיץ",
   "matchSeriesWinsShort": "נ",
   "matchSeriesLossesShort": "ה",
-  "matchSeriesTiesShort": "ת"
+  "matchSeriesTiesShort": "ת",
+
+  "matchModeSheetTitle": "בחר סוג משחק",
+  "matchModeQuickTitle": "משחק מהיר",
+  "matchModeQuickSubtitle": "סיבוב אחד — הניקוד הגבוה ביותר מנצח",
+  "matchModeFightTitle": "מצב לחימה",
+  "matchModeFightSubtitle": "3 HP כל אחד — גרום נזק עד ה-KO",
+  "matchModeFightDescription": "לכל שחקן יש 3 HP. נצח סיבוב כדי להכות את היריב. עצירה מושלמת = 2 נזק. הראשון שמגיע ל-0 HP מפסיד!",
+  "matchModeFightVsBot": "נגד בוט",
+  "matchModeFightVsBotSubtitle": "לחם נגד הבוט — התאמה מיידית",
+  "matchModeFightVsPlayer": "נגד שחקן",
+  "matchModeFightVsPlayerSubtitle": "מצא יריב אמיתי אונליין",
+
+  "fightRoundLabel": "סיבוב {round}",
+  "@fightRoundLabel": {
+    "placeholders": {
+      "round": { "type": "int" }
+    }
+  },
+  "fightRoundWin": "ניצחת סיבוב!",
+  "fightRoundLoss": "הפסדת סיבוב",
+  "fightNextRound": "סיבוב הבא ({seconds}ש׳)",
+  "@fightNextRound": {
+    "placeholders": {
+      "seconds": { "type": "int" }
+    }
+  },
+  "fightKnockout": "נוקאאוט!",
+  "fightKnockedOut": "הופלת!",
+  "fightRoundsPlayed": "{count} סיבובים נלחמו",
+  "@fightRoundsPlayed": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "fightPlayAgain": "לחם שוב",
+  "fightHpLabel": "HP",
+  "fightSpeedLabel": "מהירות"
 }
