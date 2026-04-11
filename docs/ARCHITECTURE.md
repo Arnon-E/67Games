@@ -163,6 +163,21 @@ stopMatchGame()
   `startMatch()` is called fire-and-forget in the background so the opponent still picks up the
   `playing` status if their own countdown hasn't fired yet
 
+### Opponent-Left Handling (match doc deleted mid-session)
+
+`_subscribeToMatch()` receives `null` when the Firestore document is deleted.
+The handler checks the current screen to decide what to do:
+
+| Screen when null arrives | Action |
+|--------------------------|--------|
+| `matchLobby` / `matchPlaying` | `_cancelMultiplayer()` → back to menu |
+| `matchResults` + `_fightRematchSearching` | Clear `_fightRematchSearching` → re-enables Menu button |
+| Anything else | Return early (no-op) |
+
+Without this, two stuck states were possible:
+- **Lobby stuck**: player1 called `resetMatchForNextRound()`, transitioned to lobby, opponent then deleted the doc → player sat in lobby until 30 s heartbeat timeout.
+- **Menu button disabled**: player2 (Firestore) returned early in `_startFightRematch()` with `_fightRematchSearching = true`; when opponent deleted the doc the flag was never cleared → Menu button stayed `onPressed: null` forever.
+
 ### Fight Rematch Flow (doc reset, no re-queuing)
 
 Between fight rounds, `fightNextRound()` calls `_startFightRematch()` instead of the standard
