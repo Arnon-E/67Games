@@ -1291,7 +1291,10 @@ class GameState extends ChangeNotifier {
     notifyListeners();
 
     final uid = _authState.user!.uid;
-    const modeId = 'classic';
+    // Fight mode players use a separate queue bucket so they never match
+    // against Quick Match players (both play 'classic' rules but HP tracking
+    // only works when both sides are in fight mode).
+    final queueModeId = _fightModeActive ? 'classic_fight' : 'classic';
     const targetMs = 6700;
 
     // Start a 7-second timeout — if no opponent found, try once more then show bot option
@@ -1303,7 +1306,7 @@ class GameState extends ChangeNotifier {
         final lateMatchId = await _matchmaking.joinQueue(
           uid: uid,
           displayName: _authState.userName,
-          modeId: modeId,
+          modeId: queueModeId,
           targetMs: targetMs,
           wrestlerSkin: _loadout.wrestlerSkin,
           preferOpponentUid: preferOpponent,
@@ -1327,7 +1330,7 @@ class GameState extends ChangeNotifier {
       matchId = await _matchmaking.joinQueue(
         uid: uid,
         displayName: _authState.userName,
-        modeId: modeId,
+        modeId: queueModeId,
         targetMs: targetMs,
         wrestlerSkin: _loadout.wrestlerSkin,
         preferOpponentUid: preferOpponent,
@@ -1347,7 +1350,7 @@ class GameState extends ChangeNotifier {
       // Queued (or queue write failed) — listen for when an opponent creates the match
       _matchmaking.listenForMatch(
         uid: uid,
-        modeId: modeId,
+        modeId: queueModeId,
         onMatchFound: (id) {
           _matchmakingTimeout?.cancel();
           _subscribeToMatch(id);
