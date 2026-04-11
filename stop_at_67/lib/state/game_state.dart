@@ -1512,7 +1512,22 @@ class GameState extends ChangeNotifier {
   void _subscribeToMatch(String matchId) {
     _matchStreamSub?.cancel();
     _matchStreamSub = _matchmaking.watchMatch(matchId).listen((match) {
-      if (match == null) return;
+      if (match == null) {
+        // Match document was deleted (opponent called matchReturnToMenu).
+        if (_screen == AppScreen.matchLobby ||
+            _screen == AppScreen.matchPlaying) {
+          // We're mid-game — opponent left. Cancel and return to menu.
+          _cancelMultiplayer();
+        } else if (_fightRematchSearching) {
+          // We were waiting for the next fight round to start (player-2 case:
+          // we returned early in _startFightRematch and were watching the stream).
+          // The opponent deleted the match instead of resetting it → unlock the
+          // Menu button so the player is not stuck.
+          _fightRematchSearching = false;
+          notifyListeners();
+        }
+        return;
+      }
       _currentMatch = match;
       _matchSpeedMultiplier = match.speedMultiplier;
       _matchSearching = false;
