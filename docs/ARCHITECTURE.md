@@ -192,6 +192,16 @@ Between fight rounds, `fightNextRound()` calls `_startFightRematch()` instead of
 - Bot matches (`isBotMatch = true`) are purely local and never written to Firestore
 - Rationale: deleting docs keeps `listenForMatch` queries small and avoids Firestore cost accumulation
 
+### Queue Mode Buckets
+`startMatchmaking()` uses `queueModeId` (not the game's `modeId`) when writing to and searching `matchmaking_queue`:
+
+| Mode | `queueModeId` | Notes |
+|------|---------------|-------|
+| Quick Match (1v1) | `'classic'` | Standard rematch |
+| Fight Mode | `'classic_fight'` | `_fightModeActive == true` when `startMatchmaking()` is called |
+
+This separation prevents fight-mode players from being matched against quick-match players (who have no HP UI). Adding a new multiplayer variant means adding a new bucket value here — do **not** reuse `'classic'`.
+
 ### Wrestler Image Precaching
 - All 18 wrestler PNGs (6 skins × idle/punch/knocked) are decoded in the background via `precacheWrestlerImages(context)` in `wrestler_avatar.dart`
 - Called when the user taps "Fight Mode" in the menu, before the lobby loads
