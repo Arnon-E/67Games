@@ -1262,6 +1262,14 @@ class GameState extends ChangeNotifier {
     }
     await _sound.cleanup();
 
+    // Kill the previous match stream before starting a new search.
+    // Without this, a late-arriving Firestore write (e.g. the fire-and-forget
+    // startMatch() call) can fire on the old subscription while _screen is
+    // already `matchmaking` and trip the "playing" transition handler,
+    // sending the player into a ghost game against the previous opponent.
+    _matchStreamSub?.cancel();
+    _matchStreamSub = null;
+
     // Fresh matchmaking resets rematch state; coming from results keeps it
     final isRematch = _rematchOpponentUid != null;
     if (!isRematch) {
@@ -1532,12 +1540,10 @@ class GameState extends ChangeNotifier {
         notifyListeners();
       } else if (match.status == MatchStatus.playing &&
           (_screen == AppScreen.matchLobby ||
-              _screen == AppScreen.matchmaking ||
-              _screen == AppScreen.matchResults)) {
+              _screen == AppScreen.matchmaking)) {
         // Countdown finished — also handles first snapshot arriving as playing.
-        // If we came from matchmaking/results (skipped lobby), start heartbeat now.
-        if (_screen == AppScreen.matchmaking ||
-            _screen == AppScreen.matchResults) {
+        // If we came from matchmaking (skipped lobby), start heartbeat now.
+        if (_screen == AppScreen.matchmaking) {
           _fightRematchSearching = false;
           final isPlayer1 = match.player1.uid == myUid;
           _startHeartbeat(matchId, isPlayer1);
