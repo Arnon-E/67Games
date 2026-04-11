@@ -244,23 +244,52 @@ class _MatchResultsScreenState extends State<MatchResultsScreen>
                 if (match.isComplete) ...[
                   // Fight mode: auto-continue or manual next round
                   if (gs.fightModeActive) ...[
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 40),
-                      child: GameButton(
-                        label: l10n.fightNextRound(_autoContinueSeconds),
-                        onPressed: () {
-                          _autoContinueTimer?.cancel();
-                          gs.fightNextRound();
-                        },
-                        width: double.infinity,
+                    if (gs.fightRematchSearching) ...[
+                      // Silently re-queuing — show a spinner while we wait.
+                      const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 12),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            SizedBox(
+                              width: 18, height: 18,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: AppColors.orange,
+                              ),
+                            ),
+                            SizedBox(width: 12),
+                            Text(
+                              'Connecting...',
+                              style: TextStyle(
+                                color: AppColors.textSecondary,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
+                    ] else ...[
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 40),
+                        child: GameButton(
+                          label: l10n.fightNextRound(_autoContinueSeconds),
+                          onPressed: () {
+                            _autoContinueTimer?.cancel();
+                            gs.fightNextRound();
+                          },
+                          width: double.infinity,
+                        ),
+                      ),
+                    ],
                     const SizedBox(height: 12),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 40),
                       child: GameButton(
                         label: l10n.commonMenu,
-                        onPressed: () => gs.matchReturnToMenu(),
+                        onPressed: gs.fightRematchSearching
+                            ? null
+                            : () => gs.matchReturnToMenu(),
                         primary: false,
                         width: double.infinity,
                       ),

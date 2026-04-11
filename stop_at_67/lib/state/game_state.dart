@@ -226,6 +226,9 @@ class GameState extends ChangeNotifier {
   static const int kFightMaxHp = 3;
   bool _fightModeActive = false;
   bool get fightModeActive => _fightModeActive;
+  /// True while silently rejoining queue for a fight rematch (no matchmaking screen).
+  bool _fightRematchSearching = false;
+  bool get fightRematchSearching => _fightRematchSearching;
   int _myFightHp = kFightMaxHp;
   int get myFightHp => _myFightHp;
   int _opponentFightHp = kFightMaxHp;
@@ -1377,8 +1380,73 @@ class GameState extends ChangeNotifier {
     if (_isBotMatch) {
       await rematchBot(increaseSpeed: true);
     } else {
-      await startMatchmaking(acceptSpeedUp: true);
+      await _startFightRematch();
     }
+  }
+
+  /// Re-queue for the next fight round while staying on the results screen.
+  /// Navigates directly to the match lobby when the same opponent is found,
+  /// skipping the matchmaking waiting screen entirely.
+  Future<void> _startFightRematch() async {
+    if (!_authState.isSignedIn) return;
+
+    final preferOpponent = _rematchOpponentUid;
+    final queuedRematchRound = _rematchRound;
+    _rematchOpponentUid = null;
+
+    _fightRematchSearching = true;
+    _matchSearching = true;
+    _currentMatch = null;
+    _matchPlayerStopped = false;
+    _matchTimedOut = false;
+    _isBotMatch = false;
+    // Stay on matchResults — no _screen change here.
+    notifyListeners();
+
+    final uid = _authState.user!.uid;
+    const modeId = 'classic';
+    const targetMs = 6700;
+
+    // Timeout: if opponent doesn't rejoin within 10 s, fall back to full matchmaking.
+    _matchmakingTimeout?.cancel();
+    _matchmakingTimeout = Timer(const Duration(seconds: 10), () {
+      if (!_matchSearching) return;
+      _fightRematchSearching = false;
+      _screen = AppScreen.matchmaking;
+      notifyListeners();
+    });
+
+    String? matchId;
+    try {
+      matchId = await _matchmaking.joinQueue(
+        uid: uid,
+        displayName: _authState.userName,
+        modeId: modeId,
+        targetMs: targetMs,
+        wrestlerSkin: _loadout.wrestlerSkin,
+        preferOpponentUid: preferOpponent,
+        acceptSpeedUp: true,
+        rematchRound: queuedRematchRound,
+      );
+    } catch (_) {}
+
+    if (matchId != null) {
+      _matchmakingTimeout?.cancel();
+      _fightRematchSearching = false;
+      _subscribeToMatch(matchId);
+      return;
+    }
+
+    // Queued — listen for opponent to create the match.
+    _matchmaking.listenForMatch(
+      uid: uid,
+      modeId: modeId,
+      onMatchFound: (id) {
+        _matchmakingTimeout?.cancel();
+        _fightRematchSearching = false;
+        _subscribeToMatch(id);
+      },
+    );
   }
 
   /// Calculate damage dealt by the round winner.
@@ -1482,17 +1550,21 @@ class GameState extends ChangeNotifier {
       }
 
       if (match.status == MatchStatus.countdown &&
-          _screen == AppScreen.matchmaking) {
+          (_screen == AppScreen.matchmaking ||
+              _screen == AppScreen.matchResults)) {
+        // matchResults source = fight rematch that bypassed the matchmaking screen.
         final isPlayer1 = match.player1.uid == myUid;
         _startHeartbeat(matchId, isPlayer1);
         _screen = AppScreen.matchLobby;
         notifyListeners();
       } else if (match.status == MatchStatus.playing &&
           (_screen == AppScreen.matchLobby ||
-              _screen == AppScreen.matchmaking)) {
+              _screen == AppScreen.matchmaking ||
+              _screen == AppScreen.matchResults)) {
         // Countdown finished — also handles first snapshot arriving as playing.
-        // If we came from matchmaking (skipped lobby), start heartbeat now.
-        if (_screen == AppScreen.matchmaking) {
+        // If we came from matchmaking/results (skipped lobby), start heartbeat now.
+        if (_screen == AppScreen.matchmaking ||
+            _screen == AppScreen.matchResults) {
           final isPlayer1 = match.player1.uid == myUid;
           _startHeartbeat(matchId, isPlayer1);
         }
@@ -1558,6 +1630,7 @@ class GameState extends ChangeNotifier {
       unawaited(_matchmaking.deleteMatch(cancelledMatch.matchId));
     }
     _matchSearching = false;
+    _fightRematchSearching = false;
     _matchTimedOut = false;
     _isBotMatch = false;
     _currentMatch = null;
@@ -1800,6 +1873,10 @@ class GameState extends ChangeNotifier {
   Future<void> matchReturnToMenu() async {
     await _sound.cleanup();
     _matchmakingTimeout?.cancel();
+    // If we were silently re-queuing for a fight rematch, leave the queue.
+    if (_fightRematchSearching && _authState.isSignedIn) {
+      unawaited(_matchmaking.leaveQueue(_authState.user!.uid));
+    }
     _stopHeartbeat();
     _matchStreamSub?.cancel();
     _matchStreamSub = null;
@@ -1813,6 +1890,7 @@ class GameState extends ChangeNotifier {
     _matchPlayerStopped = false;
     _isBotMatch = false;
     _matchTimedOut = false;
+    _fightRematchSearching = false;
     _rematchOpponentUid = null;
     _rematchRound = 1;
     _matchSpeedMultiplier = 1.0;
