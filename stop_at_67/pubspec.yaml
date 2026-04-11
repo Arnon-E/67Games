@@ -41,6 +41,7 @@ flutter:
   generate: true
   assets:
     - assets/sounds/
+    - assets/wrestlers/
 
 flutter_launcher_icons:
   android: true

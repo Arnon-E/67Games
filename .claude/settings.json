@@ -1,0 +1,28 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "if": "Bash(git commit*)",
+            "command": "echo '{\"hookSpecificOutput\":{\"hookEventName\":\"PostToolUse\",\"additionalContext\":\"REMINDER: You just committed code. If this task introduced new features, architecture changes, game modes, cosmetics, or important notes — update CLAUDE.md and the relevant docs/ file (docs/ARCHITECTURE.md, docs/GAME_DESIGN.md, or docs/COSMETICS_AND_MONETIZATION.md) before finishing.\"}}'",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '{\"systemMessage\":\"REMINDER: If this task introduced new features, architecture changes, game modes, cosmetics, or important notes — update CLAUDE.md and the relevant docs/ file (docs/ARCHITECTURE.md, docs/GAME_DESIGN.md, or docs/COSMETICS_AND_MONETIZATION.md).\"}'",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  }
+}

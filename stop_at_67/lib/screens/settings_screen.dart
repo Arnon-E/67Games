@@ -192,7 +192,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
         ),
         value: gs.isSoundEnabled,
-        activeColor: AppColors.orange,
+        activeThumbColor: AppColors.orange,
         onChanged: (val) => gs.setSoundEnabled(val),
       ),
     );

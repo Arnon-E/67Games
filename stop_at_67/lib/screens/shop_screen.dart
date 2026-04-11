@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../engine/constants.dart';
 import '../engine/types.dart';
 import '../l10n/app_localizations.dart';
 import '../state/game_state.dart';
 import '../theme/app_colors.dart';
 import '../widgets/app_gradient_background.dart';
 import '../widgets/screen_header.dart';
+import '../widgets/wrestler_avatar.dart';
 
 class _Item {
   final String id;
@@ -90,9 +92,10 @@ class ShopScreen extends StatelessWidget {
 
   String _categoryName(String key, AppLocalizations l10n) {
     return switch (key) {
-      'timerSkins' => l10n.shopCategoryTimerSkins,
-      'backgrounds' => l10n.shopCategoryBackgrounds,
-      'celebrations' => l10n.shopCategoryCelebrations,
+      'timerSkins'    => l10n.shopCategoryTimerSkins,
+      'backgrounds'   => l10n.shopCategoryBackgrounds,
+      'celebrations'  => l10n.shopCategoryCelebrations,
+      'wrestlerSkins' => l10n.shopCategoryWrestlerSkins,
       _ => key,
     };
   }
@@ -139,29 +142,47 @@ class ShopScreen extends StatelessWidget {
               Expanded(
                 child: ListView(
                   padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-                  children: categories.entries.map((entry) {
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(_categoryName(entry.key, l10n).toUpperCase(),
-                            style: const TextStyle(
-                                fontSize: 11, letterSpacing: 2,
-                                color: AppColors.textDisabled, fontWeight: FontWeight.w600)),
-                        const SizedBox(height: 10),
-                        ...entry.value.map((item) => _ItemCard(
-                              item: item,
-                              name: _itemName(item, l10n),
-                              description: _itemDesc(item, l10n),
-                              ownedLabel: l10n.shopOwned,
-                              equippedLabel: l10n.shopEquipped,
-                              equipLabel: l10n.shopEquip,
-                              unequipLabel: l10n.shopUnequip,
-                              purchasedMessage: l10n.shopPurchased(_itemName(item, l10n)),
-                            )),
-                        const SizedBox(height: 20),
-                      ],
-                    );
-                  }).toList(),
+                  children: [
+                    // ── Standard cosmetic categories ──────────────────────
+                    ...categories.entries.map((entry) {
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(_categoryName(entry.key, l10n).toUpperCase(),
+                              style: const TextStyle(
+                                  fontSize: 11, letterSpacing: 2,
+                                  color: AppColors.textDisabled, fontWeight: FontWeight.w600)),
+                          const SizedBox(height: 10),
+                          ...entry.value.map((item) => _ItemCard(
+                                item: item,
+                                name: _itemName(item, l10n),
+                                description: _itemDesc(item, l10n),
+                                ownedLabel: l10n.shopOwned,
+                                equippedLabel: l10n.shopEquipped,
+                                equipLabel: l10n.shopEquip,
+                                unequipLabel: l10n.shopUnequip,
+                                purchasedMessage: l10n.shopPurchased(_itemName(item, l10n)),
+                              )),
+                          const SizedBox(height: 20),
+                        ],
+                      );
+                    }),
+                    // ── Wrestler Skins ────────────────────────────────────
+                    Text(_categoryName('wrestlerSkins', l10n).toUpperCase(),
+                        style: const TextStyle(
+                            fontSize: 11, letterSpacing: 2,
+                            color: AppColors.textDisabled, fontWeight: FontWeight.w600)),
+                    const SizedBox(height: 10),
+                    ...kWrestlerSkins.map((skin) => _WrestlerSkinCard(
+                          skin: skin,
+                          ownedLabel: l10n.shopOwned,
+                          equippedLabel: l10n.shopEquipped,
+                          equipLabel: l10n.shopEquip,
+                          unequipLabel: l10n.shopUnequip,
+                          purchasedMessage: l10n.shopPurchased(skin.name),
+                        )),
+                    const SizedBox(height: 20),
+                  ],
                 ),
               ),
             ],
@@ -297,11 +318,158 @@ class _ItemCard extends StatelessWidget {
 
   static String? _equippedId(PlayerLoadout loadout, String equipType) {
     return switch (equipType) {
-      'timerSkin' => loadout.timerSkin,
-      'background' => loadout.background,
-      'soundPack' => loadout.soundPack,
-      'celebration' => loadout.celebration,
+      'timerSkin'    => loadout.timerSkin,
+      'background'   => loadout.background,
+      'soundPack'    => loadout.soundPack,
+      'celebration'  => loadout.celebration,
+      'wrestlerSkin' => loadout.wrestlerSkin,
       _ => null,
     };
+  }
+}
+
+// ── Wrestler Skin Card ────────────────────────────────────────
+
+class _WrestlerSkinCard extends StatelessWidget {
+  final WrestlerSkin skin;
+  final String ownedLabel;
+  final String equippedLabel;
+  final String equipLabel;
+  final String unequipLabel;
+  final String purchasedMessage;
+
+  const _WrestlerSkinCard({
+    required this.skin,
+    required this.ownedLabel,
+    required this.equippedLabel,
+    required this.equipLabel,
+    required this.unequipLabel,
+    required this.purchasedMessage,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final gs = context.watch<GameState>();
+    final owned    = gs.ownedCosmetics.contains(skin.id) || skin.priceCoin == 0;
+    final equipped = gs.loadout.wrestlerSkin == skin.id;
+    final canAfford = gs.coins >= skin.priceCoin;
+    final color = skin.accentColor;
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppColors.darkCard,
+        borderRadius: BorderRadius.circular(14),
+        border: equipped
+            ? Border.all(color: color, width: 1.5)
+            : owned
+                ? Border.all(color: color.withValues(alpha: 0.35))
+                : null,
+      ),
+      child: Row(
+        children: [
+          // Wrestler avatar preview
+          SizedBox(
+            width: 56,
+            child: WrestlerAvatar(skin: skin, size: 50),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Text(skin.name,
+                        style: const TextStyle(
+                            color: AppColors.textPrimary,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600)),
+                    if (equipped) ...[
+                      const SizedBox(width: 6),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: color.withValues(alpha: 0.2),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Text(equippedLabel,
+                            style: TextStyle(
+                                color: color, fontSize: 10, fontWeight: FontWeight.w700)),
+                      ),
+                    ],
+                  ],
+                ),
+                Text(skin.description,
+                    style: const TextStyle(
+                        color: AppColors.textDisabled, fontSize: 12)),
+              ],
+            ),
+          ),
+          const SizedBox(width: 10),
+          if (equipped)
+            GestureDetector(
+              onTap: skin.priceCoin == 0 ? null : () => gs.unequipCosmetic('wrestlerSkin'),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                    color: color.withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: color.withValues(alpha: 0.5))),
+                child: Text(skin.priceCoin == 0 ? ownedLabel : unequipLabel,
+                    style: TextStyle(
+                        color: color, fontSize: 12, fontWeight: FontWeight.w600)),
+              ),
+            )
+          else if (owned)
+            GestureDetector(
+              onTap: () => gs.equipCosmetic('wrestlerSkin', skin.id),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                    color: color.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: color.withValues(alpha: 0.5))),
+                child: Text(equipLabel,
+                    style: TextStyle(
+                        color: color, fontSize: 12, fontWeight: FontWeight.w600)),
+              ),
+            )
+          else
+            GestureDetector(
+              onTap: canAfford ? () {
+                final bought = gs.purchaseCosmetic(skin.id, skin.priceCoin);
+                if (bought && context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                        content: Text(purchasedMessage),
+                        duration: const Duration(seconds: 2)));
+                }
+              } : null,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                    color: canAfford ? AppColors.orange : AppColors.textHint,
+                    borderRadius: BorderRadius.circular(20)),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.circle,
+                        color: canAfford ? AppColors.textPrimary : AppColors.textDisabled,
+                        size: 10),
+                    const SizedBox(width: 4),
+                    Text('${skin.priceCoin}',
+                        style: TextStyle(
+                            color: canAfford ? AppColors.textPrimary : AppColors.textDisabled,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600)),
+                  ],
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
   }
 }
