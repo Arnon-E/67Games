@@ -163,18 +163,21 @@ stopMatchGame()
   `startMatch()` is called fire-and-forget in the background so the opponent still picks up the
   `playing` status if their own countdown hasn't fired yet
 
-### Fight Rematch Flow (bypasses matchmaking screen)
+### Fight Rematch Flow (doc reset, no re-queuing)
 
 Between fight rounds, `fightNextRound()` calls `_startFightRematch()` instead of the standard
-`startMatchmaking()`. Key differences:
+`startMatchmaking()`. This avoids the matchmaking queue entirely:
 
-- Screen stays on `matchResults` — no matchmaking waiting screen is shown
-- `_fightRematchSearching = true` while re-queuing; results screen shows a spinner
-- Both players re-join the queue with `preferOpponentUid` set to each other → matched in ~1 s
-- `_subscribeToMatch()` accepts `matchResults` as a valid source screen so it can navigate
-  directly to `matchLobby` without going through the matchmaking screen
-- **Fallback**: if opponent doesn't re-queue within 10 s, falls back to standard matchmaking screen
-- `matchReturnToMenu()` calls `leaveQueue()` if the player exits during `_fightRematchSearching`
+- **Player 1** calls `MatchmakingService.resetMatchForNextRound(matchId, newSpeed)` — a single
+  Firestore update that sets `status = countdown`, clears player scores, and writes the new speed.
+- **Player 2** does nothing — their existing `_matchStreamSub` (never cancelled between rounds)
+  fires when it sees the status change and navigates to lobby automatically.
+- `_fightRematchSearching = true` while the write is in flight; results screen shows a brief spinner.
+- `_subscribeToMatch()` accepts `matchResults` as a valid source screen so the lobby transition
+  triggers correctly from the fight rematch path.
+- **Fallback**: if `resetMatchForNextRound` throws (e.g. doc was deleted), falls back to standard
+  `startMatchmaking()`.
+- `matchReturnToMenu()` calls `leaveQueue()` defensively in case of fallback.
 
 ### Heartbeat / Disconnect Detection
 - Each client calls `sendHeartbeat(matchId, isPlayer1)` every **10 seconds** (`_heartbeatInterval`)
