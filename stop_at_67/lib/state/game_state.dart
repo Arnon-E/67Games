@@ -1384,70 +1384,40 @@ class GameState extends ChangeNotifier {
     }
   }
 
-  /// Re-queue for the next fight round while staying on the results screen.
-  /// Navigates directly to the match lobby when the same opponent is found,
-  /// skipping the matchmaking waiting screen entirely.
+  /// Advance to the next fight round without touching the queue.
+  ///
+  /// Player 1 updates the *existing* match document back to `countdown`
+  /// with the new speed.  Both clients already have an active `_matchStreamSub`
+  /// on that document, so they pick up the status change instantly — no
+  /// queue, no searching, no race conditions.
+  ///
+  /// Player 2 just sets the connecting flag and waits; their stream fires
+  /// when player 1 writes the reset.
   Future<void> _startFightRematch() async {
     if (!_authState.isSignedIn) return;
+    final match = _currentMatch;
+    if (match == null) return;
 
-    final preferOpponent = _rematchOpponentUid;
-    final queuedRematchRound = _rematchRound;
-    _rematchOpponentUid = null;
+    final myUid = _authState.user!.uid;
+    final isPlayer1 = match.player1.uid == myUid;
+    // _rematchRound was already incremented when the previous match finished.
+    final newSpeed =
+        (1.0 + (_rematchRound - 1) * 0.2).clamp(1.0, 3.0).toDouble();
 
     _fightRematchSearching = true;
-    _matchSearching = true;
-    // Do NOT null _currentMatch — results screen needs it to stay rendered
-    // while we silently search for the next round's match.
     _matchPlayerStopped = false;
-    _matchTimedOut = false;
-    _isBotMatch = false;
-    // Stay on matchResults — no _screen change here.
     notifyListeners();
 
-    final uid = _authState.user!.uid;
-    const modeId = 'classic';
-    const targetMs = 6700;
+    if (!isPlayer1) return; // Player 2 waits — stream will fire when P1 resets.
 
-    // Timeout: if opponent doesn't rejoin within 10 s, fall back to full matchmaking.
-    _matchmakingTimeout?.cancel();
-    _matchmakingTimeout = Timer(const Duration(seconds: 10), () {
-      if (!_matchSearching) return;
-      _fightRematchSearching = false;
-      _screen = AppScreen.matchmaking;
-      notifyListeners();
-    });
-
-    String? matchId;
     try {
-      matchId = await _matchmaking.joinQueue(
-        uid: uid,
-        displayName: _authState.userName,
-        modeId: modeId,
-        targetMs: targetMs,
-        wrestlerSkin: _loadout.wrestlerSkin,
-        preferOpponentUid: preferOpponent,
-        acceptSpeedUp: true,
-        rematchRound: queuedRematchRound,
-      );
-    } catch (_) {}
-
-    if (matchId != null) {
-      _matchmakingTimeout?.cancel();
+      await _matchmaking.resetMatchForNextRound(match.matchId, newSpeed);
+    } catch (_) {
+      // Firestore write failed (e.g. doc deleted) — fall back to fresh matchmaking.
       _fightRematchSearching = false;
-      _subscribeToMatch(matchId);
-      return;
+      notifyListeners();
+      unawaited(startMatchmaking(acceptSpeedUp: true));
     }
-
-    // Queued — listen for opponent to create the match.
-    _matchmaking.listenForMatch(
-      uid: uid,
-      modeId: modeId,
-      onMatchFound: (id) {
-        _matchmakingTimeout?.cancel();
-        _fightRematchSearching = false;
-        _subscribeToMatch(id);
-      },
-    );
   }
 
   /// Calculate damage dealt by the round winner.
@@ -1553,7 +1523,9 @@ class GameState extends ChangeNotifier {
       if (match.status == MatchStatus.countdown &&
           (_screen == AppScreen.matchmaking ||
               _screen == AppScreen.matchResults)) {
-        // matchResults source = fight rematch that bypassed the matchmaking screen.
+        // matchResults → fight rematch reset: existing stream picked up the
+        // countdown status written by resetMatchForNextRound.
+        _fightRematchSearching = false;
         final isPlayer1 = match.player1.uid == myUid;
         _startHeartbeat(matchId, isPlayer1);
         _screen = AppScreen.matchLobby;
@@ -1566,6 +1538,7 @@ class GameState extends ChangeNotifier {
         // If we came from matchmaking/results (skipped lobby), start heartbeat now.
         if (_screen == AppScreen.matchmaking ||
             _screen == AppScreen.matchResults) {
+          _fightRematchSearching = false;
           final isPlayer1 = match.player1.uid == myUid;
           _startHeartbeat(matchId, isPlayer1);
         }

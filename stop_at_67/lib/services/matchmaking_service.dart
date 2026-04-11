@@ -319,6 +319,26 @@ class MatchmakingService {
     } catch (_) {}
   }
 
+  /// Reset an existing match document for the next fight round.
+  /// Clears player results and sets status back to `countdown` with
+  /// the new speed multiplier. Both clients are already watching this
+  /// document, so they transition automatically — no queue needed.
+  Future<void> resetMatchForNextRound(
+      String matchId, double speedMultiplier) async {
+    await _db.collection('matches').doc(matchId).update({
+      'status': MatchStatus.countdown.name,
+      'speedMultiplier': speedMultiplier,
+      'speedUpAgreed': speedMultiplier > 1.0,
+      'speedUpRequested': speedMultiplier > 1.0,
+      'player1.stoppedAtMs': null,
+      'player1.deviationMs': null,
+      'player1.score': null,
+      'player2.stoppedAtMs': null,
+      'player2.deviationMs': null,
+      'player2.score': null,
+    });
+  }
+
   /// Clean up listeners.
   void dispose() {
     _matchSub?.cancel();
