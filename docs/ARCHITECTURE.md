@@ -163,6 +163,19 @@ stopMatchGame()
   `startMatch()` is called fire-and-forget in the background so the opponent still picks up the
   `playing` status if their own countdown hasn't fired yet
 
+### Fight Rematch Flow (bypasses matchmaking screen)
+
+Between fight rounds, `fightNextRound()` calls `_startFightRematch()` instead of the standard
+`startMatchmaking()`. Key differences:
+
+- Screen stays on `matchResults` — no matchmaking waiting screen is shown
+- `_fightRematchSearching = true` while re-queuing; results screen shows a spinner
+- Both players re-join the queue with `preferOpponentUid` set to each other → matched in ~1 s
+- `_subscribeToMatch()` accepts `matchResults` as a valid source screen so it can navigate
+  directly to `matchLobby` without going through the matchmaking screen
+- **Fallback**: if opponent doesn't re-queue within 10 s, falls back to standard matchmaking screen
+- `matchReturnToMenu()` calls `leaveQueue()` if the player exits during `_fightRematchSearching`
+
 ### Heartbeat / Disconnect Detection
 - Each client calls `sendHeartbeat(matchId, isPlayer1)` every **10 seconds** (`_heartbeatInterval`)
 - `_opponentGone(match, myUid)` returns `true` if opponent's heartbeat timestamp is **> 30 seconds old** (`_heartbeatTimeout`)
