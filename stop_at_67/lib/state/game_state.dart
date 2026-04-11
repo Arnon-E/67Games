@@ -1396,7 +1396,8 @@ class GameState extends ChangeNotifier {
 
     _fightRematchSearching = true;
     _matchSearching = true;
-    _currentMatch = null;
+    // Do NOT null _currentMatch — results screen needs it to stay rendered
+    // while we silently search for the next round's match.
     _matchPlayerStopped = false;
     _matchTimedOut = false;
     _isBotMatch = false;
