@@ -9,6 +9,7 @@ import '../engine/constants.dart';
 import '../engine/scoring.dart';
 import '../engine/progression.dart';
 import '../engine/timer_engine.dart';
+import 'package:in_app_review/in_app_review.dart';
 import '../services/storage_service.dart';
 import '../services/sound_service.dart';
 import '../services/ads_service.dart';
@@ -818,6 +819,7 @@ class GameState extends ChangeNotifier {
         ),
         _storage.saveWeeklyMissions(_weeklyMissions),
       ]).catchError((_) => <void>[]);
+      _maybeRequestReview().catchError((_) {});
     }
 
     // Submit to online leaderboard if signed in.
@@ -842,6 +844,19 @@ class GameState extends ChangeNotifier {
           score: scoreToSubmit,
         );
       }
+    }
+  }
+
+  // Request an in-app review once the user has played at least 7 games and
+  // we haven't prompted them before. The OS rate-limits actual dialogs shown.
+  Future<void> _maybeRequestReview() async {
+    if (_stats.totalGames < 7) return;
+    final alreadyRequested = await _storage.loadRatingRequested();
+    if (alreadyRequested) return;
+    final inAppReview = InAppReview.instance;
+    if (await inAppReview.isAvailable()) {
+      await _storage.saveRatingRequested();
+      await inAppReview.requestReview();
     }
   }
 
