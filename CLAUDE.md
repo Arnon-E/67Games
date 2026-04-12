@@ -209,6 +209,7 @@ stop_at_67_weekly_missions    ← WeeklyMissionsState JSON
 stop_at_67_streak             ← streak data
 stop_at_67_sound_enabled      ← bool
 stop_at_67_language           ← 'en' | 'he' | 'ru'
+stop_at_67_rating_requested   ← bool — true once the OS rating dialog has been requested
 ```
 
 ---
@@ -283,4 +284,4 @@ AppColors.textDisabled   // #6C728A
 
 ---
 
-*Last updated: 2026-04-08 — Fight Mode implemented.*
+*Last updated: 2026-04-12 — App rating prompt added (in_app_review, triggers after 7 games, once per install).*
