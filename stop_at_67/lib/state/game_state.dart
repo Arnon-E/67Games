@@ -1398,6 +1398,13 @@ class GameState extends ChangeNotifier {
     _fightRound = 1;
     _lastRoundMyDamage = 0;
     _lastRoundOpponentDamage = 0;
+    // Reset round/speed/series so a fresh fight always starts clean,
+    // even when _rematchOpponentUid is set (re-queuing with same opponent
+    // after a completed fight). startMatchmaking() only resets these when
+    // _rematchOpponentUid is null, which it isn't after a finished fight.
+    _rematchRound = 1;
+    _matchSpeedMultiplier = 1.0;
+    _resetMatchSeriesRecord();
     await startMatchmaking(acceptSpeedUp: false);
   }
 
