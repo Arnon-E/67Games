@@ -32,12 +32,14 @@ enum AppScreen {
   matchLobby,
   matchPlaying,
   matchResults,
+  fightInvite,
 }
 
 class GameState extends ChangeNotifier {
   final StorageService _storage;
   final SoundService _sound;
   final AdsService _ads;
+  AdsService get ads => _ads;
 
   // ── Navigation ─────────────────────────────────────────────
   AppScreen _screen = AppScreen.menu;
@@ -243,6 +245,20 @@ class GameState extends ChangeNotifier {
   int get lastRoundOpponentDamage => _lastRoundOpponentDamage;
   bool get isFightOver =>
       _fightModeActive && (_myFightHp <= 0 || _opponentFightHp <= 0);
+
+  // ── Fight invite ─────────────────────────────────────────────
+  String? _fightInviteCode;
+  String? get fightInviteCode => _fightInviteCode;
+  StreamSubscription<Map<String, dynamic>?>? _fightInviteSub;
+  /// Error message for join-by-code flow (null = no error).
+  String? _fightInviteError;
+  String? get fightInviteError => _fightInviteError;
+  bool _fightInviteLoading = false;
+  bool get fightInviteLoading => _fightInviteLoading;
+
+  // ── Multiplayer match counter (for interstitial pacing) ──────
+  int _multiplayerMatchesCompleted = 0;
+  int get multiplayerMatchesCompleted => _multiplayerMatchesCompleted;
 
   GameState({
     required StorageService storage,
@@ -1385,6 +1401,115 @@ class GameState extends ChangeNotifier {
     await startMatchmaking(acceptSpeedUp: false);
   }
 
+  /// Start fight-mode matchmaking targeting a specific invited partner.
+  Future<void> _startFightInviteMatch(String partnerUid) async {
+    _rematchOpponentUid = partnerUid;
+    _rematchRound = 1;
+    _matchSpeedMultiplier = 1.0;
+    _resetMatchSeriesRecord();
+    _fightModeActive = true;
+    _myFightHp = kFightMaxHp;
+    _opponentFightHp = kFightMaxHp;
+    _fightRound = 1;
+    _lastRoundMyDamage = 0;
+    _lastRoundOpponentDamage = 0;
+    await startMatchmaking(acceptSpeedUp: false);
+  }
+
+  // ── Fight invite (host side) ──────────────────────────────────
+
+  /// Create a private fight invite and navigate to the invite screen.
+  Future<void> createFightInvite() async {
+    if (!_authState.isSignedIn) {
+      _authReturnScreen = AppScreen.fightInvite;
+      _screen = AppScreen.auth;
+      notifyListeners();
+      return;
+    }
+    _fightInviteCode = null;
+    _fightInviteError = null;
+    _screen = AppScreen.fightInvite;
+    notifyListeners();
+
+    try {
+      final code = await _matchmaking.createFightInvite(
+        hostUid: _authState.user!.uid,
+        hostName: _authState.userName,
+        wrestlerSkin: _loadout.wrestlerSkin,
+      );
+      _fightInviteCode = code;
+      notifyListeners();
+
+      // Watch for guest acceptance
+      _fightInviteSub?.cancel();
+      _fightInviteSub = _matchmaking.watchFightInvite(code).listen((data) async {
+        if (data == null) return; // deleted externally
+        if (data['status'] == 'accepted') {
+          final guestUid = data['guestUid'] as String?;
+          if (guestUid == null) return;
+          _fightInviteSub?.cancel();
+          _fightInviteSub = null;
+          // Delete invite doc — match will now proceed via queue
+          unawaited(_matchmaking.deleteFightInvite(code));
+          await _startFightInviteMatch(guestUid);
+        }
+      });
+    } catch (e) {
+      _fightInviteError = e.toString();
+      _screen = AppScreen.menu;
+      notifyListeners();
+    }
+  }
+
+  /// Cancel the pending fight invite (host taps Cancel).
+  Future<void> cancelFightInvite() async {
+    _fightInviteSub?.cancel();
+    _fightInviteSub = null;
+    final code = _fightInviteCode;
+    _fightInviteCode = null;
+    _fightInviteError = null;
+    _screen = AppScreen.menu;
+    notifyListeners();
+    if (code != null) unawaited(_matchmaking.deleteFightInvite(code));
+  }
+
+  // ── Fight invite (guest side) ─────────────────────────────────
+
+  /// Join a fight by entering the host's invite code.
+  Future<void> joinFightByCode(String code) async {
+    if (!_authState.isSignedIn) {
+      _authReturnScreen = AppScreen.menu;
+      _screen = AppScreen.auth;
+      notifyListeners();
+      return;
+    }
+    _fightInviteError = null;
+    _fightInviteLoading = true;
+    notifyListeners();
+
+    try {
+      final hostUid = await _matchmaking.joinFightInvite(
+        code: code.trim().toUpperCase(),
+        guestUid: _authState.user!.uid,
+        guestName: _authState.userName,
+        wrestlerSkin: _loadout.wrestlerSkin,
+      );
+      if (hostUid == null) {
+        _fightInviteError = 'invalid_code';
+        _fightInviteLoading = false;
+        notifyListeners();
+        return;
+      }
+      _fightInviteLoading = false;
+      notifyListeners();
+      await _startFightInviteMatch(hostUid);
+    } catch (_) {
+      _fightInviteError = 'invalid_code';
+      _fightInviteLoading = false;
+      notifyListeners();
+    }
+  }
+
   /// Continue the fight to the next round (called from results screen).
   /// Speed increases automatically each round in fight mode.
   Future<void> fightNextRound() async {
@@ -1574,6 +1699,8 @@ class GameState extends ChangeNotifier {
         _startPrecisionTimer();
       } else if (match.status == MatchStatus.finished) {
         _stopHeartbeat();
+        // Track completed multiplayer matches for ad pacing
+        if (!_isBotMatch) _multiplayerMatchesCompleted++;
         // Remember opponent for rematch and bump speed for next round
         final myUid = _authState.user?.uid;
         _rematchOpponentUid = myUid == match.player1.uid
@@ -1875,6 +2002,11 @@ class GameState extends ChangeNotifier {
     if (_fightRematchSearching && _authState.isSignedIn) {
       unawaited(_matchmaking.leaveQueue(_authState.user!.uid));
     }
+    // Show interstitial every 3 completed multiplayer matches (non-bot).
+    if (!_isBotMatch && _multiplayerMatchesCompleted > 0 &&
+        _multiplayerMatchesCompleted % 3 == 0) {
+      unawaited(_ads.showInterstitial());
+    }
     _stopHeartbeat();
     _matchStreamSub?.cancel();
     _matchStreamSub = null;
@@ -1914,6 +2046,7 @@ class GameState extends ChangeNotifier {
     _matchHeartbeatTimer?.cancel();
     _matchAutoStopTimer?.cancel();
     _matchStreamSub?.cancel();
+    _fightInviteSub?.cancel();
     _matchmaking.dispose();
     super.dispose();
   }

@@ -368,6 +368,10 @@
   "matchModeFightVsBotSubtitle": "Бой с ботом — мгновенный матч",
   "matchModeFightVsPlayer": "Против игрока",
   "matchModeFightVsPlayerSubtitle": "Найди реального соперника онлайн",
+  "matchModeFightInviteTitle": "Пригласить друга",
+  "matchModeFightInviteSubtitle": "Поделись кодом — сразись с конкретным другом",
+  "matchModeFightJoinTitle": "Войти по коду",
+  "matchModeFightJoinSubtitle": "Есть код приглашения? Вход здесь",
 
   "fightRoundLabel": "РАУНД {round}",
   "@fightRoundLabel": {
@@ -393,5 +397,26 @@
   },
   "fightPlayAgain": "БОЙ СНОВА",
   "fightHpLabel": "HP",
-  "fightSpeedLabel": "СКОРОСТЬ"
+  "fightSpeedLabel": "СКОРОСТЬ",
+
+  "fightInviteTitle": "Пригласить друга",
+  "fightInviteSubtitle": "Поделись кодом с другом — он введёт его, чтобы присоединиться к бою.",
+  "fightInviteCodeLabel": "ВАШ КОД",
+  "fightInviteShareButton": "Поделиться приглашением",
+  "fightInviteShareText": "Вызываю тебя в режим Бой в Stop at 67!\nИспользуй код: {code}",
+  "@fightInviteShareText": {
+    "placeholders": {
+      "code": { "type": "String" }
+    }
+  },
+  "fightInviteWaiting": "Ожидание друга...",
+  "fightInviteExpiry": "Код действует 10 минут",
+  "fightInviteCancel": "Отменить приглашение",
+  "fightInviteCopied": "Код скопирован!",
+  "fightInviteTapToCopy": "Нажмите для копирования",
+  "fightInviteJoinTitle": "Войти в бой друга",
+  "fightInviteJoinSubtitle": "Введите 6-символьный код приглашения",
+  "fightInviteJoinButton": "ВОЙТИ В БОЙ",
+  "fightInviteJoinInvalid": "Неверный или просроченный код. Попробуйте снова.",
+  "fightInviteJoinShort": "Код должен быть 6 символов"
 }

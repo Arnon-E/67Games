@@ -16,6 +16,10 @@ class AdsService {
       ? 'ca-app-pub-3940256099942544/5224354917' // Google test rewarded
       : 'ca-app-pub-XXXXXXXXXXXXXXXX/XXXXXXXXXX'; // TODO: your real Android rewarded ID
 
+  static const _bannerAdUnitId = kDebugMode
+      ? 'ca-app-pub-3940256099942544/6300978111' // Google test banner
+      : 'ca-app-pub-XXXXXXXXXXXXXXXX/XXXXXXXXXX'; // TODO: your real Android banner ID
+
   InterstitialAd? _interstitialAd;
   RewardedAd? _rewardedAd;
 
@@ -147,6 +151,32 @@ class AdsService {
   bool get isInterstitialReady => _interstitialReady;
   bool get isRewardedReady => _rewardedReady;
 
+  /// Returns true when a single-player game count warrants an interstitial.
   static bool shouldShowAd(int gamesPlayed) =>
       gamesPlayed > 0 && gamesPlayed % 5 == 0;
+
+  /// Returns true when a 1v1 match count warrants a between-session interstitial.
+  /// Shows after every 3 completed multiplayer matches.
+  static bool shouldShow1v1Ad(int matchesCompleted) =>
+      matchesCompleted > 0 && matchesCompleted % 3 == 0;
+
+  // ── Banner ads (matchmaking waiting screen) ───────────────────
+
+  /// Create a banner ad pre-configured for the matchmaking screen.
+  /// The caller must call [BannerAd.load] and dispose when done.
+  BannerAd? createMatchmakingBanner({
+    required void Function(Ad ad) onLoaded,
+    required void Function(Ad ad, LoadAdError error) onFailedToLoad,
+  }) {
+    if (!adsEnabled) return null;
+    return BannerAd(
+      adUnitId: _bannerAdUnitId,
+      size: AdSize.banner,
+      request: const AdRequest(),
+      listener: BannerAdListener(
+        onAdLoaded: onLoaded,
+        onAdFailedToLoad: onFailedToLoad,
+      ),
+    );
+  }
 }

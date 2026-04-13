@@ -13,6 +13,7 @@ import '../widgets/coin_fly_animation.dart';
 import '../widgets/daily_reward_modal.dart';
 import '../widgets/update_dialog.dart';
 import '../services/update_service.dart';
+import 'fight_invite_screen.dart' show showJoinFightDialog;
 
 class MenuScreen extends StatefulWidget {
   const MenuScreen({super.key});
@@ -611,6 +612,28 @@ class _MenuScreenState extends State<MenuScreen>
                 onTap: () {
                   Navigator.pop(context);
                   gs.startFightMatchmaking();
+                },
+              ),
+              const SizedBox(height: 12),
+              _MatchModeOption(
+                emoji: '📨',
+                title: l10n.matchModeFightInviteTitle,
+                subtitle: l10n.matchModeFightInviteSubtitle,
+                color: AppColors.gold,
+                onTap: () {
+                  Navigator.pop(context);
+                  gs.createFightInvite();
+                },
+              ),
+              const SizedBox(height: 12),
+              _MatchModeOption(
+                emoji: '🔑',
+                title: l10n.matchModeFightJoinTitle,
+                subtitle: l10n.matchModeFightJoinSubtitle,
+                color: AppColors.textSecondary,
+                onTap: () {
+                  Navigator.pop(context);
+                  showJoinFightDialog(context);
                 },
               ),
             ],

@@ -898,6 +898,19 @@ class AppLocalizationsRu extends AppLocalizations {
       'Найди реального соперника онлайн';
 
   @override
+  String get matchModeFightInviteTitle => 'Пригласить друга';
+
+  @override
+  String get matchModeFightInviteSubtitle =>
+      'Поделись кодом — сразись с конкретным другом';
+
+  @override
+  String get matchModeFightJoinTitle => 'Войти по коду';
+
+  @override
+  String get matchModeFightJoinSubtitle => 'Есть код приглашения? Вход здесь';
+
+  @override
   String fightRoundLabel(int round) {
     return 'РАУНД $round';
   }
@@ -932,4 +945,52 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get fightSpeedLabel => 'СКОРОСТЬ';
+
+  @override
+  String get fightInviteTitle => 'Пригласить друга';
+
+  @override
+  String get fightInviteSubtitle =>
+      'Поделись кодом с другом — он введёт его, чтобы присоединиться к бою.';
+
+  @override
+  String get fightInviteCodeLabel => 'ВАШ КОД';
+
+  @override
+  String get fightInviteShareButton => 'Поделиться приглашением';
+
+  @override
+  String fightInviteShareText(String code) =>
+      'Вызываю тебя в режим Бой в Stop at 67!\nИспользуй код: $code';
+
+  @override
+  String get fightInviteWaiting => 'Ожидание друга...';
+
+  @override
+  String get fightInviteExpiry => 'Код действует 10 минут';
+
+  @override
+  String get fightInviteCancel => 'Отменить приглашение';
+
+  @override
+  String get fightInviteCopied => 'Код скопирован!';
+
+  @override
+  String get fightInviteTapToCopy => 'Нажмите для копирования';
+
+  @override
+  String get fightInviteJoinTitle => 'Войти в бой друга';
+
+  @override
+  String get fightInviteJoinSubtitle => 'Введите 6-символьный код приглашения';
+
+  @override
+  String get fightInviteJoinButton => 'ВОЙТИ В БОЙ';
+
+  @override
+  String get fightInviteJoinInvalid =>
+      'Неверный или просроченный код. Попробуйте снова.';
+
+  @override
+  String get fightInviteJoinShort => 'Код должен быть 6 символов';
 }

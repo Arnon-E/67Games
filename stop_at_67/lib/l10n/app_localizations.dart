@@ -1762,6 +1762,30 @@ abstract class AppLocalizations {
   /// **'Find a real opponent online'**
   String get matchModeFightVsPlayerSubtitle;
 
+  /// No description provided for @matchModeFightInviteTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Invite Friend'**
+  String get matchModeFightInviteTitle;
+
+  /// No description provided for @matchModeFightInviteSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Share a code — fight a specific person'**
+  String get matchModeFightInviteSubtitle;
+
+  /// No description provided for @matchModeFightJoinTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Join with Code'**
+  String get matchModeFightJoinTitle;
+
+  /// No description provided for @matchModeFightJoinSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Have an invite code? Join here'**
+  String get matchModeFightJoinSubtitle;
+
   /// No description provided for @fightRoundLabel.
   ///
   /// In en, this message translates to:
@@ -1821,6 +1845,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'SPEED'**
   String get fightSpeedLabel;
+
+  /// No description provided for @fightInviteTitle.
+  String get fightInviteTitle;
+
+  /// No description provided for @fightInviteSubtitle.
+  String get fightInviteSubtitle;
+
+  /// No description provided for @fightInviteCodeLabel.
+  String get fightInviteCodeLabel;
+
+  /// No description provided for @fightInviteShareButton.
+  String get fightInviteShareButton;
+
+  /// No description provided for @fightInviteShareText.
+  ///
+  /// In en, this message translates to:
+  /// **'Challenge me to Fight Mode in Stop at 67!\nUse code: {code}'**
+  String fightInviteShareText(String code);
+
+  /// No description provided for @fightInviteWaiting.
+  String get fightInviteWaiting;
+
+  /// No description provided for @fightInviteExpiry.
+  String get fightInviteExpiry;
+
+  /// No description provided for @fightInviteCancel.
+  String get fightInviteCancel;
+
+  /// No description provided for @fightInviteCopied.
+  String get fightInviteCopied;
+
+  /// No description provided for @fightInviteTapToCopy.
+  String get fightInviteTapToCopy;
+
+  /// No description provided for @fightInviteJoinTitle.
+  String get fightInviteJoinTitle;
+
+  /// No description provided for @fightInviteJoinSubtitle.
+  String get fightInviteJoinSubtitle;
+
+  /// No description provided for @fightInviteJoinButton.
+  String get fightInviteJoinButton;
+
+  /// No description provided for @fightInviteJoinInvalid.
+  String get fightInviteJoinInvalid;
+
+  /// No description provided for @fightInviteJoinShort.
+  String get fightInviteJoinShort;
 }
 
 class _AppLocalizationsDelegate

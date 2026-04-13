@@ -22,6 +22,7 @@ import 'screens/matchmaking_screen.dart';
 import 'screens/match_lobby_screen.dart';
 import 'screens/match_playing_screen.dart';
 import 'screens/match_results_screen.dart';
+import 'screens/fight_invite_screen.dart';
 
 class StopAt67App extends StatelessWidget {
   const StopAt67App({super.key});
@@ -71,6 +72,7 @@ class _ScreenSwitcher extends StatelessWidget {
     AppScreen.matchLobby    => null, // can't leave a matched lobby
     AppScreen.matchPlaying  => null, // can't leave during play
     AppScreen.matchResults  => AppScreen.menu,
+    AppScreen.fightInvite   => AppScreen.menu,
   };
 
   @override
@@ -101,6 +103,8 @@ class _ScreenSwitcher extends StatelessWidget {
             gs.cancelMatchmaking();
           } else if (screen == AppScreen.matchResults) {
             gs.matchReturnToMenu();
+          } else if (screen == AppScreen.fightInvite) {
+            gs.cancelFightInvite();
           } else {
             gs.setScreen(backTarget);
           }
@@ -133,6 +137,7 @@ class _ScreenSwitcher extends StatelessWidget {
       AppScreen.matchLobby    => const MatchLobbyScreen(),
       AppScreen.matchPlaying  => const MatchPlayingScreen(),
       AppScreen.matchResults  => const MatchResultsScreen(),
+      AppScreen.fightInvite   => const FightInviteScreen(),
     };
   }
 }
