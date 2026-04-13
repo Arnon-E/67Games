@@ -125,19 +125,26 @@ Used exclusively in Fight Mode. Drawn with `CustomPainter` in `widgets/wrestler_
 
 ### Ad Placements
 
-| Ad Type | Trigger | Test Unit ID |
-|---------|---------|-------------|
-| Interstitial | Every 5th game start | `ca-app-pub-3940256099942544/1033173712` |
-| Rewarded | Pressure mode retry | `ca-app-pub-3940256099942544/5224354917` |
+| Ad Type | Screen / Trigger | Notes |
+|---------|-----------------|-------|
+| Interstitial | Every 5th single-player game (before countdown) | `shouldShowAd(gamesPlayed)` |
+| Rewarded | Pressure mode retry / Surge lives | `showRewarded(onRewarded)` |
+| **Banner** | **Matchmaking screen while waiting** | Loaded by `MatchmakingScreen`, disposed on exit |
+| **Interstitial** | **After Fight Mode KO (~2.4 s delay)** | Fires once per fight series end, real matches only |
+| **Interstitial** | **Every 3 completed real 1v1 matches** | `shouldShow1v1Ad(matchesCompleted)`, on menu return |
+
+### Ad Unit IDs (`ads_service.dart`)
+
+| Slot | Debug (Google Test) | Production |
+|------|---------------------|-----------|
+| Interstitial | `ca-app-pub-3940256099942544/1033173712` | TODO: replace `XXXXXXXXXXXXXXXX` |
+| Rewarded | `ca-app-pub-3940256099942544/5224354917` | TODO: replace `XXXXXXXXXXXXXXXX` |
+| **Banner** | `ca-app-pub-3940256099942544/6300978111` | TODO: replace `XXXXXXXXXXXXXXXX` |
 
 **To re-enable ads:**
 1. Set `adsEnabled = true` in `ads_service.dart`
-2. Replace test IDs with real AdMob unit IDs on lines 13 and 17
-3. Test with test IDs first
-
-**Ad Frequency:**
-- Interstitials: shown before countdown (every 5 games)
-- `_gamesAtLastAd` tracks when last ad was shown
+2. Replace all three `XXXXXXXXXXXXXXXX` placeholders with real AdMob unit IDs
+3. Test with debug test IDs first (already set via `kDebugMode` ternary)
 
 ---
 

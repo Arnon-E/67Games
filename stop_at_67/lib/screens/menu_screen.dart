@@ -13,6 +13,7 @@ import '../widgets/coin_fly_animation.dart';
 import '../widgets/daily_reward_modal.dart';
 import '../widgets/update_dialog.dart';
 import '../services/update_service.dart';
+import 'fight_invite_screen.dart' show showJoinFightDialog;
 
 class MenuScreen extends StatefulWidget {
   const MenuScreen({super.key});
@@ -21,9 +22,9 @@ class MenuScreen extends StatefulWidget {
   State<MenuScreen> createState() => _MenuScreenState();
 }
 
-class _MenuScreenState extends State<MenuScreen>
-    with TickerProviderStateMixin {
-  static bool _updateCheckedThisSession = false; // guard against repeated checks within one session
+class _MenuScreenState extends State<MenuScreen> with TickerProviderStateMixin {
+  static bool _updateCheckedThisSession =
+      false; // guard against repeated checks within one session
 
   late AnimationController _pulseController;
   late Animation<double> _pulseAnimation;
@@ -59,7 +60,8 @@ class _MenuScreenState extends State<MenuScreen>
       TweenSequenceItem(tween: Tween(begin: 1.0, end: 1.45), weight: 40),
       TweenSequenceItem(tween: Tween(begin: 1.45, end: 0.88), weight: 25),
       TweenSequenceItem(tween: Tween(begin: 0.88, end: 1.0), weight: 35),
-    ]).animate(CurvedAnimation(parent: _coinBounceController, curve: Curves.easeOut));
+    ]).animate(
+        CurvedAnimation(parent: _coinBounceController, curve: Curves.easeOut));
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final gs = context.read<GameState>();
@@ -118,8 +120,8 @@ class _MenuScreenState extends State<MenuScreen>
 
     final coinPos = box.localToGlobal(box.size.center(Offset.zero));
     final screenSize = MediaQuery.of(context).size;
-    final from = sourceOffset ??
-        Offset(screenSize.width / 2, screenSize.height * 0.82);
+    final from =
+        sourceOffset ?? Offset(screenSize.width / 2, screenSize.height * 0.82);
 
     CoinFlyAnimation.show(
       context: context,
@@ -155,322 +157,339 @@ class _MenuScreenState extends State<MenuScreen>
         child: SafeArea(
           child: SingleChildScrollView(
             child: Column(
-                  children: [
-              // Top bar
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    // Level chip
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: AppColors.darkElevated,
-                        borderRadius: BorderRadius.circular(20),
+              children: [
+                // Top bar
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      // Level chip
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: AppColors.darkElevated,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Text(
+                          l10n.menuLevel(levelInfo.level),
+                          style: const TextStyle(
+                              color: AppColors.textSecondary, fontSize: 13),
+                        ),
                       ),
-                      child: Text(
-                        l10n.menuLevel(levelInfo.level),
-                        style: const TextStyle(color: AppColors.textSecondary, fontSize: 13),
+                      // Coins with bounce animation on increase
+                      AnimatedBuilder(
+                        animation: _coinBounceAnimation,
+                        builder: (context, child) => Transform.scale(
+                          scale: _coinBounceAnimation.value,
+                          child: child,
+                        ),
+                        child: Row(
+                          key: _coinKey,
+                          children: [
+                            const Icon(Icons.circle,
+                                color: AppColors.gold, size: 14),
+                            const SizedBox(width: 4),
+                            AnimatedSwitcher(
+                              duration: const Duration(milliseconds: 300),
+                              transitionBuilder: (child, anim) =>
+                                  ScaleTransition(
+                                scale: anim,
+                                child: child,
+                              ),
+                              child: Text(
+                                '${gs.coins}',
+                                key: ValueKey(gs.coins),
+                                style: const TextStyle(
+                                  color: AppColors.gold,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      // Settings
+                      GestureDetector(
+                        onTap: () => gs.setScreen(AppScreen.settings),
+                        child: const Icon(Icons.settings_outlined,
+                            color: AppColors.textDisabled, size: 24),
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 24),
+
+                // Logo with shimmer glow
+                disableAnimations
+                    ? Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            l10n.menuLogo,
+                            style: const TextStyle(
+                              fontSize: 96,
+                              fontWeight: FontWeight.w100,
+                              color: AppColors.textPrimary,
+                              letterSpacing: -4,
+                            ),
+                          ),
+                          Text(
+                            l10n.menuSubtitle,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              color: AppColors.textDisabled,
+                              letterSpacing: 1,
+                            ),
+                          ),
+                        ],
+                      )
+                    : AnimatedBuilder(
+                        animation: _glowAnimation,
+                        builder: (context, child) {
+                          final glowOpacity =
+                              0.15 + _glowAnimation.value * 0.25;
+                          return Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              ShaderMask(
+                                shaderCallback: (bounds) {
+                                  final offset = _glowAnimation.value * 2 - 0.5;
+                                  return LinearGradient(
+                                    begin: Alignment(-1.0 + offset, 0),
+                                    end: Alignment(0.0 + offset, 0),
+                                    colors: const [
+                                      AppColors.textPrimary,
+                                      AppColors.gold,
+                                      AppColors.textPrimary,
+                                    ],
+                                    stops: const [0.0, 0.5, 1.0],
+                                  ).createShader(bounds);
+                                },
+                                child: Text(
+                                  l10n.menuLogo,
+                                  style: TextStyle(
+                                    fontSize: 96,
+                                    fontWeight: FontWeight.w100,
+                                    color: AppColors.textPrimary,
+                                    letterSpacing: -4,
+                                    shadows: [
+                                      Shadow(
+                                        color: AppColors.orange
+                                            .withValues(alpha: glowOpacity),
+                                        blurRadius: 40,
+                                      ),
+                                      Shadow(
+                                        color: AppColors.gold.withValues(
+                                            alpha: glowOpacity * 0.6),
+                                        blurRadius: 80,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              Text(
+                                l10n.menuSubtitle,
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: AppColors.textDisabled,
+                                  letterSpacing: 1,
+                                  shadows: [
+                                    Shadow(
+                                      color: AppColors.orange
+                                          .withValues(alpha: glowOpacity * 0.3),
+                                      blurRadius: 20,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          );
+                        },
+                      ),
+
+                const SizedBox(height: 32),
+
+                // Rotating per-mode stats
+                const _RotatingModeStats(),
+
+                const SizedBox(height: 32),
+
+                // PLAY button with pulse
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 48),
+                  child: disableAnimations
+                      ? SizedBox(
+                          width: double.infinity,
+                          height: 64,
+                          child: ElevatedButton(
+                            onPressed: () => gs.setScreen(AppScreen.modeSelect),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.orange,
+                              foregroundColor: AppColors.textPrimary,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(32),
+                              ),
+                              elevation: 12,
+                              shadowColor:
+                                  AppColors.orange.withValues(alpha: 0.5),
+                            ),
+                            child: const Text(
+                              'PLAY',
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: 3,
+                              ),
+                            ),
+                          ),
+                        )
+                      : AnimatedBuilder(
+                          animation: _pulseAnimation,
+                          builder: (context, child) {
+                            final glowIntensity = _glowAnimation.value;
+                            return Transform.scale(
+                              scale: _pulseAnimation.value,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(32),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: AppColors.orange.withValues(
+                                          alpha: 0.3 + glowIntensity * 0.3),
+                                      blurRadius: 20 + glowIntensity * 20,
+                                      spreadRadius: glowIntensity * 8,
+                                    ),
+                                  ],
+                                ),
+                                child: child,
+                              ),
+                            );
+                          },
+                          child: SizedBox(
+                            width: double.infinity,
+                            height: 64,
+                            child: ElevatedButton(
+                              onPressed: () =>
+                                  gs.setScreen(AppScreen.modeSelect),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppColors.orange,
+                                foregroundColor: AppColors.textPrimary,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(32),
+                                ),
+                                elevation: 12,
+                                shadowColor:
+                                    AppColors.orange.withValues(alpha: 0.5),
+                              ),
+                              child: Text(
+                                l10n.commonPlay,
+                                style: const TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w700,
+                                  letterSpacing: 3,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                ),
+
+                const SizedBox(height: 24),
+
+                // 1v1 Multiplayer button
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 48),
+                  child: SizedBox(
+                    width: double.infinity,
+                    height: 48,
+                    child: OutlinedButton.icon(
+                      onPressed: () => _showMatchModeSheet(context, gs, l10n),
+                      icon: const Icon(Icons.people, size: 20),
+                      label: Text(
+                        l10n.menuMultiplayer,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 1.5,
+                        ),
+                      ),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: AppColors.cyan,
+                        side: BorderSide(
+                            color: AppColors.cyan.withValues(alpha: 0.5)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(24),
+                        ),
                       ),
                     ),
-                    // Coins with bounce animation on increase
-                    AnimatedBuilder(
-                      animation: _coinBounceAnimation,
-                      builder: (context, child) => Transform.scale(
-                        scale: _coinBounceAnimation.value,
-                        child: child,
-                      ),
-                      child: Row(
-                        key: _coinKey,
-                        children: [
-                          const Icon(Icons.circle, color: AppColors.gold, size: 14),
-                          const SizedBox(width: 4),
-                          AnimatedSwitcher(
-                            duration: const Duration(milliseconds: 300),
-                            transitionBuilder: (child, anim) => ScaleTransition(
-                              scale: anim,
-                              child: child,
-                            ),
-                            child: Text(
-                              '${gs.coins}',
-                              key: ValueKey(gs.coins),
+                  ),
+                ),
+
+                const SizedBox(height: 24),
+
+                // Secondary nav row
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    _navButton(l10n.menuLeaderboard, Icons.leaderboard_outlined,
+                        () => gs.setScreen(AppScreen.leaderboard)),
+                    const SizedBox(width: 16),
+                    _navButton(l10n.menuProfile, Icons.person_outline,
+                        () => gs.setScreen(AppScreen.profile)),
+                    const SizedBox(width: 16),
+                    _navButton(l10n.menuShop, Icons.store_outlined,
+                        () => gs.setScreen(AppScreen.shop)),
+                  ],
+                ),
+
+                const SizedBox(height: 8),
+
+                // Weekly missions card
+                const _WeeklyMissionsCard(),
+
+                const SizedBox(height: 16),
+
+                // Daily reward button (if available)
+                if (gs.dailyRewards.canClaim)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 24),
+                    child: GestureDetector(
+                      onTap: _showDailyReward,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 20, vertical: 10),
+                        decoration: BoxDecoration(
+                          color: AppColors.gold.withValues(alpha: 0.15),
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(
+                            color: AppColors.gold.withValues(alpha: 0.4),
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(Icons.card_giftcard,
+                                color: AppColors.gold, size: 18),
+                            const SizedBox(width: 8),
+                            Text(
+                              l10n.menuDailyReward,
                               style: const TextStyle(
                                 color: AppColors.gold,
                                 fontSize: 14,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    // Settings
-                    GestureDetector(
-                      onTap: () => gs.setScreen(AppScreen.settings),
-                      child: const Icon(Icons.settings_outlined, color: AppColors.textDisabled, size: 24),
-                    ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 24),
-
-              // Logo with shimmer glow
-              disableAnimations
-                  ? Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          l10n.menuLogo,
-                          style: const TextStyle(
-                            fontSize: 96,
-                            fontWeight: FontWeight.w100,
-                            color: AppColors.textPrimary,
-                            letterSpacing: -4,
-                          ),
-                        ),
-                        Text(
-                          l10n.menuSubtitle,
-                          style: const TextStyle(
-                            fontSize: 16,
-                            color: AppColors.textDisabled,
-                            letterSpacing: 1,
-                          ),
-                        ),
-                      ],
-                    )
-                  : AnimatedBuilder(
-                animation: _glowAnimation,
-                builder: (context, child) {
-                  final glowOpacity = 0.15 + _glowAnimation.value * 0.25;
-                  return Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      ShaderMask(
-                        shaderCallback: (bounds) {
-                          final offset = _glowAnimation.value * 2 - 0.5;
-                          return LinearGradient(
-                            begin: Alignment(-1.0 + offset, 0),
-                            end: Alignment(0.0 + offset, 0),
-                            colors: const [
-                              AppColors.textPrimary,
-                              AppColors.gold,
-                              AppColors.textPrimary,
-                            ],
-                            stops: const [0.0, 0.5, 1.0],
-                          ).createShader(bounds);
-                        },
-                        child: Text(
-                          l10n.menuLogo,
-                          style: TextStyle(
-                            fontSize: 96,
-                            fontWeight: FontWeight.w100,
-                            color: AppColors.textPrimary,
-                            letterSpacing: -4,
-                            shadows: [
-                              Shadow(
-                                color: AppColors.orange.withValues(alpha: glowOpacity),
-                                blurRadius: 40,
-                              ),
-                              Shadow(
-                                color: AppColors.gold.withValues(alpha: glowOpacity * 0.6),
-                                blurRadius: 80,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      Text(
-                        l10n.menuSubtitle,
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: AppColors.textDisabled,
-                          letterSpacing: 1,
-                          shadows: [
-                            Shadow(
-                              color: AppColors.orange.withValues(alpha: glowOpacity * 0.3),
-                              blurRadius: 20,
-                            ),
                           ],
                         ),
                       ),
-                    ],
-                  );
-                },
-              ),
-
-              const SizedBox(height: 32),
-
-              // Rotating per-mode stats
-              const _RotatingModeStats(),
-
-              const SizedBox(height: 32),
-
-              // PLAY button with pulse
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 48),
-                child: disableAnimations
-                    ? SizedBox(
-                        width: double.infinity,
-                        height: 64,
-                        child: ElevatedButton(
-                          onPressed: () => gs.setScreen(AppScreen.modeSelect),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.orange,
-                            foregroundColor: AppColors.textPrimary,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(32),
-                            ),
-                            elevation: 12,
-                            shadowColor: AppColors.orange.withValues(alpha: 0.5),
-                          ),
-                          child: const Text(
-                            'PLAY',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.w700,
-                              letterSpacing: 3,
-                            ),
-                          ),
-                        ),
-                      )
-                    : AnimatedBuilder(
-                  animation: _pulseAnimation,
-                  builder: (context, child) {
-                    final glowIntensity = _glowAnimation.value;
-                    return Transform.scale(
-                      scale: _pulseAnimation.value,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(32),
-                          boxShadow: [
-                            BoxShadow(
-                              color: AppColors.orange.withValues(alpha: 0.3 + glowIntensity * 0.3),
-                              blurRadius: 20 + glowIntensity * 20,
-                              spreadRadius: glowIntensity * 8,
-                            ),
-                          ],
-                        ),
-                        child: child,
-                      ),
-                    );
-                  },
-                  child: SizedBox(
-                    width: double.infinity,
-                    height: 64,
-                    child: ElevatedButton(
-                      onPressed: () => gs.setScreen(AppScreen.modeSelect),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.orange,
-                        foregroundColor: AppColors.textPrimary,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(32),
-                        ),
-                        elevation: 12,
-                        shadowColor: AppColors.orange.withValues(alpha: 0.5),
-                      ),
-                      child: Text(
-                        l10n.commonPlay,
-                        style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: 3,
-                        ),
-                      ),
                     ),
                   ),
-                ),
-              ),
-
-              const SizedBox(height: 24),
-
-              // 1v1 Multiplayer button
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 48),
-                child: SizedBox(
-                  width: double.infinity,
-                  height: 48,
-                  child: OutlinedButton.icon(
-                    onPressed: () => _showMatchModeSheet(context, gs, l10n),
-                    icon: const Icon(Icons.people, size: 20),
-                    label: Text(
-                      l10n.menuMultiplayer,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: 1.5,
-                      ),
-                    ),
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: AppColors.cyan,
-                      side: BorderSide(color: AppColors.cyan.withValues(alpha: 0.5)),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(24),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 24),
-
-              // Secondary nav row
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  _navButton(l10n.menuLeaderboard, Icons.leaderboard_outlined,
-                      () => gs.setScreen(AppScreen.leaderboard)),
-                  const SizedBox(width: 16),
-                  _navButton(l10n.menuProfile, Icons.person_outline,
-                      () => gs.setScreen(AppScreen.profile)),
-                  const SizedBox(width: 16),
-                  _navButton(l10n.menuShop, Icons.store_outlined,
-                      () => gs.setScreen(AppScreen.shop)),
-                ],
-              ),
-
-              const SizedBox(height: 8),
-
-              // Weekly missions card
-              const _WeeklyMissionsCard(),
-
-              const SizedBox(height: 16),
-
-              // Daily reward button (if available)
-              if (gs.dailyRewards.canClaim)
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 24),
-                  child: GestureDetector(
-                    onTap: _showDailyReward,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                      decoration: BoxDecoration(
-                        color: AppColors.gold.withValues(alpha: 0.15),
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(
-                          color: AppColors.gold.withValues(alpha: 0.4),
-                        ),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Icon(Icons.card_giftcard, color: AppColors.gold, size: 18),
-                          const SizedBox(width: 8),
-                          Text(
-                            l10n.menuDailyReward,
-                            style: const TextStyle(
-                              color: AppColors.gold,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-            ],
+              ],
             ),
           ),
         ),
@@ -486,62 +505,69 @@ class _MenuScreenState extends State<MenuScreen>
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (_) => SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(24, 20, 24, 28),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Handle
-              Container(
-                width: 36,
-                height: 4,
-                margin: const EdgeInsets.only(bottom: 20),
-                decoration: BoxDecoration(
-                  color: AppColors.textHint,
-                  borderRadius: BorderRadius.circular(2),
-                ),
+      isScrollControlled: true,
+      builder: (sheetContext) {
+        final screenHeight = MediaQuery.of(sheetContext).size.height;
+        return SafeArea(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(maxHeight: screenHeight * 0.9),
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(24, 20, 24, 28),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Handle
+                  Container(
+                    width: 36,
+                    height: 4,
+                    margin: const EdgeInsets.only(bottom: 20),
+                    decoration: BoxDecoration(
+                      color: AppColors.textHint,
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                  Text(
+                    l10n.matchModeSheetTitle,
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.textPrimary,
+                      letterSpacing: 1,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  // Quick Match
+                  _MatchModeOption(
+                    emoji: '⚡',
+                    title: l10n.matchModeQuickTitle,
+                    subtitle: l10n.matchModeQuickSubtitle,
+                    color: AppColors.cyan,
+                    onTap: () {
+                      Navigator.pop(context);
+                      gs.startMatchmaking();
+                    },
+                  ),
+                  const SizedBox(height: 12),
+                  // Fight Mode
+                  _MatchModeOption(
+                    emoji: '🥊',
+                    title: l10n.matchModeFightTitle,
+                    subtitle: l10n.matchModeFightSubtitle,
+                    color: AppColors.orange,
+                    onTap: () {
+                      Navigator.pop(context);
+                      // Start decoding all wrestler PNGs in background so the
+                      // lobby and results screens don't stall on first render.
+                      precacheWrestlerImages(context);
+                      _showFightModeSheet(context, gs, l10n);
+                    },
+                  ),
+                ],
               ),
-              Text(
-                l10n.matchModeSheetTitle,
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.textPrimary,
-                  letterSpacing: 1,
-                ),
-              ),
-              const SizedBox(height: 20),
-              // Quick Match
-              _MatchModeOption(
-                emoji: '⚡',
-                title: l10n.matchModeQuickTitle,
-                subtitle: l10n.matchModeQuickSubtitle,
-                color: AppColors.cyan,
-                onTap: () {
-                  Navigator.pop(context);
-                  gs.startMatchmaking();
-                },
-              ),
-              const SizedBox(height: 12),
-              // Fight Mode
-              _MatchModeOption(
-                emoji: '🥊',
-                title: l10n.matchModeFightTitle,
-                subtitle: l10n.matchModeFightSubtitle,
-                color: AppColors.orange,
-                onTap: () {
-                  Navigator.pop(context);
-                  // Start decoding all wrestler PNGs in background so the
-                  // lobby and results screens don't stall on first render.
-                  precacheWrestlerImages(context);
-                  _showFightModeSheet(context, gs, l10n);
-                },
-              ),
-            ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 
@@ -553,70 +579,99 @@ class _MenuScreenState extends State<MenuScreen>
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (_) => SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(24, 20, 24, 28),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 36,
-                height: 4,
-                margin: const EdgeInsets.only(bottom: 20),
-                decoration: BoxDecoration(
-                  color: AppColors.textHint,
-                  borderRadius: BorderRadius.circular(2),
-                ),
+      isScrollControlled: true,
+      builder: (sheetContext) {
+        final screenHeight = MediaQuery.of(sheetContext).size.height;
+        return SafeArea(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(maxHeight: screenHeight * 0.9),
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(24, 20, 24, 28),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 36,
+                    height: 4,
+                    margin: const EdgeInsets.only(bottom: 20),
+                    decoration: BoxDecoration(
+                      color: AppColors.textHint,
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                  const Text(
+                    '🥊',
+                    style: TextStyle(fontSize: 36),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    l10n.matchModeFightTitle,
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.orange,
+                      letterSpacing: 1,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    l10n.matchModeFightDescription,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      fontSize: 13,
+                      color: AppColors.textDisabled,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  _MatchModeOption(
+                    emoji: '🤖',
+                    title: l10n.matchModeFightVsBot,
+                    subtitle: l10n.matchModeFightVsBotSubtitle,
+                    color: AppColors.orange,
+                    onTap: () {
+                      Navigator.pop(context);
+                      gs.startFightVsBot();
+                    },
+                  ),
+                  const SizedBox(height: 12),
+                  _MatchModeOption(
+                    emoji: '🌐',
+                    title: l10n.matchModeFightVsPlayer,
+                    subtitle: l10n.matchModeFightVsPlayerSubtitle,
+                    color: AppColors.cyan,
+                    onTap: () {
+                      Navigator.pop(context);
+                      gs.startFightMatchmaking();
+                    },
+                  ),
+                  const SizedBox(height: 12),
+                  _MatchModeOption(
+                    emoji: '📨',
+                    title: l10n.matchModeFightInviteTitle,
+                    subtitle: l10n.matchModeFightInviteSubtitle,
+                    color: AppColors.gold,
+                    onTap: () {
+                      Navigator.pop(context);
+                      gs.createFightInvite();
+                    },
+                  ),
+                  const SizedBox(height: 12),
+                  _MatchModeOption(
+                    emoji: '🔑',
+                    title: l10n.matchModeFightJoinTitle,
+                    subtitle: l10n.matchModeFightJoinSubtitle,
+                    color: AppColors.textSecondary,
+                    onTap: () {
+                      Navigator.pop(context);
+                      showJoinFightDialog(context);
+                    },
+                  ),
+                ],
               ),
-              const Text(
-                '🥊',
-                style: TextStyle(fontSize: 36),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                l10n.matchModeFightTitle,
-                style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.orange,
-                  letterSpacing: 1,
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                l10n.matchModeFightDescription,
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontSize: 13,
-                  color: AppColors.textDisabled,
-                ),
-              ),
-              const SizedBox(height: 20),
-              _MatchModeOption(
-                emoji: '🤖',
-                title: l10n.matchModeFightVsBot,
-                subtitle: l10n.matchModeFightVsBotSubtitle,
-                color: AppColors.orange,
-                onTap: () {
-                  Navigator.pop(context);
-                  gs.startFightVsBot();
-                },
-              ),
-              const SizedBox(height: 12),
-              _MatchModeOption(
-                emoji: '🌐',
-                title: l10n.matchModeFightVsPlayer,
-                subtitle: l10n.matchModeFightVsPlayerSubtitle,
-                color: AppColors.cyan,
-                onTap: () {
-                  Navigator.pop(context);
-                  gs.startFightMatchmaking();
-                },
-              ),
-            ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 
@@ -634,7 +689,9 @@ class _MenuScreenState extends State<MenuScreen>
           children: [
             Icon(icon, color: AppColors.textDisabled, size: 16),
             const SizedBox(width: 6),
-            Text(label, style: const TextStyle(color: AppColors.textDisabled, fontSize: 12)),
+            Text(label,
+                style: const TextStyle(
+                    color: AppColors.textDisabled, fontSize: 12)),
           ],
         ),
       ),
@@ -673,20 +730,21 @@ class _RotatingModeStatsState extends State<_RotatingModeStats> {
     super.dispose();
   }
 
-  String _modeNameL10n(String modeId, AppLocalizations l10n) => switch (modeId) {
-    'classic'      => l10n.modeClassicName,
-    'extended'     => l10n.modeExtendedName,
-    'blind'        => l10n.modeBlindName,
-    'reverse'      => l10n.modeReverseName,
-    'reverse100'   => l10n.modeReverse100Name,
-    'daily'        => l10n.modeDailyName,
-    'surge'        => l10n.modeSurgeName,
-    'doubletap'    => l10n.modeDoubleTapName,
-    'movingtarget' => l10n.modeMovingTargetName,
-    'calibration'  => l10n.modeCalibrationName,
-    'pressure'     => l10n.modePressureName,
-    _              => modeId,
-  };
+  String _modeNameL10n(String modeId, AppLocalizations l10n) =>
+      switch (modeId) {
+        'classic' => l10n.modeClassicName,
+        'extended' => l10n.modeExtendedName,
+        'blind' => l10n.modeBlindName,
+        'reverse' => l10n.modeReverseName,
+        'reverse100' => l10n.modeReverse100Name,
+        'daily' => l10n.modeDailyName,
+        'surge' => l10n.modeSurgeName,
+        'doubletap' => l10n.modeDoubleTapName,
+        'movingtarget' => l10n.modeMovingTargetName,
+        'calibration' => l10n.modeCalibrationName,
+        'pressure' => l10n.modePressureName,
+        _ => modeId,
+      };
 
   List<String> _getPlayedModes(GameState gs) {
     final played = gs.stats.modeGamesPlayed.entries
@@ -731,7 +789,8 @@ class _RotatingModeStatsState extends State<_RotatingModeStats> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      _statItem(l10n.menuGames, '${gs.stats.modeGamesPlayed[modeId] ?? 0}'),
+                      _statItem(l10n.menuGames,
+                          '${gs.stats.modeGamesPlayed[modeId] ?? 0}'),
                       _statItem(l10n.menuBest, best > 0 ? '$best' : '—'),
                       _statItem(l10n.menuStreak, '$streak'),
                     ],
@@ -779,22 +838,22 @@ class _RotatingModeStatsState extends State<_RotatingModeStats> {
 // ── Mission l10n helpers ─────────────────────────────────────
 
 String _missionLabel(String id, AppLocalizations l10n) => switch (id) {
-  'play_10'   => l10n.weeklyMissionPlay10Label,
-  'perfect_3' => l10n.weeklyMissionPerfect3Label,
-  'modes_3'   => l10n.weeklyMissionModes3Label,
-  'score_900' => l10n.weeklyMissionScore900Label,
-  'streak_5'  => l10n.weeklyMissionStreak5Label,
-  _           => id,
-};
+      'play_10' => l10n.weeklyMissionPlay10Label,
+      'perfect_3' => l10n.weeklyMissionPerfect3Label,
+      'modes_3' => l10n.weeklyMissionModes3Label,
+      'score_900' => l10n.weeklyMissionScore900Label,
+      'streak_5' => l10n.weeklyMissionStreak5Label,
+      _ => id,
+    };
 
 String _missionDesc(String id, AppLocalizations l10n) => switch (id) {
-  'play_10'   => l10n.weeklyMissionPlay10Desc,
-  'perfect_3' => l10n.weeklyMissionPerfect3Desc,
-  'modes_3'   => l10n.weeklyMissionModes3Desc,
-  'score_900' => l10n.weeklyMissionScore900Desc,
-  'streak_5'  => l10n.weeklyMissionStreak5Desc,
-  _           => id,
-};
+      'play_10' => l10n.weeklyMissionPlay10Desc,
+      'perfect_3' => l10n.weeklyMissionPerfect3Desc,
+      'modes_3' => l10n.weeklyMissionModes3Desc,
+      'score_900' => l10n.weeklyMissionScore900Desc,
+      'streak_5' => l10n.weeklyMissionStreak5Desc,
+      _ => id,
+    };
 
 // ── Weekly Missions Card ─────────────────────────────────────
 
@@ -823,7 +882,12 @@ class _WeeklyMissionsCardState extends State<_WeeklyMissionsCard> {
       final def = kWeeklyMissions.firstWhere(
         (d) => d.id == mp.missionId,
         orElse: () => const WeeklyMissionDef(
-          id: '', label: '', description: '', target: 0, type: '', rewardCoins: 0,
+          id: '',
+          label: '',
+          description: '',
+          target: 0,
+          type: '',
+          rewardCoins: 0,
         ),
       );
       if (def.id.isEmpty) continue;
@@ -851,7 +915,8 @@ class _WeeklyMissionsCardState extends State<_WeeklyMissionsCard> {
             children: [
               // Header row
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 child: Row(
                   children: [
                     const Text('📋', style: TextStyle(fontSize: 16)),
@@ -872,7 +937,9 @@ class _WeeklyMissionsCardState extends State<_WeeklyMissionsCard> {
                           Text(
                             l10n.weeklyMissionsProgress(completed, total),
                             style: TextStyle(
-                              color: hasUnclaimed ? AppColors.gold : AppColors.textHint,
+                              color: hasUnclaimed
+                                  ? AppColors.gold
+                                  : AppColors.textHint,
                               fontSize: 11,
                             ),
                             textDirection: TextDirection.ltr,
@@ -882,11 +949,13 @@ class _WeeklyMissionsCardState extends State<_WeeklyMissionsCard> {
                     ),
                     if (hasUnclaimed)
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 3),
                         decoration: BoxDecoration(
                           color: AppColors.gold.withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(10),
-                          border: Border.all(color: AppColors.gold.withValues(alpha: 0.4)),
+                          border: Border.all(
+                              color: AppColors.gold.withValues(alpha: 0.4)),
                         ),
                         child: Text(
                           l10n.weeklyMissionsClaim,
@@ -930,7 +999,12 @@ class _WeeklyMissionsCardState extends State<_WeeklyMissionsCard> {
                   final def = kWeeklyMissions.firstWhere(
                     (d) => d.id == mp.missionId,
                     orElse: () => const WeeklyMissionDef(
-                      id: '', label: '', description: '', target: 0, type: '', rewardCoins: 0,
+                      id: '',
+                      label: '',
+                      description: '',
+                      target: 0,
+                      type: '',
+                      rewardCoins: 0,
                     ),
                   );
                   if (def.id.isEmpty) return const SizedBox.shrink();
@@ -984,7 +1058,11 @@ class _MissionRow extends StatelessWidget {
         children: [
           // Icon
           Text(
-            isClaimed ? '✅' : isDone ? '🎁' : '🎯',
+            isClaimed
+                ? '✅'
+                : isDone
+                    ? '🎁'
+                    : '🎯',
             style: const TextStyle(fontSize: 18),
           ),
           const SizedBox(width: 10),
@@ -997,7 +1075,8 @@ class _MissionRow extends StatelessWidget {
                 Text(
                   _missionLabel(def.id, l10n),
                   style: TextStyle(
-                    color: isClaimed ? AppColors.textHint : AppColors.textPrimary,
+                    color:
+                        isClaimed ? AppColors.textHint : AppColors.textPrimary,
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
                     decoration: isClaimed ? TextDecoration.lineThrough : null,
@@ -1006,7 +1085,8 @@ class _MissionRow extends StatelessWidget {
                 const SizedBox(height: 2),
                 Text(
                   _missionDesc(def.id, l10n),
-                  style: const TextStyle(color: AppColors.textDisabled, fontSize: 11),
+                  style: const TextStyle(
+                      color: AppColors.textDisabled, fontSize: 11),
                 ),
                 const SizedBox(height: 6),
                 Row(
@@ -1027,7 +1107,8 @@ class _MissionRow extends StatelessWidget {
                     const SizedBox(width: 8),
                     Text(
                       '${progress.progress.clamp(0, def.target)}/${def.target}',
-                      style: const TextStyle(color: AppColors.textHint, fontSize: 10),
+                      style: const TextStyle(
+                          color: AppColors.textHint, fontSize: 10),
                     ),
                   ],
                 ),
@@ -1046,7 +1127,10 @@ class _MissionRow extends StatelessWidget {
                   const SizedBox(width: 3),
                   Text(
                     '${def.rewardCoins}',
-                    style: const TextStyle(color: AppColors.gold, fontSize: 12, fontWeight: FontWeight.w600),
+                    style: const TextStyle(
+                        color: AppColors.gold,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600),
                   ),
                 ],
               ),
@@ -1055,11 +1139,13 @@ class _MissionRow extends StatelessWidget {
                 GestureDetector(
                   onTap: onClaim,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
                       color: AppColors.gold.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: AppColors.gold.withValues(alpha: 0.5)),
+                      border: Border.all(
+                          color: AppColors.gold.withValues(alpha: 0.5)),
                     ),
                     child: Text(
                       l10n.weeklyMissionsClaimButton,
@@ -1137,7 +1223,8 @@ class _MatchModeOption extends StatelessWidget {
                 ],
               ),
             ),
-            Icon(Icons.chevron_right, color: color.withValues(alpha: 0.6), size: 20),
+            Icon(Icons.chevron_right,
+                color: color.withValues(alpha: 0.6), size: 20),
           ],
         ),
       ),

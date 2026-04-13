@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 import '../l10n/app_localizations.dart';
 import '../state/game_state.dart';
@@ -10,8 +11,38 @@ import '../widgets/screen_header.dart';
 
 /// Matchmaking screen — shows a searching animation while waiting for an opponent.
 /// After 7 seconds with no match, displays a "Play vs Bot" option.
-class MatchmakingScreen extends StatelessWidget {
+class MatchmakingScreen extends StatefulWidget {
   const MatchmakingScreen({super.key});
+
+  @override
+  State<MatchmakingScreen> createState() => _MatchmakingScreenState();
+}
+
+class _MatchmakingScreenState extends State<MatchmakingScreen> {
+  BannerAd? _bannerAd;
+  bool _bannerLoaded = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _loadBanner());
+  }
+
+  void _loadBanner() {
+    if (!mounted) return;
+    final ads = context.read<GameState>().ads;
+    _bannerAd = ads.createMatchmakingBanner(
+      onLoaded: (_) { if (mounted) setState(() => _bannerLoaded = true); },
+      onFailedToLoad: (_, __) { if (mounted) setState(() => _bannerLoaded = false); },
+    );
+    _bannerAd?.load();
+  }
+
+  @override
+  void dispose() {
+    _bannerAd?.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -89,6 +120,17 @@ class MatchmakingScreen extends StatelessWidget {
               ],
 
               const Spacer(),
+
+              // Banner ad — shown while waiting for opponent
+              if (_bannerLoaded && _bannerAd != null) ...[
+                SizedBox(
+                  width: _bannerAd!.size.width.toDouble(),
+                  height: _bannerAd!.size.height.toDouble(),
+                  child: AdWidget(ad: _bannerAd!),
+                ),
+                const SizedBox(height: 12),
+              ],
+
               // Player identity bar
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 24),
