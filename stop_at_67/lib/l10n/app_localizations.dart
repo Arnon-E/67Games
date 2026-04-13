@@ -1847,15 +1847,27 @@ abstract class AppLocalizations {
   String get fightSpeedLabel;
 
   /// No description provided for @fightInviteTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Invite Friend'**
   String get fightInviteTitle;
 
   /// No description provided for @fightInviteSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Share the code with a friend — they enter it to join your fight.'**
   String get fightInviteSubtitle;
 
   /// No description provided for @fightInviteCodeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'YOUR CODE'**
   String get fightInviteCodeLabel;
 
   /// No description provided for @fightInviteShareButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Share Invite'**
   String get fightInviteShareButton;
 
   /// No description provided for @fightInviteShareText.
@@ -1865,33 +1877,63 @@ abstract class AppLocalizations {
   String fightInviteShareText(String code);
 
   /// No description provided for @fightInviteWaiting.
+  ///
+  /// In en, this message translates to:
+  /// **'Waiting for friend to join...'**
   String get fightInviteWaiting;
 
   /// No description provided for @fightInviteExpiry.
+  ///
+  /// In en, this message translates to:
+  /// **'Code expires in 10 minutes'**
   String get fightInviteExpiry;
 
   /// No description provided for @fightInviteCancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel Invite'**
   String get fightInviteCancel;
 
   /// No description provided for @fightInviteCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'Code copied!'**
   String get fightInviteCopied;
 
   /// No description provided for @fightInviteTapToCopy.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to copy'**
   String get fightInviteTapToCopy;
 
   /// No description provided for @fightInviteJoinTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Join Friend\'s Fight'**
   String get fightInviteJoinTitle;
 
   /// No description provided for @fightInviteJoinSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the 6-character invite code'**
   String get fightInviteJoinSubtitle;
 
   /// No description provided for @fightInviteJoinButton.
+  ///
+  /// In en, this message translates to:
+  /// **'JOIN FIGHT'**
   String get fightInviteJoinButton;
 
   /// No description provided for @fightInviteJoinInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid or expired code. Please try again.'**
   String get fightInviteJoinInvalid;
 
   /// No description provided for @fightInviteJoinShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Code must be 6 characters'**
   String get fightInviteJoinShort;
 }
 

@@ -107,8 +107,10 @@ class GameState extends ChangeNotifier {
   int _surgeGamesInSession = 0;
   int _surgeFailStreak = 0;
   bool _surgePendingReset = false;
+
   /// Cumulative score across all rounds in the current Accelerate session.
   int _surgeCumulativeScore = 0;
+
   /// Number of lives remaining (starts at 3, excellent+ adds 1, anything else subtracts 1).
   int _surgeLives = 3;
 
@@ -134,7 +136,8 @@ class GameState extends ChangeNotifier {
   // ── Double Tap mode ─────────────────────────────────────────
   // Phase: 0=not active, 1=running (waiting for mid-tap), 2=mid-done (waiting for stop)
   static const int _doubleTapMidpointMs = 3350;
-  static const int _doubleTapDeviationDivisor = 2; // average mid-tap + stop deviation
+  static const int _doubleTapDeviationDivisor =
+      2; // average mid-tap + stop deviation
   /// Maximum deviation from the midpoint that still lets the game continue.
   static const int _doubleTapMidToleranceMs = 500;
   int _doubleTapPhase = 0;
@@ -151,7 +154,8 @@ class GameState extends ChangeNotifier {
 
   // ── Calibration mode ────────────────────────────────────────
   List<ScoreResult> _calibrationResults = [];
-  List<ScoreResult> get calibrationResults => List.unmodifiable(_calibrationResults);
+  List<ScoreResult> get calibrationResults =>
+      List.unmodifiable(_calibrationResults);
 
   // ── Pressure mode ────────────────────────────────────────────
   static const int _pressureInitialToleranceMs = 50;
@@ -161,10 +165,13 @@ class GameState extends ChangeNotifier {
   int _pressureTolerance = _pressureInitialToleranceMs;
   int _pressureRoundsSucceeded = 0;
   bool _pressureLastRoundSuccess = false;
+
   /// Consecutive failed attempts at the current pressure level (resets on success).
   int _pressureFailAttempts = 0;
+
   /// True when the player has used their free retry and an ad retry is being offered.
   bool _pressurePendingAdRetry = false;
+
   /// True after all retries are exhausted — shows the final game-over result screen.
   bool _pressureGameOver = false;
   int get pressureTolerance => _pressureTolerance;
@@ -205,15 +212,18 @@ class GameState extends ChangeNotifier {
   Timer? _matchHeartbeatTimer;
   bool _matchTimedOut = false;
   bool get matchTimedOut => _matchTimedOut;
+
   /// True when the current match is against a local bot (no Firestore writes).
   bool _isBotMatch = false;
   bool get isBotMatch => _isBotMatch;
 
   /// Opponent UID to rematch with (set after a real match, cleared on menu return).
   String? _rematchOpponentUid;
+
   /// Round number within the current rematch streak (1 = first game, 2 = second, etc.)
   int _rematchRound = 1;
   int get rematchRound => _rematchRound;
+
   /// Speed multiplier applied to the match timer — increases each rematch round.
   double _matchSpeedMultiplier = 1.0;
   double get matchSpeedMultiplier => _matchSpeedMultiplier;
@@ -228,6 +238,7 @@ class GameState extends ChangeNotifier {
   static const int kFightMaxHp = 3;
   bool _fightModeActive = false;
   bool get fightModeActive => _fightModeActive;
+
   /// True while silently rejoining queue for a fight rematch (no matchmaking screen).
   bool _fightRematchSearching = false;
   bool get fightRematchSearching => _fightRematchSearching;
@@ -237,9 +248,11 @@ class GameState extends ChangeNotifier {
   int get opponentFightHp => _opponentFightHp;
   int _fightRound = 1;
   int get fightRound => _fightRound;
+
   /// Damage dealt to opponent this round (0 if opponent won or tie).
   int _lastRoundMyDamage = 0;
   int get lastRoundMyDamage => _lastRoundMyDamage;
+
   /// Damage taken this round (0 if I won or tie).
   int _lastRoundOpponentDamage = 0;
   int get lastRoundOpponentDamage => _lastRoundOpponentDamage;
@@ -250,11 +263,13 @@ class GameState extends ChangeNotifier {
   String? _fightInviteCode;
   String? get fightInviteCode => _fightInviteCode;
   StreamSubscription<Map<String, dynamic>?>? _fightInviteSub;
+
   /// Error message for join-by-code flow (null = no error).
   String? _fightInviteError;
   String? get fightInviteError => _fightInviteError;
   bool _fightInviteLoading = false;
   bool get fightInviteLoading => _fightInviteLoading;
+  String? _pendingFightInviteCode;
 
   // ── Multiplayer match counter (for interstitial pacing) ──────
   int _multiplayerMatchesCompleted = 0;
@@ -330,7 +345,8 @@ class GameState extends ChangeNotifier {
     if (mode == null) return;
     _currentMode = mode;
     // Reset any per-run state for the newly selected mode
-    _movingTargetCurrentTarget = mode.movingTarget ? _randomMovingTarget() : 6500;
+    _movingTargetCurrentTarget =
+        mode.movingTarget ? _randomMovingTarget() : 6500;
     _calibrationResults = [];
     _pressureTolerance = _pressureInitialToleranceMs;
     _pressureRoundsSucceeded = 0;
@@ -472,7 +488,8 @@ class GameState extends ChangeNotifier {
         (_movingTargetMaxMs - _movingTargetMinMs) ~/ _movingTargetStepMs;
     int target;
     do {
-      target = _movingTargetMinMs + _rng.nextInt(numSteps + 1) * _movingTargetStepMs;
+      target =
+          _movingTargetMinMs + _rng.nextInt(numSteps + 1) * _movingTargetStepMs;
     } while (target == _movingTargetCurrentTarget && numSteps > 0);
     return target;
   }
@@ -553,7 +570,8 @@ class GameState extends ChangeNotifier {
     if (mode.doubleTap) {
       // Build score directly from combined deviation (exponential curve)
       final rawScore = calculateRawScore(effectiveDeviation);
-      final streakMult = calculateStreakMultiplier(streakResult.streakForScoring);
+      final streakMult =
+          calculateStreakMultiplier(streakResult.streakForScoring);
       final finalScore = rawScore;
       result = ScoreResult(
         stoppedAtMs: stoppedAtMs,
@@ -568,7 +586,8 @@ class GameState extends ChangeNotifier {
       );
     } else if (mode.isPressure) {
       // Normal scoring for the individual round
-      result = calculateScore(stoppedAtMs, mode, streakResult.streakForScoring, bestScore);
+      result = calculateScore(
+          stoppedAtMs, mode, streakResult.streakForScoring, bestScore);
       // Update pressure state
       final hitTolerance = effectiveDeviation <= _pressureTolerance;
       _pressureLastRoundSuccess = hitTolerance;
@@ -578,7 +597,7 @@ class GameState extends ChangeNotifier {
         _pressureFailAttempts = 0;
         _pressurePendingAdRetry = false;
         _pressureTolerance = (_pressureTolerance - _pressureToleranceStepMs)
-                .clamp(_pressureMinToleranceMs, _pressureInitialToleranceMs);
+            .clamp(_pressureMinToleranceMs, _pressureInitialToleranceMs);
       } else {
         // Failure: track consecutive fail attempts at this level
         _pressureFailAttempts++;
@@ -658,7 +677,8 @@ class GameState extends ChangeNotifier {
     if (isExcellentOrAbove) {
       _hotStreak++;
       if (_hotStreak > 1) {
-        final hotBonus = 1.0 + (_hotStreak - 1) * 0.1; // +10% per extra consecutive excellent+
+        final hotBonus = 1.0 +
+            (_hotStreak - 1) * 0.1; // +10% per extra consecutive excellent+
         final boosted = (result.finalScore * hotBonus).round();
         result = ScoreResult(
           stoppedAtMs: result.stoppedAtMs,
@@ -703,7 +723,8 @@ class GameState extends ChangeNotifier {
 
     // Use averaged result for calibration final persistence
     ScoreResult resultToSave = result;
-    if (mode.isCalibration && _calibrationResults.length >= mode.calibrationRounds) {
+    if (mode.isCalibration &&
+        _calibrationResults.length >= mode.calibrationRounds) {
       final avgDev = _calibrationResults
               .map((r) => r.deviationMs)
               .reduce((a, b) => a + b) ~/
@@ -763,7 +784,10 @@ class GameState extends ChangeNotifier {
     // Only update session score for non-pressure, non-calibration, non-surge normal rounds
     if (!mode.isPressure && !mode.isCalibration && mode.id != 'surge') {
       final tier = result.rating.tier;
-      if (tier == 'great' || tier == 'excellent' || tier == 'incredible' || tier == 'perfect') {
+      if (tier == 'great' ||
+          tier == 'excellent' ||
+          tier == 'incredible' ||
+          tier == 'perfect') {
         _sessionScore += result.finalScore;
       } else if (tier == 'miss') {
         _sessionScore = (_sessionScore - 200).clamp(0, 999999);
@@ -773,7 +797,8 @@ class GameState extends ChangeNotifier {
       // If the session total now beats the stored best, patch newStats so it
       // gets persisted and submitted to the leaderboard.
       if (persistStats && _sessionScore > (newStats.bestScores[mode.id] ?? 0)) {
-        final patchedBest = Map<String, int>.from(newStats.bestScores)..[mode.id] = _sessionScore;
+        final patchedBest = Map<String, int>.from(newStats.bestScores)
+          ..[mode.id] = _sessionScore;
         newStats = newStats.copyWith(bestScores: patchedBest);
       }
     }
@@ -841,8 +866,10 @@ class GameState extends ChangeNotifier {
     // For surge/pressure/calibration: submit the single-round score as before.
     if (_authState.isSignedIn) {
       final uid = _authState.user!.uid;
-      final bool isSessionMode = !mode.isPressure && !mode.isCalibration && mode.id != 'surge';
-      final int scoreToSubmit = isSessionMode ? _sessionScore : resultToSave.finalScore;
+      final bool isSessionMode =
+          !mode.isPressure && !mode.isCalibration && mode.id != 'surge';
+      final int scoreToSubmit =
+          isSessionMode ? _sessionScore : resultToSave.finalScore;
       final bool isNewBest = scoreToSubmit > bestScore;
 
       if (isNewBest) {
@@ -997,7 +1024,9 @@ class GameState extends ChangeNotifier {
 
   Future<void> surgeWatchAdRetry() async {
     bool rewarded = false;
-    final success = await _ads.showRewarded((_) { rewarded = true; });
+    final success = await _ads.showRewarded((_) {
+      rewarded = true;
+    });
     if (success && rewarded) {
       // Ad rewards exactly 1 life — speed and cumulative score are preserved
       _surgeLives = 1;
@@ -1027,7 +1056,9 @@ class GameState extends ChangeNotifier {
   /// current pressure level. Otherwise treat as a full game-over.
   Future<void> pressureWatchAdRetry() async {
     bool rewarded = false;
-    final success = await _ads.showRewarded((_) { rewarded = true; });
+    final success = await _ads.showRewarded((_) {
+      rewarded = true;
+    });
     if (success && rewarded) {
       _pressurePendingAdRetry = false;
       // Keep _pressureFailAttempts at 2 so that a subsequent fail increments to 3
@@ -1074,7 +1105,8 @@ class GameState extends ChangeNotifier {
     if (!_dailyRewards.canClaim) return null;
 
     final today = _dateString(DateTime.now());
-    final yesterday = _dateString(DateTime.now().subtract(const Duration(days: 1)));
+    final yesterday =
+        _dateString(DateTime.now().subtract(const Duration(days: 1)));
     final isConsecutive = _dailyRewards.lastClaimDate == yesterday;
     final newStreak = isConsecutive ? _dailyRewards.loginStreak + 1 : 1;
     final rewardCoins = (50 + (newStreak - 1) * 10).clamp(0, 200);
@@ -1129,10 +1161,10 @@ class GameState extends ChangeNotifier {
   void equipCosmetic(String type, String cosmeticId) {
     if (!_ownedCosmetics.contains(cosmeticId)) return;
     _loadout = switch (type) {
-      'timerSkin'    => _loadout.copyWith(timerSkin: cosmeticId),
-      'background'   => _loadout.copyWith(background: cosmeticId),
-      'soundPack'    => _loadout.copyWith(soundPack: cosmeticId),
-      'celebration'  => _loadout.copyWith(celebration: cosmeticId),
+      'timerSkin' => _loadout.copyWith(timerSkin: cosmeticId),
+      'background' => _loadout.copyWith(background: cosmeticId),
+      'soundPack' => _loadout.copyWith(soundPack: cosmeticId),
+      'celebration' => _loadout.copyWith(celebration: cosmeticId),
       'wrestlerSkin' => _loadout.copyWith(wrestlerSkin: cosmeticId),
       _ => _loadout,
     };
@@ -1142,10 +1174,10 @@ class GameState extends ChangeNotifier {
 
   void unequipCosmetic(String type) {
     _loadout = switch (type) {
-      'timerSkin'    => _loadout.copyWith(timerSkin: 'timer_skin_default'),
-      'background'   => _loadout.copyWith(background: 'bg_default'),
-      'soundPack'    => _loadout.copyWith(soundPack: 'sound_default'),
-      'celebration'  => _loadout.copyWith(celebration: 'celebration_default'),
+      'timerSkin' => _loadout.copyWith(timerSkin: 'timer_skin_default'),
+      'background' => _loadout.copyWith(background: 'bg_default'),
+      'soundPack' => _loadout.copyWith(soundPack: 'sound_default'),
+      'celebration' => _loadout.copyWith(celebration: 'celebration_default'),
       'wrestlerSkin' => _loadout.copyWith(wrestlerSkin: 'wrestler_default'),
       _ => _loadout,
     };
@@ -1177,7 +1209,12 @@ class GameState extends ChangeNotifier {
       final def = kWeeklyMissions.firstWhere(
         (d) => d.id == mp.missionId,
         orElse: () => const WeeklyMissionDef(
-          id: '', label: '', description: '', target: 0, type: '', rewardCoins: 0,
+          id: '',
+          label: '',
+          description: '',
+          target: 0,
+          type: '',
+          rewardCoins: 0,
         ),
       );
       if (def.id.isEmpty || def.type == 'modes') return mp;
@@ -1218,7 +1255,8 @@ class GameState extends ChangeNotifier {
       }
     }
 
-    return state.copyWith(missions: updatedMissions, playedModeIds: newPlayedModeIds);
+    return state.copyWith(
+        missions: updatedMissions, playedModeIds: newPlayedModeIds);
   }
 
   /// Claim the coin reward for a completed mission.
@@ -1231,7 +1269,12 @@ class GameState extends ChangeNotifier {
     final def = kWeeklyMissions.firstWhere(
       (d) => d.id == missionId,
       orElse: () => const WeeklyMissionDef(
-        id: '', label: '', description: '', target: 0, type: '', rewardCoins: 0,
+        id: '',
+        label: '',
+        description: '',
+        target: 0,
+        type: '',
+        rewardCoins: 0,
       ),
     );
     if (def.id.isEmpty) return false;
@@ -1239,7 +1282,8 @@ class GameState extends ChangeNotifier {
     final mp = _weeklyMissions.missions[missionIdx];
     if (mp.progress < def.target) return false;
 
-    final updatedMissions = List<WeeklyMissionProgress>.from(_weeklyMissions.missions);
+    final updatedMissions =
+        List<WeeklyMissionProgress>.from(_weeklyMissions.missions);
     updatedMissions[missionIdx] = mp.copyWith(claimed: true);
     _weeklyMissions = _weeklyMissions.copyWith(missions: updatedMissions);
     _coins += def.rewardCoins;
@@ -1329,7 +1373,9 @@ class GameState extends ChangeNotifier {
           acceptSpeedUp: allowSpeedUp,
           rematchRound: queuedRematchRound,
         );
-        if (lateMatchId != null && _matchSearching && _screen == AppScreen.matchmaking) {
+        if (lateMatchId != null &&
+            _matchSearching &&
+            _screen == AppScreen.matchmaking) {
           _subscribeToMatch(lateMatchId);
           return;
         }
@@ -1449,7 +1495,8 @@ class GameState extends ChangeNotifier {
 
       // Watch for guest acceptance
       _fightInviteSub?.cancel();
-      _fightInviteSub = _matchmaking.watchFightInvite(code).listen((data) async {
+      _fightInviteSub =
+          _matchmaking.watchFightInvite(code).listen((data) async {
         if (data == null) return; // deleted externally
         if (data['status'] == 'accepted') {
           final guestUid = data['guestUid'] as String?;
@@ -1462,8 +1509,7 @@ class GameState extends ChangeNotifier {
         }
       });
     } catch (e) {
-      _fightInviteError = e.toString();
-      _screen = AppScreen.menu;
+      _fightInviteError = _friendlyFightInviteError(e);
       notifyListeners();
     }
   }
@@ -1484,7 +1530,9 @@ class GameState extends ChangeNotifier {
 
   /// Join a fight by entering the host's invite code.
   Future<void> joinFightByCode(String code) async {
+    final normalizedCode = _normalizeFightInviteCode(code);
     if (!_authState.isSignedIn) {
+      _pendingFightInviteCode = normalizedCode;
       _authReturnScreen = AppScreen.menu;
       _screen = AppScreen.auth;
       notifyListeners();
@@ -1496,7 +1544,7 @@ class GameState extends ChangeNotifier {
 
     try {
       final hostUid = await _matchmaking.joinFightInvite(
-        code: code.trim().toUpperCase(),
+        code: normalizedCode,
         guestUid: _authState.user!.uid,
         guestName: _authState.userName,
         wrestlerSkin: _loadout.wrestlerSkin,
@@ -1515,6 +1563,66 @@ class GameState extends ChangeNotifier {
       _fightInviteLoading = false;
       notifyListeners();
     }
+  }
+
+  /// Accept incoming invite links such as `stopat67://fight?code=ABC123`.
+  Future<void> handleIncomingFightInviteUri(Uri uri) async {
+    final code = _extractFightInviteCodeFromUri(uri);
+    if (code == null) return;
+    await joinFightByCode(code);
+  }
+
+  /// Called after successful auth to continue joining a deep-link invite.
+  Future<bool> continuePendingFightInviteAfterAuth() async {
+    final code = _pendingFightInviteCode;
+    if (code == null || code.isEmpty) return false;
+    _pendingFightInviteCode = null;
+    await joinFightByCode(code);
+    return true;
+  }
+
+  String _normalizeFightInviteCode(String rawCode) =>
+      rawCode.trim().toUpperCase();
+
+  String _friendlyFightInviteError(Object error) {
+    final msg = error.toString().toLowerCase();
+    final isPermissionIssue = msg.contains('permission-denied') ||
+        msg.contains('does not have permission to execute');
+    if (isPermissionIssue) {
+      return 'Invite creation is blocked by Firestore permissions. '
+          'Please update backend rules for fight_invites.';
+    }
+    return error.toString();
+  }
+
+  String? _extractFightInviteCodeFromUri(Uri uri) {
+    final scheme = uri.scheme.toLowerCase();
+    final host = uri.host.toLowerCase();
+    final isAppSchemeInvite = scheme == 'stopat67' && host == 'fight';
+    final isHttpsInvite = scheme == 'https' && host == 'fight.stopat67.app';
+    if (!isAppSchemeInvite && !isHttpsInvite) return null;
+
+    final queryCode = uri.queryParameters['code'] ??
+        uri.queryParameters['invite'] ??
+        uri.queryParameters['fightCode'];
+    final pathCode = uri.pathSegments.isNotEmpty ? uri.pathSegments.last : null;
+
+    final candidates = <String?>[
+      queryCode,
+      pathCode,
+      uri.fragment,
+    ];
+
+    for (final candidate in candidates) {
+      if (candidate == null || candidate.isEmpty) continue;
+      final cleaned = _normalizeFightInviteCode(candidate);
+      final matched = RegExp(r'[A-Z0-9]{6}').firstMatch(cleaned)?.group(0);
+      if (matched != null && matched.length == 6) {
+        return matched;
+      }
+    }
+
+    return null;
   }
 
   /// Continue the fight to the next round (called from results screen).
@@ -1628,8 +1736,10 @@ class GameState extends ChangeNotifier {
   /// Returns true if the opponent's heartbeat has gone stale (they disconnected).
   bool _opponentGone(MatchData match, String myUid) {
     final isPlayer1 = match.player1.uid == myUid;
-    final myHeartbeat = isPlayer1 ? match.player1Heartbeat : match.player2Heartbeat;
-    final oppHeartbeat = isPlayer1 ? match.player2Heartbeat : match.player1Heartbeat;
+    final myHeartbeat =
+        isPlayer1 ? match.player1Heartbeat : match.player2Heartbeat;
+    final oppHeartbeat =
+        isPlayer1 ? match.player2Heartbeat : match.player1Heartbeat;
     final now = DateTime.now();
     if (oppHeartbeat != null) {
       return now.difference(oppHeartbeat) > _heartbeatTimeout;
@@ -1668,8 +1778,8 @@ class GameState extends ChangeNotifier {
       final myUid = _authState.user?.uid ?? '';
       if (!_isBotMatch &&
           (_screen == AppScreen.matchLobby ||
-            _screen == AppScreen.matchPlaying ||
-            _screen == AppScreen.matchmaking) &&
+              _screen == AppScreen.matchPlaying ||
+              _screen == AppScreen.matchmaking) &&
           match.status != MatchStatus.finished &&
           match.status != MatchStatus.cancelled &&
           _opponentGone(match, myUid)) {
@@ -1710,14 +1820,15 @@ class GameState extends ChangeNotifier {
         if (!_isBotMatch) _multiplayerMatchesCompleted++;
         // Remember opponent for rematch and bump speed for next round
         final myUid = _authState.user?.uid;
-        _rematchOpponentUid = myUid == match.player1.uid
-            ? match.player2?.uid
-            : match.player1.uid;
+        _rematchOpponentUid =
+            myUid == match.player1.uid ? match.player2?.uid : match.player1.uid;
         _rematchRound++;
         _matchSpeedMultiplier = 1.0;
         // Play winner/loser sound
-        final myPlayer = myUid == match.player1.uid ? match.player1 : match.player2;
-        final oppPlayer = myUid == match.player1.uid ? match.player2 : match.player1;
+        final myPlayer =
+            myUid == match.player1.uid ? match.player1 : match.player2;
+        final oppPlayer =
+            myUid == match.player1.uid ? match.player2 : match.player1;
         final myScore = myPlayer?.score ?? 0;
         final oppScore = oppPlayer?.score ?? 0;
         final myDev = myPlayer?.deviationMs ?? 999;
@@ -1757,7 +1868,8 @@ class GameState extends ChangeNotifier {
     _matchStreamSub = null;
     // Delete cancelled match docs to keep Firestore clean.
     final cancelledMatch = _currentMatch;
-    if (cancelledMatch != null && !_isBotMatch &&
+    if (cancelledMatch != null &&
+        !_isBotMatch &&
         cancelledMatch.status == MatchStatus.cancelled) {
       unawaited(_matchmaking.deleteMatch(cancelledMatch.matchId));
     }
@@ -1819,7 +1931,8 @@ class GameState extends ChangeNotifier {
 
     // Build a purely local MatchData (never touches Firestore)
     _currentMatch = MatchData(
-      matchId: 'bot_${DateTime.now().millisecondsSinceEpoch}_${Random().nextInt(99999)}',
+      matchId:
+          'bot_${DateTime.now().millisecondsSinceEpoch}_${Random().nextInt(99999)}',
       modeId: 'classic',
       targetMs: targetMs,
       speedMultiplier: 1.0,
@@ -1847,13 +1960,13 @@ class GameState extends ChangeNotifier {
     _matchPlayerStopped = false;
     if (increaseSpeed) {
       _rematchRound++;
-      _matchSpeedMultiplier =
-          (1.0 + (_rematchRound - 1) * 0.2).clamp(1.0, 3.0);
+      _matchSpeedMultiplier = (1.0 + (_rematchRound - 1) * 0.2).clamp(1.0, 3.0);
     }
 
     final uid = _authState.user!.uid;
     _currentMatch = MatchData(
-      matchId: 'bot_${DateTime.now().millisecondsSinceEpoch}_${Random().nextInt(99999)}',
+      matchId:
+          'bot_${DateTime.now().millisecondsSinceEpoch}_${Random().nextInt(99999)}',
       modeId: 'classic',
       targetMs: 6700,
       speedMultiplier: _matchSpeedMultiplier,
@@ -1937,9 +2050,11 @@ class GameState extends ChangeNotifier {
     if (match == null) return;
 
     final rng = Random();
-    final botDeviationMs = 20 + rng.nextInt(131); // 20..150ms — bot always stops within ±150ms
+    final botDeviationMs =
+        20 + rng.nextInt(131); // 20..150ms — bot always stops within ±150ms
     final botScore = calculateRawScore(botDeviationMs);
-    final botStoppedAtMs = match.targetMs + (rng.nextBool() ? botDeviationMs : -botDeviationMs);
+    final botStoppedAtMs =
+        match.targetMs + (rng.nextBool() ? botDeviationMs : -botDeviationMs);
 
     final uid = _authState.user!.uid;
     final isPlayer1 = match.player1.uid == uid;
@@ -2010,7 +2125,8 @@ class GameState extends ChangeNotifier {
       unawaited(_matchmaking.leaveQueue(_authState.user!.uid));
     }
     // Show interstitial every 3 completed multiplayer matches (non-bot).
-    if (!_isBotMatch && _multiplayerMatchesCompleted > 0 &&
+    if (!_isBotMatch &&
+        _multiplayerMatchesCompleted > 0 &&
         _multiplayerMatchesCompleted % 3 == 0) {
       unawaited(_ads.showInterstitial());
     }

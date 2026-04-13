@@ -893,7 +893,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get matchModeFightInviteTitle => 'Invite Friend';
 
   @override
-  String get matchModeFightInviteSubtitle => 'Share a code — fight a specific person';
+  String get matchModeFightInviteSubtitle =>
+      'Share a code — fight a specific person';
 
   @override
   String get matchModeFightJoinTitle => 'Join with Code';
@@ -951,8 +952,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get fightInviteShareButton => 'Share Invite';
 
   @override
-  String fightInviteShareText(String code) =>
-      'Challenge me to Fight Mode in Stop at 67!\nUse code: $code';
+  String fightInviteShareText(String code) {
+    return 'Challenge me to Fight Mode in Stop at 67!\nUse code: $code';
+  }
 
   @override
   String get fightInviteWaiting => 'Waiting for friend to join...';
@@ -970,7 +972,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get fightInviteTapToCopy => 'Tap to copy';
 
   @override
-  String get fightInviteJoinTitle => "Join Friend's Fight";
+  String get fightInviteJoinTitle => 'Join Friend\'s Fight';
 
   @override
   String get fightInviteJoinSubtitle => 'Enter the 6-character invite code';

@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:app_links/app_links.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 
@@ -47,9 +50,48 @@ class StopAt67App extends StatelessWidget {
         data: MediaQuery.of(context).copyWith(textScaler: TextScaler.noScaling),
         child: child!,
       ),
-      home: const _ScreenSwitcher(),
+      home: const _DeepLinkGate(),
     );
   }
+}
+
+class _DeepLinkGate extends StatefulWidget {
+  const _DeepLinkGate();
+
+  @override
+  State<_DeepLinkGate> createState() => _DeepLinkGateState();
+}
+
+class _DeepLinkGateState extends State<_DeepLinkGate> {
+  final AppLinks _appLinks = AppLinks();
+  StreamSubscription<Uri>? _linkSub;
+
+  @override
+  void initState() {
+    super.initState();
+    _initDeepLinks();
+  }
+
+  Future<void> _initDeepLinks() async {
+    final initialUri = await _appLinks.getInitialLink();
+    if (!mounted) return;
+    if (initialUri != null) {
+      await context.read<GameState>().handleIncomingFightInviteUri(initialUri);
+    }
+
+    _linkSub = _appLinks.uriLinkStream.listen((uri) {
+      context.read<GameState>().handleIncomingFightInviteUri(uri);
+    });
+  }
+
+  @override
+  void dispose() {
+    _linkSub?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => const _ScreenSwitcher();
 }
 
 class _ScreenSwitcher extends StatelessWidget {
@@ -57,23 +99,23 @@ class _ScreenSwitcher extends StatelessWidget {
 
   /// Returns the screen to go back to, or null if we should exit the app.
   AppScreen? _backTarget(AppScreen screen) => switch (screen) {
-    AppScreen.menu          => null, // exit app
-    AppScreen.modeSelect    => AppScreen.menu,
-    AppScreen.fortuneWheel  => AppScreen.modeSelect,
-    AppScreen.countdown     => AppScreen.modeSelect,
-    AppScreen.playing       => null, // handled by PlayingScreen's own PopScope
-    AppScreen.results       => AppScreen.menu,
-    AppScreen.settings      => AppScreen.menu,
-    AppScreen.leaderboard   => AppScreen.menu,
-    AppScreen.profile       => AppScreen.menu,
-    AppScreen.shop          => AppScreen.menu,
-    AppScreen.auth          => AppScreen.menu,
-    AppScreen.matchmaking   => AppScreen.menu,
-    AppScreen.matchLobby    => null, // can't leave a matched lobby
-    AppScreen.matchPlaying  => null, // can't leave during play
-    AppScreen.matchResults  => AppScreen.menu,
-    AppScreen.fightInvite   => AppScreen.menu,
-  };
+        AppScreen.menu => null, // exit app
+        AppScreen.modeSelect => AppScreen.menu,
+        AppScreen.fortuneWheel => AppScreen.modeSelect,
+        AppScreen.countdown => AppScreen.modeSelect,
+        AppScreen.playing => null, // handled by PlayingScreen's own PopScope
+        AppScreen.results => AppScreen.menu,
+        AppScreen.settings => AppScreen.menu,
+        AppScreen.leaderboard => AppScreen.menu,
+        AppScreen.profile => AppScreen.menu,
+        AppScreen.shop => AppScreen.menu,
+        AppScreen.auth => AppScreen.menu,
+        AppScreen.matchmaking => AppScreen.menu,
+        AppScreen.matchLobby => null, // can't leave a matched lobby
+        AppScreen.matchPlaying => null, // can't leave during play
+        AppScreen.matchResults => AppScreen.menu,
+        AppScreen.fightInvite => AppScreen.menu,
+      };
 
   @override
   Widget build(BuildContext context) {
@@ -122,22 +164,22 @@ class _ScreenSwitcher extends StatelessWidget {
 
   Widget _buildScreen(AppScreen screen) {
     return switch (screen) {
-      AppScreen.menu          => const MenuScreen(),
-      AppScreen.modeSelect    => const ModeSelectScreen(),
-      AppScreen.fortuneWheel  => const FortuneWheelScreen(),
-      AppScreen.countdown     => const CountdownScreen(),
-      AppScreen.playing       => const PlayingScreen(),
-      AppScreen.results       => const ResultsScreen(),
-      AppScreen.settings      => const SettingsScreen(),
-      AppScreen.leaderboard   => const LeaderboardScreen(),
-      AppScreen.profile       => const ProfileScreen(),
-      AppScreen.shop          => const ShopScreen(),
-      AppScreen.auth          => const AuthScreen(),
-      AppScreen.matchmaking   => const MatchmakingScreen(),
-      AppScreen.matchLobby    => const MatchLobbyScreen(),
-      AppScreen.matchPlaying  => const MatchPlayingScreen(),
-      AppScreen.matchResults  => const MatchResultsScreen(),
-      AppScreen.fightInvite   => const FightInviteScreen(),
+      AppScreen.menu => const MenuScreen(),
+      AppScreen.modeSelect => const ModeSelectScreen(),
+      AppScreen.fortuneWheel => const FortuneWheelScreen(),
+      AppScreen.countdown => const CountdownScreen(),
+      AppScreen.playing => const PlayingScreen(),
+      AppScreen.results => const ResultsScreen(),
+      AppScreen.settings => const SettingsScreen(),
+      AppScreen.leaderboard => const LeaderboardScreen(),
+      AppScreen.profile => const ProfileScreen(),
+      AppScreen.shop => const ShopScreen(),
+      AppScreen.auth => const AuthScreen(),
+      AppScreen.matchmaking => const MatchmakingScreen(),
+      AppScreen.matchLobby => const MatchLobbyScreen(),
+      AppScreen.matchPlaying => const MatchPlayingScreen(),
+      AppScreen.matchResults => const MatchResultsScreen(),
+      AppScreen.fightInvite => const FightInviteScreen(),
     };
   }
 }

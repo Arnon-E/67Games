@@ -946,8 +946,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get fightInviteShareButton => 'שתף הזמנה';
 
   @override
-  String fightInviteShareText(String code) =>
-      'אתגר אותי למצב קרב ב-Stop at 67!\nהשתמש בקוד: $code';
+  String fightInviteShareText(String code) {
+    return 'אתגר אותי למצב קרב ב-Stop at 67!\nהשתמש בקוד: $code';
+  }
 
   @override
   String get fightInviteWaiting => 'ממתין לחבר להצטרף...';

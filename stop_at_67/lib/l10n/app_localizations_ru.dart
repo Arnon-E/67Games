@@ -960,8 +960,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get fightInviteShareButton => 'Поделиться приглашением';
 
   @override
-  String fightInviteShareText(String code) =>
-      'Вызываю тебя в режим Бой в Stop at 67!\nИспользуй код: $code';
+  String fightInviteShareText(String code) {
+    return 'Вызываю тебя в режим Бой в Stop at 67!\nИспользуй код: $code';
+  }
 
   @override
   String get fightInviteWaiting => 'Ожидание друга...';
