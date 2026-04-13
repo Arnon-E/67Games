@@ -15,10 +15,11 @@
 | `profile` | `profile_screen.dart` | `ProfileScreen` | Player stats, best scores, unlocked achievements |
 | `shop` | `shop_screen.dart` | `ShopScreen` | Buy cosmetics with coins |
 | `auth` | `auth_screen.dart` | `AuthScreen` | Google Sign-In (required for leaderboard/multiplayer) |
-| `matchmaking` | `matchmaking_screen.dart` | `MatchmakingScreen` | Queue for 1v1; bot fallback after 7s timeout |
+| `matchmaking` | `matchmaking_screen.dart` | `MatchmakingScreen` | Queue for 1v1; bot fallback after 7s timeout; banner ad while waiting |
 | `matchLobby` | `match_lobby_screen.dart` | `MatchLobbyScreen` | Pre-game VS screen with countdown; shows wrestlers in Fight Mode |
 | `matchPlaying` | `match_playing_screen.dart` | `MatchPlayingScreen` | Live 1v1 timer; HP bars in Fight Mode |
 | `matchResults` | `match_results_screen.dart` | `MatchResultsScreen` | Round result + KO screen in Fight Mode; rematch dialog otherwise |
+| `fightInvite` | `fight_invite_screen.dart` | `FightInviteScreen` | Host waits with a shareable 6-char code; guest joins via dialog |
 
 ### Back Navigation (`_backTarget()` in `app.dart`)
 
@@ -29,6 +30,7 @@ matchPlaying → (blocked, canPop: false)
 matchLobby → (blocked)
 matchResults → menu (via matchReturnToMenu())
 matchmaking → menu (via cancelMatchmaking())
+fightInvite → menu (via cancelFightInvite())
 everything else → menu
 ```
 
@@ -84,7 +86,7 @@ double _matchSpeedMultiplier    // 1.0 + (round-1) × 0.2, capped 3.0
 int _matchSeriesWins/Losses/Ties
 ```
 
-**Fight Mode (new):**
+**Fight Mode:**
 ```dart
 static const int kFightMaxHp = 3
 bool _fightModeActive
@@ -93,6 +95,20 @@ int _fightRound                     // increments after each round
 int _lastRoundMyDamage              // damage I dealt (if I won)
 int _lastRoundOpponentDamage        // damage taken (if I lost)
 bool get isFightOver                // true when any HP ≤ 0
+bool _fightRematchSearching         // true while silently re-queuing for next round
+```
+
+**Fight Invite (friend challenge):**
+```dart
+String? _fightInviteCode            // 6-char code shown on FightInviteScreen (host)
+StreamSubscription? _fightInviteSub // watches fight_invites/{code} for acceptance
+String? _fightInviteError           // 'invalid_code' on bad join attempt (guest)
+bool _fightInviteLoading            // true while joinFightByCode() is in-flight
+```
+
+**Multiplayer ad tracking:**
+```dart
+int _multiplayerMatchesCompleted    // incremented on each finished real match
 ```
 
 **Mode-specific state:**

@@ -84,7 +84,7 @@ Platform: Android (primary) + iOS. Languages: English, Hebrew (RTL), Russian.
 
 - `main` — production
 - `claude/<feature-name>` — feature branches for Claude's work
-- Current active branch: `claude/add-wrestling-combat-2aVCN`
+- Current active branch: `claude/add-1v1-sharing-ads-itHJR`
 
 Always push to the assigned Claude branch. Do NOT push to `main`.
 
@@ -181,6 +181,13 @@ Speed negotiation: lobby shows "Speed Challenge" dialog if one player
 
 Fight mode: HP tracked in GameState (client-side), both clients
             calculate identically from same Firestore match results
+
+Fight invite (friend challenge):
+  fight_invites/{code}  ← 6-char code, status: waiting → accepted, TTL 10min
+  Host creates → shares code → guest joins → both queue with preferOpponentUid
+  FightInviteScreen (AppScreen.fightInvite) shows code + share sheet (share_plus)
+  joinFightByCode(code) in game_state.dart — guest-side join flow
+  createFightInvite() / cancelFightInvite() — host-side flow
 ```
 
 ---
@@ -192,7 +199,10 @@ Fight mode: HP tracked in GameState (client-side), both clients
 | Ads (AdMob) | **DISABLED** | Suspended until Apr 18 2026 — test IDs in place |
 | RevenueCat | **STUBBED** | All methods return false — ready to wire up |
 | Coins (in-game) | **LIVE** | Daily rewards, missions, shop purchases |
-| Wrestler skins | **LIVE** (new) | Added to shop system, 500–1200 coins |
+| Wrestler skins | **LIVE** | Added to shop system, 500–1200 coins |
+| Fight invite/share | **LIVE** | 6-char code share, Firestore rendezvous, share_plus |
+| 1v1 banner ad | **READY** (disabled) | Matchmaking screen, loads while waiting for opponent |
+| 1v1 interstitial | **READY** (disabled) | After KO + every 3 real matches on menu return |
 
 ---
 
@@ -247,12 +257,14 @@ stop_at_67_rating_requested   ← bool — true once the OS rating dialog has be
 
 ## Known Issues / TODOs
 
-- [ ] Replace AdMob test IDs with production IDs (`ads_service.dart` lines 13, 17)
+- [ ] Replace AdMob test IDs with production IDs (`ads_service.dart` lines 13, 17, **and new banner line ~20**)
 - [ ] Implement RevenueCat (currently stubbed in `subscription_service.dart`)
 - [x] Wrestler skins now shown in Shop with WrestlerAvatar preview — buy/equip/unequip live
 - [ ] Fight Mode vs real player: opponent doesn't see fight UI unless they also chose Fight Mode
 - [ ] Bot difficulty in Fight Mode could be tuned (currently 20–150ms random deviation)
 - [ ] Consider adding Fight Mode to the weekly missions system
+- [x] Fight Mode friend invite — 6-char share code + FightInviteScreen + join dialog
+- [x] 1v1 ads — banner on matchmaking screen + interstitial after KO + every 3 real matches
 
 ---
 

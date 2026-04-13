@@ -368,6 +368,10 @@
   "matchModeFightVsBotSubtitle": "Fight the bot — instant match",
   "matchModeFightVsPlayer": "vs Player",
   "matchModeFightVsPlayerSubtitle": "Find a real opponent online",
+  "matchModeFightInviteTitle": "Invite Friend",
+  "matchModeFightInviteSubtitle": "Share a code — fight a specific person",
+  "matchModeFightJoinTitle": "Join with Code",
+  "matchModeFightJoinSubtitle": "Have an invite code? Join here",
 
   "fightRoundLabel": "ROUND {round}",
   "@fightRoundLabel": {
@@ -393,5 +397,26 @@
   },
   "fightPlayAgain": "FIGHT AGAIN",
   "fightHpLabel": "HP",
-  "fightSpeedLabel": "SPEED"
+  "fightSpeedLabel": "SPEED",
+
+  "fightInviteTitle": "Invite Friend",
+  "fightInviteSubtitle": "Share the code with a friend — they enter it to join your fight.",
+  "fightInviteCodeLabel": "YOUR CODE",
+  "fightInviteShareButton": "Share Invite",
+  "fightInviteShareText": "Challenge me to Fight Mode in Stop at 67!\nUse code: {code}",
+  "@fightInviteShareText": {
+    "placeholders": {
+      "code": { "type": "String" }
+    }
+  },
+  "fightInviteWaiting": "Waiting for friend to join...",
+  "fightInviteExpiry": "Code expires in 10 minutes",
+  "fightInviteCancel": "Cancel Invite",
+  "fightInviteCopied": "Code copied!",
+  "fightInviteTapToCopy": "Tap to copy",
+  "fightInviteJoinTitle": "Join Friend's Fight",
+  "fightInviteJoinSubtitle": "Enter the 6-character invite code",
+  "fightInviteJoinButton": "JOIN FIGHT",
+  "fightInviteJoinInvalid": "Invalid or expired code. Please try again.",
+  "fightInviteJoinShort": "Code must be 6 characters"
 }

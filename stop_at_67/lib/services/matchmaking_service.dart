@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../engine/types.dart';
 
@@ -338,6 +339,96 @@ class MatchmakingService {
       'player2.score': null,
     });
   }
+
+  // ── Fight invites ──────────────────────────────────────────────
+
+  static const _inviteCodeChars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  static const _inviteCodeLength = 6;
+  static const _inviteTtl = Duration(minutes: 10);
+
+  String _generateInviteCode() {
+    final rng = Random.secure();
+    return List.generate(
+      _inviteCodeLength,
+      (_) => _inviteCodeChars[rng.nextInt(_inviteCodeChars.length)],
+    ).join();
+  }
+
+  /// Create a private fight-invite lobby. Returns the 6-char code.
+  Future<String> createFightInvite({
+    required String hostUid,
+    required String hostName,
+    String? wrestlerSkin,
+  }) async {
+    final code = _generateInviteCode();
+    final expiresAt = DateTime.now().add(_inviteTtl);
+    await _db.collection('fight_invites').doc(code).set({
+      'code': code,
+      'hostUid': hostUid,
+      'hostName': hostName,
+      if (wrestlerSkin != null) 'hostWrestlerSkin': wrestlerSkin,
+      'status': 'waiting',
+      'guestUid': null,
+      'guestName': null,
+      'createdAt': FieldValue.serverTimestamp(),
+      'expiresAt': Timestamp.fromDate(expiresAt),
+    });
+    return code;
+  }
+
+  /// Stream real-time updates on a fight-invite document.
+  Stream<Map<String, dynamic>?> watchFightInvite(String code) {
+    return _db
+        .collection('fight_invites')
+        .doc(code)
+        .snapshots()
+        .map((snap) => snap.exists ? (snap.data() as Map<String, dynamic>) : null);
+  }
+
+  /// Accept a fight invite as the guest. Returns the host UID on success,
+  /// or null if the invite is invalid/expired/already taken.
+  Future<String?> joinFightInvite({
+    required String code,
+    required String guestUid,
+    required String guestName,
+    String? wrestlerSkin,
+  }) async {
+    final ref = _db.collection('fight_invites').doc(code.toUpperCase());
+    String? hostUid;
+
+    await _db.runTransaction((tx) async {
+      final snap = await tx.get(ref);
+      if (!snap.exists) return;
+
+      final data = snap.data()!;
+      if (data['status'] != 'waiting') return;
+
+      final expiresAt = (data['expiresAt'] as Timestamp?)?.toDate();
+      if (expiresAt != null && DateTime.now().isAfter(expiresAt)) return;
+
+      final existingGuest = data['guestUid'];
+      if (existingGuest != null && existingGuest != guestUid) return; // already taken
+
+      hostUid = data['hostUid'] as String;
+      tx.update(ref, {
+        'status': 'accepted',
+        'guestUid': guestUid,
+        'guestName': guestName,
+        if (wrestlerSkin != null) 'guestWrestlerSkin': wrestlerSkin,
+      });
+    });
+
+    return hostUid;
+  }
+
+  /// Delete a fight-invite document (called by host on cancel or both on match start).
+  Future<void> deleteFightInvite(String code) async {
+    try {
+      await _db.collection('fight_invites').doc(code).delete();
+    } catch (_) {}
+  }
+
+  // ── Clean up listeners ─────────────────────────────────────────
 
   /// Clean up listeners.
   void dispose() {

@@ -26,9 +26,12 @@ class _AuthScreenState extends State<AuthScreen> {
     super.dispose();
   }
 
-  void _onSignInSuccess(GameState gs) {
+  Future<void> _onSignInSuccess(GameState gs) async {
+    final resumedInvite = await gs.continuePendingFightInviteAfterAuth();
+    if (resumedInvite) return;
+
     if (gs.authReturnScreen == AppScreen.matchmaking) {
-      gs.startMatchmaking();
+      await gs.startMatchmaking();
     } else {
       gs.setScreen(gs.authReturnScreen);
     }
@@ -36,12 +39,16 @@ class _AuthScreenState extends State<AuthScreen> {
 
   Future<void> _signInGoogle() async {
     final ok = await context.read<AuthState>().signInWithGoogle();
-    if (ok && mounted) _onSignInSuccess(context.read<GameState>());
+    if (ok && mounted) {
+      await _onSignInSuccess(context.read<GameState>());
+    }
   }
 
   Future<void> _signInGuest() async {
     final ok = await context.read<AuthState>().signInAnonymous(_nameController.text);
-    if (ok && mounted) _onSignInSuccess(context.read<GameState>());
+    if (ok && mounted) {
+      await _onSignInSuccess(context.read<GameState>());
+    }
   }
 
   @override

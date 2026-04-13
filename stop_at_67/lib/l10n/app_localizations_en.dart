@@ -890,6 +890,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get matchModeFightVsPlayerSubtitle => 'Find a real opponent online';
 
   @override
+  String get matchModeFightInviteTitle => 'Invite Friend';
+
+  @override
+  String get matchModeFightInviteSubtitle =>
+      'Share a code — fight a specific person';
+
+  @override
+  String get matchModeFightJoinTitle => 'Join with Code';
+
+  @override
+  String get matchModeFightJoinSubtitle => 'Have an invite code? Join here';
+
+  @override
   String fightRoundLabel(int round) {
     return 'ROUND $round';
   }
@@ -924,4 +937,53 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get fightSpeedLabel => 'SPEED';
+
+  @override
+  String get fightInviteTitle => 'Invite Friend';
+
+  @override
+  String get fightInviteSubtitle =>
+      'Share the code with a friend — they enter it to join your fight.';
+
+  @override
+  String get fightInviteCodeLabel => 'YOUR CODE';
+
+  @override
+  String get fightInviteShareButton => 'Share Invite';
+
+  @override
+  String fightInviteShareText(String code) {
+    return 'Challenge me to Fight Mode in Stop at 67!\nUse code: $code';
+  }
+
+  @override
+  String get fightInviteWaiting => 'Waiting for friend to join...';
+
+  @override
+  String get fightInviteExpiry => 'Code expires in 10 minutes';
+
+  @override
+  String get fightInviteCancel => 'Cancel Invite';
+
+  @override
+  String get fightInviteCopied => 'Code copied!';
+
+  @override
+  String get fightInviteTapToCopy => 'Tap to copy';
+
+  @override
+  String get fightInviteJoinTitle => 'Join Friend\'s Fight';
+
+  @override
+  String get fightInviteJoinSubtitle => 'Enter the 6-character invite code';
+
+  @override
+  String get fightInviteJoinButton => 'JOIN FIGHT';
+
+  @override
+  String get fightInviteJoinInvalid =>
+      'Invalid or expired code. Please try again.';
+
+  @override
+  String get fightInviteJoinShort => 'Code must be 6 characters';
 }

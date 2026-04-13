@@ -885,6 +885,18 @@ class AppLocalizationsHe extends AppLocalizations {
   String get matchModeFightVsPlayerSubtitle => 'מצא יריב אמיתי אונליין';
 
   @override
+  String get matchModeFightInviteTitle => 'הזמן חבר';
+
+  @override
+  String get matchModeFightInviteSubtitle => 'שתף קוד — הילחם נגד מישהו ספציפי';
+
+  @override
+  String get matchModeFightJoinTitle => 'הצטרף עם קוד';
+
+  @override
+  String get matchModeFightJoinSubtitle => 'יש לך קוד הזמנה? הצטרף כאן';
+
+  @override
   String fightRoundLabel(int round) {
     return 'סיבוב $round';
   }
@@ -919,4 +931,52 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get fightSpeedLabel => 'מהירות';
+
+  @override
+  String get fightInviteTitle => 'הזמן חבר';
+
+  @override
+  String get fightInviteSubtitle =>
+      'שתף את הקוד עם חבר — הוא יכניס אותו כדי להצטרף לקרב שלך.';
+
+  @override
+  String get fightInviteCodeLabel => 'הקוד שלך';
+
+  @override
+  String get fightInviteShareButton => 'שתף הזמנה';
+
+  @override
+  String fightInviteShareText(String code) {
+    return 'אתגר אותי למצב קרב ב-Stop at 67!\nהשתמש בקוד: $code';
+  }
+
+  @override
+  String get fightInviteWaiting => 'ממתין לחבר להצטרף...';
+
+  @override
+  String get fightInviteExpiry => 'הקוד יפוג בעוד 10 דקות';
+
+  @override
+  String get fightInviteCancel => 'בטל הזמנה';
+
+  @override
+  String get fightInviteCopied => 'קוד הועתק!';
+
+  @override
+  String get fightInviteTapToCopy => 'לחץ להעתקה';
+
+  @override
+  String get fightInviteJoinTitle => 'הצטרף לקרב של חבר';
+
+  @override
+  String get fightInviteJoinSubtitle => 'הכנס את קוד ההזמנה בן 6 תווים';
+
+  @override
+  String get fightInviteJoinButton => 'הצטרף לקרב';
+
+  @override
+  String get fightInviteJoinInvalid => 'קוד לא תקין או שפג תוקפו. נסה שוב.';
+
+  @override
+  String get fightInviteJoinShort => 'הקוד חייב להיות בן 6 תווים';
 }

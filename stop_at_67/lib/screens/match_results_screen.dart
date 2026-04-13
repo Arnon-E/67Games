@@ -47,6 +47,15 @@ class _MatchResultsScreenState extends State<MatchResultsScreen>
         _hitController.forward().then((_) => _hitController.reverse());
         _startAutoContinue(gs);
       }
+      // After fight series ends (KO), show interstitial once the KO animation
+      // finishes (~2.2s). The ad shows between the KO scene and when the player
+      // taps a button, which is the most natural break point.
+      if (gs.isFightOver && !gs.isBotMatch) {
+        Future.delayed(const Duration(milliseconds: 2400), () {
+          if (!mounted) return;
+          context.read<GameState>().ads.showInterstitial();
+        });
+      }
     });
   }
 

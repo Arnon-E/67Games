@@ -369,6 +369,10 @@
   "matchModeFightVsBotSubtitle": "לחם נגד הבוט — התאמה מיידית",
   "matchModeFightVsPlayer": "נגד שחקן",
   "matchModeFightVsPlayerSubtitle": "מצא יריב אמיתי אונליין",
+  "matchModeFightInviteTitle": "הזמן חבר",
+  "matchModeFightInviteSubtitle": "שתף קוד — הילחם נגד מישהו ספציפי",
+  "matchModeFightJoinTitle": "הצטרף עם קוד",
+  "matchModeFightJoinSubtitle": "יש לך קוד הזמנה? הצטרף כאן",
 
   "fightRoundLabel": "סיבוב {round}",
   "@fightRoundLabel": {
@@ -394,5 +398,26 @@
   },
   "fightPlayAgain": "לחם שוב",
   "fightHpLabel": "HP",
-  "fightSpeedLabel": "מהירות"
+  "fightSpeedLabel": "מהירות",
+
+  "fightInviteTitle": "הזמן חבר",
+  "fightInviteSubtitle": "שתף את הקוד עם חבר — הוא יכניס אותו כדי להצטרף לקרב שלך.",
+  "fightInviteCodeLabel": "הקוד שלך",
+  "fightInviteShareButton": "שתף הזמנה",
+  "fightInviteShareText": "אתגר אותי למצב קרב ב-Stop at 67!\nהשתמש בקוד: {code}",
+  "@fightInviteShareText": {
+    "placeholders": {
+      "code": { "type": "String" }
+    }
+  },
+  "fightInviteWaiting": "ממתין לחבר להצטרף...",
+  "fightInviteExpiry": "הקוד יפוג בעוד 10 דקות",
+  "fightInviteCancel": "בטל הזמנה",
+  "fightInviteCopied": "קוד הועתק!",
+  "fightInviteTapToCopy": "לחץ להעתקה",
+  "fightInviteJoinTitle": "הצטרף לקרב של חבר",
+  "fightInviteJoinSubtitle": "הכנס את קוד ההזמנה בן 6 תווים",
+  "fightInviteJoinButton": "הצטרף לקרב",
+  "fightInviteJoinInvalid": "קוד לא תקין או שפג תוקפו. נסה שוב.",
+  "fightInviteJoinShort": "הקוד חייב להיות בן 6 תווים"
 }
