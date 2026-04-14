@@ -274,6 +274,9 @@ class GameState extends ChangeNotifier {
 
   // ── Multiplayer match counter (for interstitial pacing) ──────
   int _multiplayerMatchesCompleted = 0;
+
+  // ── In-app review ─────────────────────────────────────────────
+  bool _reviewRequestedThisSession = false;
   int get multiplayerMatchesCompleted => _multiplayerMatchesCompleted;
 
   GameState({
@@ -893,9 +896,11 @@ class GameState extends ChangeNotifier {
   // Request an in-app review once the user has played at least 7 games and
   // we haven't prompted them before. The OS rate-limits actual dialogs shown.
   Future<void> _maybeRequestReview() async {
+    if (_reviewRequestedThisSession) return;
     if (_stats.totalGames < 7) return;
     final alreadyRequested = await _storage.loadRatingRequested();
     if (alreadyRequested) return;
+    _reviewRequestedThisSession = true;
     final inAppReview = InAppReview.instance;
     if (await inAppReview.isAvailable()) {
       await _storage.saveRatingRequested();
