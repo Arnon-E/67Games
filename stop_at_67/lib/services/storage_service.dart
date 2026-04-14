@@ -13,6 +13,7 @@ class StorageService {
   static const _streakKey = 'stop_at_67_streak';
   static const _weeklyMissionsKey = 'stop_at_67_weekly_missions';
   static const _soundEnabledKey = 'stop_at_67_sound_enabled';
+  static const _ratingRequestedKey = 'stop_at_67_rating_requested';
 
   Future<SharedPreferences> get _prefs => SharedPreferences.getInstance();
 
@@ -136,6 +137,16 @@ class StorageService {
   Future<void> saveSoundEnabled(bool enabled) async {
     final prefs = await _prefs;
     await prefs.setBool(_soundEnabledKey, enabled);
+  }
+
+  Future<bool> loadRatingRequested() async {
+    final prefs = await _prefs;
+    return prefs.getBool(_ratingRequestedKey) ?? false;
+  }
+
+  Future<void> saveRatingRequested() async {
+    final prefs = await _prefs;
+    await prefs.setBool(_ratingRequestedKey, true);
   }
 
   Future<WeeklyMissionsState?> loadWeeklyMissions() async {
