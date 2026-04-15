@@ -114,12 +114,17 @@ class FightInviteScreen extends StatelessWidget {
                     child: ElevatedButton.icon(
                       onPressed: () {
                         final playStoreLink = _playStoreLink();
-                        // Code is on its own isolated line so it's easy to
-                        // long-press → select → copy in WhatsApp/SMS etc.
+                        final deepLink = Uri(
+                          scheme: 'stopat67',
+                          host: 'fight',
+                          queryParameters: {'code': code},
+                        ).toString();
+                        // Deep link opens the app directly on the join screen.
+                        // Code is kept as a fallback for manual entry.
                         final shareText =
                             '${l10n.fightInviteShareText(code)}\n\n'
+                            '👉 $deepLink\n\n'
                             '🔑  $code  🔑\n\n'
-                            'Stop at 67 → Fight Mode → Invite Friend → Join by Code\n\n'
                             'Get the app: $playStoreLink';
                         Share.share(shareText);
                       },
