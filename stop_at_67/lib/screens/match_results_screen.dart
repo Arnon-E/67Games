@@ -253,8 +253,8 @@ class _MatchResultsScreenState extends State<MatchResultsScreen>
                 if (match.isComplete) ...[
                   // Fight mode: auto-continue or manual next round
                   if (gs.fightModeActive) ...[
-                    if (gs.fightRematchSearching) ...[
-                      // Silently re-queuing — show a spinner while we wait.
+                    if (gs.fightReadySignaled) ...[
+                      // This player signaled ready — waiting for opponent.
                       const Padding(
                         padding: EdgeInsets.symmetric(vertical: 12),
                         child: Row(
@@ -269,7 +269,32 @@ class _MatchResultsScreenState extends State<MatchResultsScreen>
                             ),
                             SizedBox(width: 12),
                             Text(
-                              'Connecting...',
+                              'Waiting for opponent...',
+                              style: TextStyle(
+                                color: AppColors.textSecondary,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ] else if (gs.fightRematchSearching) ...[
+                      // Transitioning to next round (both ready, resetting match).
+                      const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 12),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            SizedBox(
+                              width: 18, height: 18,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: AppColors.orange,
+                              ),
+                            ),
+                            SizedBox(width: 12),
+                            Text(
+                              'Starting next round...',
                               style: TextStyle(
                                 color: AppColors.textSecondary,
                                 fontSize: 14,
@@ -296,7 +321,7 @@ class _MatchResultsScreenState extends State<MatchResultsScreen>
                       padding: const EdgeInsets.symmetric(horizontal: 40),
                       child: GameButton(
                         label: l10n.commonMenu,
-                        onPressed: gs.fightRematchSearching
+                        onPressed: (gs.fightReadySignaled || gs.fightRematchSearching)
                             ? null
                             : () => gs.matchReturnToMenu(),
                         primary: false,

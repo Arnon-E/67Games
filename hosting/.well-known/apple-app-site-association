@@ -1,0 +1,10 @@
+{
+  "applinks": {
+    "details": [{
+      "appIDs": ["TODO_TEAM_ID.com.sixtysevengames.stop_at_67"],
+      "components": [
+        { "/": "/fight*", "comment": "Fight invite deep links" }
+      ]
+    }]
+  }
+}

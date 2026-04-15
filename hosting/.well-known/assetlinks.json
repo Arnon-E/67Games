@@ -1,0 +1,10 @@
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "com.sixtysevengames.stop_at_67",
+    "sha256_cert_fingerprints": [
+      "C8:ED:E1:30:B4:31:A8:19:02:5B:85:C4:79:80:83:65:F7:88:81:46:B4:F8:B2:21:86:C2:E4:68:97:A6:F1:98"
+    ]
+  }
+}]
