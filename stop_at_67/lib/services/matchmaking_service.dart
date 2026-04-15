@@ -334,9 +334,59 @@ class MatchmakingService {
       'player1.stoppedAtMs': null,
       'player1.deviationMs': null,
       'player1.score': null,
+      'player1.readyForNextRound': null,
       'player2.stoppedAtMs': null,
       'player2.deviationMs': null,
       'player2.score': null,
+      'player2.readyForNextRound': null,
+    });
+  }
+
+  /// Signal that this player is ready for the next fight round.
+  ///
+  /// Writes the player's ready flag. If both players are now ready,
+  /// Player 1 resets the match to start the next round.
+  Future<void> signalReadyForNextRound({
+    required String matchId,
+    required bool isPlayer1,
+    required double newSpeed,
+  }) async {
+    final matchRef = _db.collection('matches').doc(matchId);
+    final field =
+        isPlayer1 ? 'player1.readyForNextRound' : 'player2.readyForNextRound';
+
+    await _db.runTransaction((tx) async {
+      final snap = await tx.get(matchRef);
+      if (!snap.exists) return;
+
+      tx.update(matchRef, {field: true});
+
+      final data = snap.data()!;
+      final p1 = data['player1'] as Map<String, dynamic>;
+      final p2 = data['player2'] as Map<String, dynamic>?;
+
+      // Check if the other player is already ready
+      final otherReady = isPlayer1
+          ? (p2?['readyForNextRound'] == true)
+          : (p1['readyForNextRound'] == true);
+
+      if (otherReady) {
+        // Both ready — whoever arrives second resets the match
+        tx.update(matchRef, {
+          'status': MatchStatus.countdown.name,
+          'speedMultiplier': newSpeed,
+          'speedUpAgreed': newSpeed > 1.0,
+          'speedUpRequested': newSpeed > 1.0,
+          'player1.stoppedAtMs': null,
+          'player1.deviationMs': null,
+          'player1.score': null,
+          'player1.readyForNextRound': null,
+          'player2.stoppedAtMs': null,
+          'player2.deviationMs': null,
+          'player2.score': null,
+          'player2.readyForNextRound': null,
+        });
+      }
     });
   }
 

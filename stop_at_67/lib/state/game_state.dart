@@ -243,6 +243,11 @@ class GameState extends ChangeNotifier {
   /// True while silently rejoining queue for a fight rematch (no matchmaking screen).
   bool _fightRematchSearching = false;
   bool get fightRematchSearching => _fightRematchSearching;
+
+  /// True once this player has signaled ready for the next fight round,
+  /// waiting for the opponent to also signal ready.
+  bool _fightReadySignaled = false;
+  bool get fightReadySignaled => _fightReadySignaled;
   int _myFightHp = kFightMaxHp;
   int get myFightHp => _myFightHp;
   int _opponentFightHp = kFightMaxHp;
@@ -1657,19 +1662,19 @@ class GameState extends ChangeNotifier {
     }
   }
 
-  /// Advance to the next fight round without touching the queue.
+  /// Advance to the next fight round — both players must signal ready first.
   ///
-  /// Player 1 updates the *existing* match document back to `countdown`
-  /// with the new speed.  Both clients already have an active `_matchStreamSub`
-  /// on that document, so they pick up the status change instantly — no
-  /// queue, no searching, no race conditions.
-  ///
-  /// Player 2 just sets the connecting flag and waits; their stream fires
-  /// when player 1 writes the reset.
+  /// Each player writes their own ready flag via [signalReadyForNextRound].
+  /// When both flags are set, Player 1's transaction also resets the match
+  /// document to `countdown`. Both clients' streams pick up the status change
+  /// instantly — no queue, no race conditions, and neither player is dragged
+  /// into the next round without consent.
   Future<void> _startFightRematch() async {
     if (!_authState.isSignedIn) return;
     final match = _currentMatch;
     if (match == null) return;
+
+    if (_fightReadySignaled) return; // already signaled, don't double-write
 
     final myUid = _authState.user!.uid;
     final isPlayer1 = match.player1.uid == myUid;
@@ -1677,16 +1682,20 @@ class GameState extends ChangeNotifier {
     final newSpeed =
         (1.0 + (_rematchRound - 1) * 0.2).clamp(1.0, 3.0).toDouble();
 
+    _fightReadySignaled = true;
     _fightRematchSearching = true;
     _matchPlayerStopped = false;
     notifyListeners();
 
-    if (!isPlayer1) return; // Player 2 waits — stream will fire when P1 resets.
-
     try {
-      await _matchmaking.resetMatchForNextRound(match.matchId, newSpeed);
+      await _matchmaking.signalReadyForNextRound(
+        matchId: match.matchId,
+        isPlayer1: isPlayer1,
+        newSpeed: newSpeed,
+      );
     } catch (_) {
-      // Firestore write failed (e.g. doc deleted) — fall back to fresh matchmaking.
+      // Firestore write failed — fall back to fresh matchmaking.
+      _fightReadySignaled = false;
       _fightRematchSearching = false;
       notifyListeners();
       unawaited(startMatchmaking(acceptSpeedUp: true));
@@ -1816,6 +1825,7 @@ class GameState extends ChangeNotifier {
         // matchResults → fight rematch reset: existing stream picked up the
         // countdown status written by resetMatchForNextRound.
         _fightRematchSearching = false;
+        _fightReadySignaled = false;
         final isPlayer1 = match.player1.uid == myUid;
         _startHeartbeat(matchId, isPlayer1);
         _screen = AppScreen.matchLobby;
@@ -1836,7 +1846,8 @@ class GameState extends ChangeNotifier {
         _matchPlayerStopped = false;
         notifyListeners();
         _startPrecisionTimer();
-      } else if (match.status == MatchStatus.finished) {
+      } else if (match.status == MatchStatus.finished &&
+          _screen != AppScreen.matchResults) {
         _stopHeartbeat();
         // Track completed multiplayer matches for ad pacing
         if (!_isBotMatch) _multiplayerMatchesCompleted++;
@@ -2166,6 +2177,7 @@ class GameState extends ChangeNotifier {
     _isBotMatch = false;
     _matchTimedOut = false;
     _fightRematchSearching = false;
+    _fightReadySignaled = false;
     _rematchOpponentUid = null;
     _rematchRound = 1;
     _matchSpeedMultiplier = 1.0;
