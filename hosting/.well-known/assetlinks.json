@@ -1,0 +1,10 @@
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "com.sixtysevengames.stop_at_67",
+    "sha256_cert_fingerprints": [
+      "TODO: Replace with your SHA-256 signing certificate fingerprint.\n      Find it in: Play Console → Your app → Setup → App signing → SHA-256 certificate fingerprint.\n      Format: AA:BB:CC:DD:... (32 colon-separated hex pairs)"
+    ]
+  }
+}]

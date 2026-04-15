@@ -1619,8 +1619,10 @@ class GameState extends ChangeNotifier {
     final scheme = uri.scheme.toLowerCase();
     final host = uri.host.toLowerCase();
     final isAppSchemeInvite = scheme == 'stopat67' && host == 'fight';
+    // Firebase Hosting domain (primary share URL, clickable in all messaging apps)
+    final isWebAppInvite = scheme == 'https' && host == 'stop-at-67.web.app';
     final isHttpsInvite = scheme == 'https' && host == 'fight.stopat67.app';
-    if (!isAppSchemeInvite && !isHttpsInvite) return null;
+    if (!isAppSchemeInvite && !isWebAppInvite && !isHttpsInvite) return null;
 
     final queryCode = uri.queryParameters['code'] ??
         uri.queryParameters['invite'] ??
