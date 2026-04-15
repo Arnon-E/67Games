@@ -190,12 +190,22 @@ Fight invite (friend challenge):
   createFightInvite() / cancelFightInvite() — host-side flow
 
 Deep link invite (direct open):
-  Share text includes stopat67://fight?code=ABC123 — tapping opens the app directly
-  Android: intent-filter for stopat67://fight in AndroidManifest.xml
-  iOS: CFBundleURLSchemes includes "stopat67" in Info.plist
+  Share URL: https://stop-at-67.web.app/fight?code=ABC123 (clickable in ALL messaging apps)
+  hosting/fight.html  ← branded redirect page; auto-launches stopat67:// scheme, falls
+                        back to Play Store after 2.5 s if app not installed
+  firebase.json       ← Firebase Hosting config (public dir = hosting/)
+  Deploy: npm i -g firebase-tools && firebase login && firebase deploy --only hosting
+
+  Android App Links (skips browser entirely when assetlinks.json is filled in):
+    AndroidManifest: autoVerify intent-filter for https://stop-at-67.web.app/fight
+    hosting/.well-known/assetlinks.json ← TODO: paste SHA-256 from Play Console → App signing
+  iOS Universal Links (skips browser when filled in):
+    hosting/.well-known/apple-app-site-association ← TODO: paste Apple Team ID
+    Also requires Associated Domains capability in Xcode (applinks:stop-at-67.web.app)
+
   app_links package handles cold-start (getInitialLink) + warm-start (uriLinkStream)
   Both route through handleIncomingFightInviteUri() → joinFightByCode()
-  _extractFightInviteCodeFromUri() parses query param, path segment, or fragment
+  _extractFightInviteCodeFromUri() accepts stopat67://, stop-at-67.web.app, fight.stopat67.app
   If unauthenticated: code saved to _pendingFightInviteCode, resumed after sign-in
 ```
 
