@@ -4,7 +4,7 @@
     "namespace": "android_app",
     "package_name": "com.sixtysevengames.stop_at_67",
     "sha256_cert_fingerprints": [
-      "TODO: Replace with your SHA-256 signing certificate fingerprint.\n      Find it in: Play Console → Your app → Setup → App signing → SHA-256 certificate fingerprint.\n      Format: AA:BB:CC:DD:... (32 colon-separated hex pairs)"
+      "C8:ED:E1:30:B4:31:A8:19:02:5B:85:C4:79:80:83:65:F7:88:81:46:B4:F8:B2:21:86:C2:E4:68:97:A6:F1:98"
     ]
   }
 }]
