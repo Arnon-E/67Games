@@ -188,6 +188,15 @@ Fight invite (friend challenge):
   FightInviteScreen (AppScreen.fightInvite) shows code + share sheet (share_plus)
   joinFightByCode(code) in game_state.dart — guest-side join flow
   createFightInvite() / cancelFightInvite() — host-side flow
+
+Deep link invite (direct open):
+  Share text includes stopat67://fight?code=ABC123 — tapping opens the app directly
+  Android: intent-filter for stopat67://fight in AndroidManifest.xml
+  iOS: CFBundleURLSchemes includes "stopat67" in Info.plist
+  app_links package handles cold-start (getInitialLink) + warm-start (uriLinkStream)
+  Both route through handleIncomingFightInviteUri() → joinFightByCode()
+  _extractFightInviteCodeFromUri() parses query param, path segment, or fragment
+  If unauthenticated: code saved to _pendingFightInviteCode, resumed after sign-in
 ```
 
 ---
@@ -201,6 +210,7 @@ Fight invite (friend challenge):
 | Coins (in-game) | **LIVE** | Daily rewards, missions, shop purchases |
 | Wrestler skins | **LIVE** | Added to shop system, 500–1200 coins |
 | Fight invite/share | **LIVE** | 6-char code share, Firestore rendezvous, share_plus |
+| Fight invite deep link | **LIVE** | stopat67://fight?code=X opens app directly; app_links handles cold+warm start |
 | 1v1 banner ad | **READY** (disabled) | Matchmaking screen, loads while waiting for opponent |
 | 1v1 interstitial | **READY** (disabled) | After KO + every 3 real matches on menu return |
 
@@ -264,6 +274,7 @@ stop_at_67_rating_requested   ← bool — true once the OS rating dialog has be
 - [ ] Bot difficulty in Fight Mode could be tuned (currently 20–150ms random deviation)
 - [ ] Consider adding Fight Mode to the weekly missions system
 - [x] Fight Mode friend invite — 6-char share code + FightInviteScreen + join dialog
+- [x] Fight invite deep link — share includes stopat67://fight?code=X, opens app directly
 - [x] 1v1 ads — banner on matchmaking screen + interstitial after KO + every 3 real matches
 
 ---
