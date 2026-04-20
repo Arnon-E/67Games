@@ -3,22 +3,31 @@ import 'package:flutter/foundation.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 class AdsService {
-  // Set to true on April 18 when AdMob suspension lifts
-  static const bool adsEnabled = false;
+  static const bool adsEnabled = true;
 
-  // TODO: Replace these test IDs with your real AdMob ad unit IDs from admob.google.com
-  // Test App IDs are already set in AndroidManifest.xml / Info.plist
+  // Your registered test device hashes — clicks/views from these devices are never
+  // counted as real traffic, protecting your AdMob account from invalid traffic flags.
+  // HOW TO FIND YOUR DEVICE HASH:
+  //   1. Run the app on your phone in debug mode (flutter run)
+  //   2. Run: adb logcat | grep "Use RequestConfiguration"
+  //   3. Copy the hash from the printed message and add it to this list.
+  static const List<String> _testDeviceIds = [
+    // 'YOUR_DEVICE_HASH_HERE',  // e.g. 'B3AEABB7641E5A26598B5E8F2F3E1234'
+  ];
+
+  // TODO: Replace placeholder IDs with your real AdMob ad unit IDs from admob.google.com
+  // Publisher ID: pub-6676728509237934
   static const _interstitialAdUnitId = kDebugMode
       ? 'ca-app-pub-3940256099942544/1033173712' // Google test interstitial
-      : 'ca-app-pub-XXXXXXXXXXXXXXXX/XXXXXXXXXX'; // TODO: your real Android interstitial ID
+      : 'ca-app-pub-6676728509237934/XXXXXXXXXX'; // TODO: your real Android interstitial ID
 
   static const _rewardedAdUnitId = kDebugMode
       ? 'ca-app-pub-3940256099942544/5224354917' // Google test rewarded
-      : 'ca-app-pub-XXXXXXXXXXXXXXXX/XXXXXXXXXX'; // TODO: your real Android rewarded ID
+      : 'ca-app-pub-6676728509237934/XXXXXXXXXX'; // TODO: your real Android rewarded ID
 
   static const _bannerAdUnitId = kDebugMode
       ? 'ca-app-pub-3940256099942544/6300978111' // Google test banner
-      : 'ca-app-pub-XXXXXXXXXXXXXXXX/XXXXXXXXXX'; // TODO: your real Android banner ID
+      : 'ca-app-pub-6676728509237934/XXXXXXXXXX'; // TODO: your real Android banner ID
 
   InterstitialAd? _interstitialAd;
   RewardedAd? _rewardedAd;
@@ -37,6 +46,7 @@ class AdsService {
         maxAdContentRating: MaxAdContentRating.g,
         tagForChildDirectedTreatment: TagForChildDirectedTreatment.unspecified,
         tagForUnderAgeOfConsent: TagForUnderAgeOfConsent.unspecified,
+        testDeviceIds: _testDeviceIds,
       ),
     );
 
