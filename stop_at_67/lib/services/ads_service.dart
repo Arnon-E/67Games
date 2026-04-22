@@ -15,19 +15,18 @@ class AdsService {
     '5922B42B9D123D00A7A94867C6E5E6A0', // CPH2449 (OnePlus, Android 16)
   ];
 
-  // TODO: Replace placeholder IDs with your real AdMob ad unit IDs from admob.google.com
   // Publisher ID: pub-6676728509237934
   static const _interstitialAdUnitId = kDebugMode
       ? 'ca-app-pub-3940256099942544/1033173712' // Google test interstitial
-      : 'ca-app-pub-6676728509237934/XXXXXXXXXX'; // TODO: your real Android interstitial ID
+      : 'ca-app-pub-6676728509237934/8213370504'; // Between Games (Interstitial)
 
   static const _rewardedAdUnitId = kDebugMode
       ? 'ca-app-pub-3940256099942544/5224354917' // Google test rewarded
-      : 'ca-app-pub-6676728509237934/XXXXXXXXXX'; // TODO: your real Android rewarded ID
+      : 'ca-app-pub-6676728509237934/8993875800'; // 2x XP Reward (Rewarded)
 
   static const _bannerAdUnitId = kDebugMode
       ? 'ca-app-pub-3940256099942544/6300978111' // Google test banner
-      : 'ca-app-pub-6676728509237934/XXXXXXXXXX'; // TODO: your real Android banner ID
+      : 'ca-app-pub-6676728509237934/5495840619'; // 1v1 Matchmaking Banner
 
   InterstitialAd? _interstitialAd;
   RewardedAd? _rewardedAd;
