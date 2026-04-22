@@ -215,13 +215,13 @@ Deep link invite (direct open):
 
 | Component | Status | Notes |
 |-----------|--------|-------|
-| Ads (AdMob) | **DISABLED** | Suspended until Apr 18 2026 — test IDs in place |
+| Ads (AdMob) | **ENABLED** | Re-enabled Apr 20 2026 — replace production ad unit IDs in ads_service.dart |
 | RevenueCat | **STUBBED** | All methods return false — ready to wire up |
 | Coins (in-game) | **LIVE** | Daily rewards, missions, shop purchases |
 | Wrestler skins | **LIVE** | Added to shop system, 500–1200 coins |
 | Fight invite/share | **LIVE** | 6-char code share, Firestore rendezvous, share_plus |
 | Fight invite deep link | **LIVE** | stopat67://fight?code=X opens app directly; app_links handles cold+warm start |
-| 1v1 banner ad | **READY** (disabled) | Matchmaking screen, loads while waiting for opponent |
+| 1v1 banner ad | **LIVE** | Matchmaking screen, loads while waiting for opponent |
 | 1v1 interstitial | **READY** (disabled) | After KO + every 3 real matches on menu return |
 
 ---
