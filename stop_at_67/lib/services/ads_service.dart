@@ -12,7 +12,7 @@ class AdsService {
   //   2. Run: adb logcat | grep "Use RequestConfiguration"
   //   3. Copy the hash from the printed message and add it to this list.
   static const List<String> _testDeviceIds = [
-    // 'YOUR_DEVICE_HASH_HERE',  // e.g. 'B3AEABB7641E5A26598B5E8F2F3E1234'
+    '5922B42B9D123D00A7A94867C6E5E6A0', // CPH2449 (OnePlus, Android 16)
   ];
 
   // TODO: Replace placeholder IDs with your real AdMob ad unit IDs from admob.google.com
