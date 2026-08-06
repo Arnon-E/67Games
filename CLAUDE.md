@@ -61,7 +61,7 @@ Platform: Android (primary) + iOS. Languages: English, Hebrew (RTL), Russian.
 | Backend | Firebase (Auth, Firestore, Remote Config) | Core 3.6.0 |
 | Auth | Google Sign-In + Firebase Auth | 5.3.1 |
 | Ads | Google Mobile Ads (AdMob) | 5.3.0 |
-| IAP | RevenueCat (purchases_flutter) | 8.0.0 |
+| IAP | RevenueCat (purchases_flutter) | 10.8.0 (Play Billing Library 9.x) |
 | Storage | SharedPreferences | 2.3.2 |
 | Audio | audioplayers + flutter_tts | 6.1.0 / 4.2.0 |
 | Haptics | haptic_feedback | 0.5.1+1 |
