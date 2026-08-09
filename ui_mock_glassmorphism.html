@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stop at 6.7 – Glassmorphism UI Mock</title>
+<style>
+  /* ── Reset & Base ─────────────────────────────────────────── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: #07070F;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── Space Background ─────────────────────────────────────── */
+  .bg {
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 20% 10%,  #2D0A5E55 0%, transparent 60%),
+      radial-gradient(ellipse 60% 50% at 80% 90%,  #180828AA 0%, transparent 55%),
+      radial-gradient(ellipse 100% 80% at 50% 50%, #0D0520   0%, #07070F    100%);
+    z-index: 0;
+  }
+  /* starfield */
+  .bg::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      radial-gradient(1px 1px at  8%  14%, #ffffff55 0%, transparent 100%),
+      radial-gradient(1px 1px at 22%  62%, #ffffff44 0%, transparent 100%),
+      radial-gradient(1px 1px at 41%   7%, #ffffff66 0%, transparent 100%),
+      radial-gradient(1px 1px at 63%  45%, #ffffff33 0%, transparent 100%),
+      radial-gradient(1px 1px at 78%  19%, #ffffff55 0%, transparent 100%),
+      radial-gradient(1px 1px at 91%  72%, #ffffff44 0%, transparent 100%),
+      radial-gradient(1px 1px at 15%  88%, #ffffff33 0%, transparent 100%),
+      radial-gradient(1px 1px at 55%  93%, #ffffff55 0%, transparent 100%),
+      radial-gradient(2px 2px at 33%  38%, #ffffff22 0%, transparent 100%),
+      radial-gradient(2px 2px at 70%   5%, #ffffff33 0%, transparent 100%);
+  }
+
+  /* ── Page Layout ──────────────────────────────────────────── */
+  .page-title {
+    position: relative;
+    z-index: 1;
+    color: rgba(255,255,255,0.35);
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin: 28px 0 20px;
+    direction: ltr;
+  }
+
+  .phones-row {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    gap: 40px;
+    align-items: flex-start;
+    padding: 0 24px 60px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  /* ── Phone Shell ──────────────────────────────────────────── */
+  .phone {
+    width: 320px;
+    border-radius: 44px;
+    background: #111128;
+    border: 1px solid rgba(255,255,255,0.12);
+    box-shadow:
+      0 0 0 3px #07070F,
+      0 0 0 4px rgba(255,255,255,0.06),
+      0 30px 80px rgba(0,0,0,0.7),
+      0 0 60px rgba(45,10,94,0.4);
+    overflow: hidden;
+    position: relative;
+  }
+  .phone-notch {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90px;
+    height: 24px;
+    background: #07070F;
+    border-radius: 0 0 18px 18px;
+    z-index: 10;
+  }
+  .phone-screen {
+    padding-top: 28px;
+    min-height: 640px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── Status Bar ───────────────────────────────────────────── */
+  .status-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 20px 4px;
+    direction: ltr;
+  }
+  .status-bar .time { font-size: 11px; color: rgba(255,255,255,0.85); font-weight: 600; }
+  .status-icons { display: flex; gap: 4px; align-items: center; }
+  .status-icons svg { opacity: 0.8; }
+
+  /* ── Screen Header ────────────────────────────────────────── */
+  .screen-header {
+    display: flex;
+    align-items: center;
+    padding: 10px 18px 8px;
+    direction: rtl;
+  }
+  .back-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.10);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .back-btn svg { opacity: 0.7; }
+  .screen-title {
+    flex: 1;
+    text-align: center;
+    font-size: 18px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: -0.3px;
+  }
+  .header-spacer { width: 34px; }
+
+  /* ── Mode Cards List ──────────────────────────────────────── */
+  .mode-list {
+    padding: 4px 14px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    direction: rtl;
+  }
+
+  /* ── Glassmorphism Card ───────────────────────────────────── */
+  .mode-card {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 14px;
+    border-radius: 18px;
+    background: rgba(255,255,255,0.055);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255,255,255,0.10);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.08),
+      0 4px 24px rgba(0,0,0,0.35);
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .mode-card:hover {
+    transform: translateY(-1px);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.12),
+      0 6px 32px rgba(0,0,0,0.45),
+      0 0 0 1px rgba(255,107,53,0.25);
+  }
+  /* Glow accent on left edge */
+  .mode-card::before {
+    content: '';
+    position: absolute;
+    top: 0; right: 0; bottom: 0;
+    width: 3px;
+    border-radius: 0 18px 18px 0;
+    background: linear-gradient(180deg, rgba(255,107,53,0) 0%, rgba(255,107,53,0.6) 50%, rgba(255,107,53,0) 100%);
+  }
+  .mode-card.fortune::before {
+    background: linear-gradient(180deg, rgba(255,215,0,0) 0%, rgba(255,215,0,0.7) 50%, rgba(255,215,0,0) 100%);
+  }
+  /* Subtle inner shimmer */
+  .mode-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.04) 0%, transparent 60%);
+    pointer-events: none;
+    border-radius: inherit;
+  }
+
+  /* ── Card Icon ────────────────────────────────────────────── */
+  .card-icon {
+    flex-shrink: 0;
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+    position: relative;
+    z-index: 1;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.10);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
+  }
+  .card-icon.classic  { background: rgba(255,107,53,0.12); border-color: rgba(255,107,53,0.25); }
+  .card-icon.blind    { background: rgba(180,100,255,0.12); border-color: rgba(180,100,255,0.25); }
+  .card-icon.surge    { background: rgba(0,221,255,0.10);  border-color: rgba(0,221,255,0.20); }
+  .card-icon.fortune  { background: rgba(255,215,0,0.12);  border-color: rgba(255,215,0,0.28); }
+  .card-icon.dtap     { background: rgba(100,180,255,0.10); border-color: rgba(100,180,255,0.22); }
+
+  /* ── Card Body ────────────────────────────────────────────── */
+  .card-body {
+    flex: 1;
+    min-width: 0;
+    direction: rtl;
+    text-align: right;
+    position: relative;
+    z-index: 1;
+  }
+  .card-title-row {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    flex-direction: row-reverse;
+    justify-content: flex-end;
+  }
+  .card-name {
+    font-size: 16px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: -0.2px;
+  }
+  .hot-badge {
+    font-size: 9px;
+    font-weight: 800;
+    padding: 2px 6px;
+    border-radius: 6px;
+    background: rgba(255,50,50,0.14);
+    border: 1px solid rgba(255,60,60,0.45);
+    color: #ff5555;
+    letter-spacing: 0.5px;
+    direction: ltr;
+  }
+  .card-desc {
+    font-size: 11.5px;
+    color: rgba(191,195,217,0.75);
+    margin-top: 3px;
+    line-height: 1.4;
+  }
+  .card-target {
+    font-size: 11px;
+    font-weight: 600;
+    color: #FF6B35;
+    margin-top: 5px;
+    direction: ltr;
+    text-align: right;
+  }
+  .card-target.gold { color: #FFD700; }
+
+  /* ── Card Chevron ─────────────────────────────────────────── */
+  .card-chevron {
+    flex-shrink: 0;
+    opacity: 0.3;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Fortune coin badge */
+  .coin-badge {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 8px;
+    background: rgba(255,215,0,0.10);
+    border: 1px solid rgba(255,215,0,0.32);
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 700;
+    color: #FFD700;
+    direction: ltr;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ═══════════════════════════════════════════════════════════ */
+  /* ── PLAYING SCREEN ─────────────────────────────────────── */
+  /* ═══════════════════════════════════════════════════════════ */
+  .playing-screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+    padding-bottom: 28px;
+  }
+
+  .play-header {
+    width: 100%;
+    padding: 6px 18px 0;
+    display: flex;
+    align-items: center;
+    direction: rtl;
+  }
+  .play-header-title {
+    flex: 1;
+    text-align: center;
+    font-size: 15px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.85);
+    letter-spacing: -0.2px;
+  }
+  .play-header-title span {
+    color: #FFD700;
+    font-weight: 800;
+  }
+
+  /* ── Neon Timer Ring ──────────────────────────────────────── */
+  .timer-wrapper {
+    position: relative;
+    width: 250px;
+    height: 250px;
+    margin: 20px auto 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .timer-ring-svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    transform: rotate(-100deg);
+    /* filter: drop-shadow(0 0 10px rgba(255,215,0,0.5)); */
+  }
+  .timer-glow-bg {
+    position: absolute;
+    inset: -20px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,200,0,0.12) 0%, transparent 65%);
+    animation: pulse-glow 1.8s ease-in-out infinite alternate;
+  }
+  @keyframes pulse-glow {
+    from { opacity: 0.6; transform: scale(0.97); }
+    to   { opacity: 1.0; transform: scale(1.03); }
+  }
+
+  .timer-text-center {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    direction: ltr;
+  }
+  .timer-value {
+    font-size: 52px;
+    font-weight: 800;
+    color: #FFE033;
+    letter-spacing: -2px;
+    text-shadow:
+      0 0  8px rgba(255,210,0,0.9),
+      0 0 20px rgba(255,180,0,0.6),
+      0 0 40px rgba(255,140,0,0.35);
+    line-height: 1;
+    direction: ltr;
+  }
+  .timer-sub {
+    font-size: 12px;
+    color: rgba(191,195,217,0.6);
+    margin-top: 4px;
+    letter-spacing: 0.5px;
+  }
+
+  /* ── SVG Ring Segments ────────────────────────────────────── */
+  .ring-track {
+    fill: none;
+    stroke: rgba(255,255,255,0.07);
+    stroke-width: 10;
+  }
+  .ring-progress-outer {
+    fill: none;
+    stroke-width: 10;
+    stroke-linecap: round;
+    stroke: url(#gradOuter);
+    filter: drop-shadow(0 0 6px rgba(255,200,0,0.7));
+  }
+  .ring-progress-inner {
+    fill: none;
+    stroke-width: 5;
+    stroke-linecap: round;
+    stroke: url(#gradInner);
+    filter: drop-shadow(0 0 4px rgba(0,221,255,0.5));
+  }
+  .ring-hotspot {
+    fill: none;
+    stroke: rgba(255,255,255,0.95);
+    stroke-width: 9;
+    stroke-linecap: round;
+    filter: drop-shadow(0 0 6px #fff);
+  }
+
+  /* ── Tick marks ───────────────────────────────────────────── */
+  .tick { stroke: rgba(255,215,0,0.45); stroke-width: 2; stroke-linecap: round; }
+
+  /* ── STOP Button ──────────────────────────────────────────── */
+  .stop-btn-wrapper {
+    position: relative;
+    width: 130px;
+    height: 130px;
+    margin: 18px auto 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    animation: btn-breathe 1.6s ease-in-out infinite alternate;
+  }
+  @keyframes btn-breathe {
+    from { filter: drop-shadow(0 0 14px rgba(255,80,20,0.55)) drop-shadow(0 0 32px rgba(255,60,0,0.3)); }
+    to   { filter: drop-shadow(0 0 22px rgba(255,100,30,0.75)) drop-shadow(0 0 50px rgba(255,80,0,0.45)); }
+  }
+
+  .stop-btn-outer-glow {
+    position: absolute;
+    inset: -14px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,80,20,0.3) 0%, transparent 70%);
+  }
+  .stop-btn-body {
+    width: 118px;
+    height: 118px;
+    border-radius: 50%;
+    position: relative;
+    background:
+      radial-gradient(circle at 38% 32%, rgba(255,255,255,0.30) 0%, transparent 40%),
+      radial-gradient(circle at 55% 55%, #FF4500 10%, #C02800 55%, #7A1800 100%);
+    box-shadow:
+      inset 0 3px 8px rgba(255,180,100,0.3),
+      inset 0 -4px 12px rgba(0,0,0,0.5),
+      0 6px 0 #5A1000,
+      0 8px 16px rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .stop-btn-body::before {
+    content: '';
+    position: absolute;
+    top: 10px; left: 14px;
+    width: 42px; height: 22px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.18);
+    transform: rotate(-15deg);
+    filter: blur(4px);
+  }
+  .stop-label {
+    font-size: 20px;
+    font-weight: 900;
+    color: #fff;
+    letter-spacing: 2.5px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.6);
+    position: relative;
+    z-index: 1;
+    direction: ltr;
+  }
+
+  /* ── Legend / Labels ──────────────────────────────────────── */
+  .screen-label {
+    position: relative;
+    z-index: 1;
+    color: rgba(255,255,255,0.2);
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    text-align: center;
+    margin-top: 14px;
+    direction: ltr;
+  }
+
+  /* ── Responsive ───────────────────────────────────────────── */
+  @media (max-width: 720px) {
+    .phones-row { gap: 20px; }
+    .phone { width: 290px; }
+  }
+  @media (max-width: 400px) {
+    .phone { width: 100%; border-radius: 0; }
+  }
+</style>
+</head>
+<body>
+<div class="bg"></div>
+
+<p class="page-title">UI Mock — Glassmorphism Redesign</p>
+
+<div class="phones-row">
+
+  <!-- ══════════════════════════════════════════════ -->
+  <!--  PHONE 1 — MODE SELECT SCREEN                 -->
+  <!-- ══════════════════════════════════════════════ -->
+  <div>
+    <div class="phone">
+      <div class="phone-notch"></div>
+      <div class="phone-screen">
+
+        <!-- Status bar -->
+        <div class="status-bar">
+          <span class="time">21:06</span>
+          <div class="status-icons">
+            <!-- Signal -->
+            <svg width="14" height="11" viewBox="0 0 14 11" fill="none">
+              <rect x="0"  y="8" width="2" height="3" rx="0.5" fill="white"/>
+              <rect x="3"  y="6" width="2" height="5" rx="0.5" fill="white"/>
+              <rect x="6"  y="4" width="2" height="7" rx="0.5" fill="white"/>
+              <rect x="9"  y="2" width="2" height="9" rx="0.5" fill="white"/>
+              <rect x="12" y="0" width="2" height="11" rx="0.5" fill="white" opacity="0.3"/>
+            </svg>
+            <!-- Wifi -->
+            <svg width="14" height="11" viewBox="0 0 14 11" fill="white">
+              <path d="M7 9.5a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+              <path d="M3.5 6.5C4.6 5.4 6 4.8 7 4.8s2.4.6 3.5 1.7" stroke="white" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+              <path d="M1 4C2.8 2.2 4.9 1.2 7 1.2s4.2 1 6 2.8" stroke="white" stroke-width="1.4" fill="none" stroke-linecap="round" opacity="0.5"/>
+            </svg>
+            <!-- Battery -->
+            <svg width="20" height="11" viewBox="0 0 20 11" fill="none">
+              <rect x="0" y="1" width="17" height="9" rx="2" stroke="white" stroke-width="1"/>
+              <rect x="1" y="2" width="11" height="7" rx="1" fill="white"/>
+              <path d="M18 3.5v4" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Header -->
+        <div class="screen-header">
+          <div class="back-btn">
+            <svg width="8" height="14" viewBox="0 0 8 14" fill="none">
+              <path d="M6.5 1L1 7l5.5 6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="screen-title">בחר מצב</div>
+          <div class="header-spacer"></div>
+        </div>
+
+        <!-- Mode cards -->
+        <div class="mode-list">
+
+          <!-- Classic -->
+          <div class="mode-card">
+            <div class="card-icon classic">⏱️</div>
+            <div class="card-body">
+              <div class="card-title-row">
+                <span class="card-name">קלאסי</span>
+              </div>
+              <div class="card-desc">עצור את הטיימר בדיוק על 6.7 שניות</div>
+              <div class="card-target">יעד: 6.7000s</div>
+            </div>
+            <div class="card-chevron">
+              <svg width="7" height="12" viewBox="0 0 7 12" fill="none">
+                <path d="M1 1l5 5-5 5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+          </div>
+
+          <!-- Blind -->
+          <div class="mode-card">
+            <div class="card-icon blind">🚫👁️</div>
+            <div class="card-body">
+              <div class="card-title-row">
+                <span class="card-name">עיוור</span>
+              </div>
+              <div class="card-desc">הטיימר מוסתר אחרי 3 שניות – האינסטינקטים שלך</div>
+              <div class="card-target">יעד: 6.7000s</div>
+            </div>
+            <div class="card-chevron">
+              <svg width="7" height="12" viewBox="0 0 7 12" fill="none">
+                <path d="M1 1l5 5-5 5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+          </div>
+
+          <!-- Surge / Acceleration -->
+          <div class="mode-card">
+            <div class="card-icon surge">🚀</div>
+            <div class="card-body">
+              <div class="card-title-row">
+                <span class="card-name">האצה</span>
+              </div>
+              <div class="card-desc">הטיימר מאיץ – כמה זמן תחזיק?</div>
+              <div class="card-target">יעד: 6.7000s</div>
+            </div>
+            <div class="card-chevron">
+              <svg width="7" height="12" viewBox="0 0 7 12" fill="none">
+                <path d="M1 1l5 5-5 5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+          </div>
+
+          <!-- Fortune / Roulette -->
+          <div class="mode-card fortune">
+            <div class="card-icon fortune">🎰</div>
+            <div class="card-body">
+              <div class="card-title-row">
+                <span class="card-name">רולטה</span>
+                <span class="hot-badge">🔥 HOT</span>
+              </div>
+              <div class="card-desc">סובב את הגלגל – הגורל בוחר מצב ומכפיל</div>
+              <div class="card-target gold">סובב לגלויה! 🎡</div>
+            </div>
+            <div class="coin-badge">
+              <span>🪙</span>
+              <span>500</span>
+            </div>
+          </div>
+
+          <!-- Double Tap -->
+          <div class="mode-card">
+            <div class="card-icon dtap">👆👆</div>
+            <div class="card-body">
+              <div class="card-title-row">
+                <span class="card-name">הקשה כפולה</span>
+              </div>
+              <div class="card-desc">הקש ב-3.35 שניות ואז עצור ב-6.7 שניות – בדיוק</div>
+              <div class="card-target">יעד: 6.7000s</div>
+            </div>
+            <div class="card-chevron">
+              <svg width="7" height="12" viewBox="0 0 7 12" fill="none">
+                <path d="M1 1l5 5-5 5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+          </div>
+
+        </div><!-- /mode-list -->
+      </div><!-- /phone-screen -->
+    </div><!-- /phone -->
+    <p class="screen-label">Mode Select Screen</p>
+  </div>
+
+  <!-- ══════════════════════════════════════════════ -->
+  <!--  PHONE 2 — PLAYING SCREEN                     -->
+  <!-- ══════════════════════════════════════════════ -->
+  <div>
+    <div class="phone">
+      <div class="phone-notch"></div>
+      <div class="phone-screen">
+
+        <!-- Status bar -->
+        <div class="status-bar">
+          <span class="time">21:06</span>
+          <div class="status-icons">
+            <svg width="14" height="11" viewBox="0 0 14 11" fill="none">
+              <rect x="0"  y="8" width="2" height="3" rx="0.5" fill="white"/>
+              <rect x="3"  y="6" width="2" height="5" rx="0.5" fill="white"/>
+              <rect x="6"  y="4" width="2" height="7" rx="0.5" fill="white"/>
+              <rect x="9"  y="2" width="2" height="9" rx="0.5" fill="white"/>
+              <rect x="12" y="0" width="2" height="11" rx="0.5" fill="white" opacity="0.3"/>
+            </svg>
+            <svg width="14" height="11" viewBox="0 0 14 11" fill="white">
+              <path d="M7 9.5a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+              <path d="M3.5 6.5C4.6 5.4 6 4.8 7 4.8s2.4.6 3.5 1.7" stroke="white" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+              <path d="M1 4C2.8 2.2 4.9 1.2 7 1.2s4.2 1 6 2.8" stroke="white" stroke-width="1.4" fill="none" stroke-linecap="round" opacity="0.5"/>
+            </svg>
+            <svg width="20" height="11" viewBox="0 0 20 11" fill="none">
+              <rect x="0" y="1" width="17" height="9" rx="2" stroke="white" stroke-width="1"/>
+              <rect x="1" y="2" width="11" height="7" rx="1" fill="white"/>
+              <path d="M18 3.5v4" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Play header -->
+        <div class="play-header">
+          <div class="back-btn">
+            <svg width="8" height="14" viewBox="0 0 8 14" fill="none">
+              <path d="M6.5 1L1 7l5.5 6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="play-header-title">
+            עצור על <span>6.7000s</span>
+          </div>
+          <div class="header-spacer"></div>
+        </div>
+
+        <!-- Playing content -->
+        <div class="playing-screen">
+
+          <!-- Neon Timer Ring -->
+          <div class="timer-wrapper">
+            <div class="timer-glow-bg"></div>
+
+            <svg class="timer-ring-svg" viewBox="0 0 250 250">
+              <defs>
+                <!-- Outer gold-to-cyan gradient -->
+                <linearGradient id="gradOuter" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%"   stop-color="#FFD700" stop-opacity="0"/>
+                  <stop offset="25%"  stop-color="#FFD700"/>
+                  <stop offset="60%"  stop-color="#FF9B00"/>
+                  <stop offset="85%"  stop-color="#FF6B35" stop-opacity="0.7"/>
+                  <stop offset="100%" stop-color="#FF6B35" stop-opacity="0"/>
+                </linearGradient>
+                <!-- Inner cyan gradient -->
+                <linearGradient id="gradInner" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%"   stop-color="#00DDFF" stop-opacity="0"/>
+                  <stop offset="30%"  stop-color="#00DDFF"/>
+                  <stop offset="70%"  stop-color="#7B9FFF" stop-opacity="0.7"/>
+                  <stop offset="100%" stop-color="#7B9FFF" stop-opacity="0"/>
+                </linearGradient>
+              </defs>
+
+              <!-- Track (full circle) -->
+              <circle class="ring-track"  cx="125" cy="125" r="108"/>
+              <!-- Inner track -->
+              <circle class="ring-track" style="stroke:rgba(255,255,255,0.04)" cx="125" cy="125" r="94" stroke-width="5"/>
+
+              <!-- Outer progress arc (270° sweep) -->
+              <!-- r=108, circumference = 2π*108 ≈ 678.6 -->
+              <!-- 270° = 75% of 678.6 ≈ 509  -->
+              <circle
+                class="ring-progress-outer"
+                cx="125" cy="125" r="108"
+                stroke-dasharray="509 678.6"
+                stroke-dashoffset="0"
+              />
+
+              <!-- Bright hotspot at top-right -->
+              <!-- small arc segment ≈ 5% = 34 px -->
+              <circle
+                class="ring-hotspot"
+                cx="125" cy="125" r="108"
+                stroke-dasharray="22 678.6"
+                stroke-dashoffset="-160"
+                stroke-width="9"
+              />
+
+              <!-- Inner cyan arc (bottom, 130° sweep ≈ 244px of 591 circ) -->
+              <!-- r=94, circumference ≈ 590.7 -->
+              <circle
+                class="ring-progress-inner"
+                cx="125" cy="125" r="94"
+                stroke-dasharray="244 590.7"
+                stroke-dashoffset="-50"
+              />
+
+              <!-- Tick marks (8 ticks in bottom-right quadrant) -->
+              <g class="tick">
+                <line x1="219" y1="148" x2="228" y2="154"/>
+                <line x1="216" y1="160" x2="225" y2="168"/>
+                <line x1="210" y1="172" x2="218" y2="181"/>
+                <line x1="201" y1="182" x2="207" y2="192"/>
+                <line x1="190" y1="190" x2="195" y2="201"/>
+                <line x1="177" y1="196" x2="180" y2="207"/>
+                <line x1="163" y1="200" x2="164" y2="211"/>
+                <line x1="148" y1="201" x2="148" y2="212"/>
+              </g>
+            </svg>
+
+            <!-- Timer text -->
+            <div class="timer-text-center">
+              <div class="timer-value">1.0560</div>
+              <div class="timer-sub">יעד: 6.7000s</div>
+            </div>
+          </div>
+
+          <!-- STOP Button -->
+          <div class="stop-btn-wrapper">
+            <div class="stop-btn-outer-glow"></div>
+            <div class="stop-btn-body">
+              <span class="stop-label">STOP</span>
+            </div>
+          </div>
+
+        </div><!-- /playing-screen -->
+      </div><!-- /phone-screen -->
+    </div><!-- /phone -->
+    <p class="screen-label">Playing Screen</p>
+  </div>
+
+</div><!-- /phones-row -->
+
+</body>
+</html>
